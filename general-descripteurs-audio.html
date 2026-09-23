@@ -1,0 +1,3380 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Descripteurs audio</title>
+<style>
+/* ---------------------------------------------------------------------------
+   Atelier — shared stylesheet for the course web tools.
+
+   Themes: light / dark / auto. `data-theme` on <html> wins; with no attribute the
+   OS preference decides. Every colour pair below is checked for WCAG AA contrast
+   (4.5:1 body text, 3:1 large text and UI borders).
+
+   Sizes are in rem so the text-size control scales the whole interface.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --ui-scale: 1;
+
+  --bg:        #eef0f4;
+  --panel:     #ffffff;
+  --sunken:    #f6f7f9;
+  --ink:       #12161c;   /* 16.9:1 on --panel */
+  --ink-soft:  #4d5764;   /*  7.6:1 on --panel */
+  --line:      #c8cdd6;
+  --line-firm: #9aa3b1;
+  --accent:    #14549e;   /*  7.1:1 on --panel */
+  --accent-ink:#ffffff;
+  --accent-bg: #e4ecf7;
+  --ok:        #12664a;   /*  6.4:1 */
+  --warn:      #7a5200;   /*  6.2:1 */
+  --bad:       #a41f1a;   /*  6.6:1 */
+  --focus:     #14549e;
+
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #0e1116;
+    --panel:     #171b22;
+    --sunken:    #10141a;
+    --ink:       #e8ecf2;   /* 13.8:1 on --panel */
+    --ink-soft:  #a3adbb;   /*  6.9:1 on --panel */
+    --line:      #2b323d;
+    --line-firm: #4a545f;
+    --accent:    #7fb4ff;   /*  7.6:1 on --panel */
+    --accent-ink:#0e1116;
+    --accent-bg: #1b2634;
+    --ok:        #6cc79c;
+    --warn:      #e0b354;
+    --bad:       #ff9086;
+    --focus:     #7fb4ff;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:        #0e1116;
+  --panel:     #171b22;
+  --sunken:    #10141a;
+  --ink:       #e8ecf2;
+  --ink-soft:  #a3adbb;
+  --line:      #2b323d;
+  --line-firm: #4a545f;
+  --accent:    #7fb4ff;
+  --accent-ink:#0e1116;
+  --accent-bg: #1b2634;
+  --ok:        #6cc79c;
+  --warn:      #e0b354;
+  --bad:       #ff9086;
+  --focus:     #7fb4ff;
+}
+
+/* Respect a user asking the OS for more contrast. */
+@media (prefers-contrast: more) {
+  :root { --line: var(--line-firm); --ink-soft: var(--ink); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+html { font-size: calc(100% * var(--ui-scale)); }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  /* Column layout so the console sits on the bottom edge even when the page is
+     shorter than the window; `position: sticky` alone only pins it once there is
+     something to scroll. */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main { flex: 1 0 auto; }
+
+/* Visible focus for every interactive element, keyboard or not. */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.at-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  padding: 10px 16px;
+  z-index: 100;
+  border-radius: 0 0 var(--radius) 0;
+}
+.at-skip:focus { left: 0; }
+
+.at-visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip: rect(0 0 0 0); clip-path: inset(50%);
+  overflow: hidden; white-space: nowrap;
+}
+
+/* --- header --------------------------------------------------------------- */
+
+.at-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.at-home {
+  flex: none;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.at-home:hover { background: var(--accent-bg); }
+
+.at-titles { flex: 1 1 14rem; min-width: 0; }
+.at-titles h1 { margin: 0; font-size: 1.05rem; font-weight: 650; line-height: 1.3; }
+.at-titles p  { margin: 0; font-size: 0.8rem; color: var(--ink-soft); line-height: 1.35; }
+
+.at-tools { flex: none; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+
+.at-seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.at-seg button {
+  border: 0;
+  border-radius: 0;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  background: transparent;
+  color: var(--ink-soft);
+  min-width: 2.4rem;
+}
+.at-seg button + button { border-left: 1px solid var(--line); }
+.at-seg button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 650;
+}
+.at-seg button:hover:not([aria-pressed="true"]) { background: var(--accent-bg); color: var(--ink); }
+
+/* --- layout --------------------------------------------------------------- */
+
+main { width: 100%; max-width: 68rem; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
+
+.at-lede { font-size: 1.02rem; color: var(--ink-soft); margin: 0 0 1.5rem; max-width: 68ch; }
+.at-lede strong { color: var(--ink); }
+
+section.at-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  margin: 0 0 1.35rem;
+}
+section.at-panel > h2 { margin: 0 0 0.25rem; font-size: 1rem; line-height: 1.35; }
+section.at-panel > .at-hint {
+  margin: 0 0 0.85rem; font-size: 0.88rem; color: var(--ink-soft); max-width: 70ch;
+}
+
+/* --- controls ------------------------------------------------------------- */
+
+.at-controls { display: flex; flex-wrap: wrap; gap: 0.7rem 0.9rem; align-items: flex-end;
+               margin-bottom: 0.9rem; }
+.at-field { display: flex; flex-direction: column; gap: 0.25rem; }
+.at-field > label, .at-fieldset > legend {
+  font-size: 0.75rem; color: var(--ink-soft); text-transform: uppercase;
+  letter-spacing: 0.05em; font-weight: 600;
+}
+
+button, select, input[type="number"], input[type="text"] {
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: var(--sunken);
+  border: 1px solid var(--line-firm);
+  border-radius: var(--radius);
+  padding: 0.45rem 0.7rem;
+  min-height: 2.25rem;
+}
+button { cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.at-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button.at-primary:hover:not(:disabled) { filter: brightness(1.12); color: var(--accent-ink); }
+
+.at-fieldset { border: 1px solid var(--line); border-radius: var(--radius); padding: 0.6rem 0.8rem; }
+.at-checks { display: grid; gap: 0.2rem 1rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+.at-check { display: flex; align-items: baseline; gap: 0.45rem; font-size: 0.88rem; }
+.at-check input { width: 1.05rem; height: 1.05rem; accent-color: var(--accent); flex: none; }
+.at-check code { font: 0.82rem var(--mono); color: var(--ink-soft); }
+
+/* --- drop zone ------------------------------------------------------------ */
+
+.at-drop {
+  display: block;
+  width: 100%;
+  border: 2px dashed var(--line-firm);
+  border-radius: var(--radius);
+  padding: 1.35rem;
+  text-align: center;
+  color: var(--ink-soft);
+  background: var(--sunken);
+  font-size: 0.92rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+.at-drop:hover { border-color: var(--accent); color: var(--ink); }
+.at-drop.at-over { border-color: var(--accent); background: var(--accent-bg); color: var(--ink); }
+.at-drop small { display: block; margin-top: 0.3rem; font-size: 0.8rem; }
+
+/* --- canvases ------------------------------------------------------------- */
+
+.at-canvas-wrap { overflow-x: auto; margin: 0 0 0.4rem; }
+
+/* The stack is created by Atelier.transport when a canvas gets a playhead: the
+   overlay must scroll with the canvas, so it is positioned against a box the same
+   width as the canvas rather than against the scrolling wrapper. */
+.at-canvas-stack { position: relative; width: 100%; min-width: 32rem; }
+.at-playhead {
+  position: absolute;
+  width: 2px;
+  background: var(--bad);
+  pointer-events: none;
+  display: none;
+  z-index: 2;
+}
+canvas.at-scrubbable { cursor: ew-resize; touch-action: none; }
+
+/* --- transport ------------------------------------------------------------ */
+
+.at-transport {
+  display: flex; align-items: center; gap: 0.5rem 0.7rem; flex-wrap: wrap;
+  margin: 0.6rem 0 0.7rem;
+}
+.at-transport input[type="range"] {
+  flex: 1 1 12rem; min-width: 7rem; accent-color: var(--accent);
+}
+.at-transport button { min-width: 5.5rem; }
+.at-time { font: 0.82rem var(--mono); color: var(--ink-soft); white-space: nowrap; }
+canvas.at-canvas {
+  display: block;
+  width: 100%;
+  min-width: 32rem;
+  height: auto;
+  background: var(--sunken);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.at-caption { font-size: 0.82rem; color: var(--ink-soft); margin: 0 0 0.35rem; }
+
+/* --- tables --------------------------------------------------------------- */
+
+.at-table-wrap { overflow: auto; max-height: 22rem; border: 1px solid var(--line); border-radius: 4px; }
+table.at-table { border-collapse: collapse; width: 100%; font: 0.82rem var(--mono); }
+table.at-table caption { text-align: left; padding: 0.4rem 0.6rem; color: var(--ink-soft);
+                         font: 0.8rem var(--sans); }
+table.at-table th, table.at-table td { padding: 0.3rem 0.65rem; text-align: right; white-space: nowrap; }
+table.at-table th { position: sticky; top: 0; background: var(--panel); border-bottom: 1px solid var(--line-firm); }
+table.at-table th button {
+  all: unset; cursor: pointer; font: inherit; font-weight: 650; color: var(--ink);
+  padding: 0.15rem 0.2rem;
+}
+table.at-table th button:hover { color: var(--accent); text-decoration: underline; }
+table.at-table th:first-child, table.at-table td:first-child { text-align: left; }
+table.at-table tbody tr:nth-child(even) { background: var(--sunken); }
+
+/* --- status / progress ---------------------------------------------------- */
+
+.at-status { font-size: 0.87rem; color: var(--ink-soft); min-height: 1.5em; margin: 0.5rem 0 0; }
+.at-status.ok  { color: var(--ok); }
+.at-status.bad { color: var(--bad); }
+.at-status::before { font-weight: 700; margin-right: 0.4rem; }
+.at-status.ok::before  { content: "OK"; }
+.at-status.bad::before { content: "!"; }
+
+progress { width: 100%; height: 0.5rem; accent-color: var(--accent); }
+progress[hidden] { display: none; }
+
+/* --- console -------------------------------------------------------------- */
+
+.at-console {
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+  background: var(--panel);
+  border-top: 1px solid var(--line-firm);
+}
+.at-console-bar {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.35rem 1.25rem;
+}
+.at-console-bar h2 { margin: 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em;
+                     color: var(--ink-soft); font-weight: 650; }
+.at-console-count { font: 0.78rem var(--mono); color: var(--ink-soft); }
+.at-console-count.bad { color: var(--bad); font-weight: 700; }
+.at-console-bar .at-spacer { flex: 1; }
+.at-console-bar button { padding: 0.25rem 0.55rem; font-size: 0.78rem; min-height: 0; }
+
+.at-console-body {
+  max-height: 13rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.5rem 1.25rem 0.8rem;
+  border-top: 1px solid var(--line);
+  background: var(--sunken);
+  font: 0.82rem/1.5 var(--mono);
+  list-style: none;
+}
+.at-console-body[hidden] { display: none; }
+.at-console-body li { display: flex; gap: 0.6rem; padding: 0.08rem 0; }
+.at-console-body .at-time { color: var(--ink-soft); flex: none; }
+.at-console-body .at-lvl { flex: none; font-weight: 700; min-width: 3.6rem; }
+.at-console-body .at-lvl.info { color: var(--ink-soft); }
+.at-console-body .at-lvl.ok   { color: var(--ok); }
+.at-console-body .at-lvl.warn { color: var(--warn); }
+.at-console-body .at-lvl.err  { color: var(--bad); }
+.at-console-body .at-msg { white-space: pre-wrap; word-break: break-word; }
+
+/* --- homepage cards ------------------------------------------------------- */
+
+.at-grid { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+a.at-card {
+  display: block; padding: 1rem 1.1rem;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  text-decoration: none; color: inherit;
+}
+a.at-card:hover { border-color: var(--accent); background: var(--accent-bg); }
+a.at-card h3 { margin: 0 0 0.25rem; font-size: 0.98rem; color: var(--accent); }
+a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
+.at-card[aria-disabled="true"] { opacity: 0.6; }
+.at-tag {
+  display: inline-block; font: 0.72rem var(--mono); text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--ink-soft);
+  border: 1px solid var(--line-firm); border-radius: 3px;
+  padding: 0.05rem 0.4rem; margin-bottom: 0.5rem;
+}
+
+/* --- accessible mode ------------------------------------------------------
+   Opt-in, via the toggle in the header (data-a11y="on" on <html>). The baseline
+   theme is already AA-contrast, keyboard-operable and motion-safe; this goes
+   further — near-maximum contrast, bigger type, more space, underlined links,
+   larger hit targets — for anyone who wants it, without imposing it on everyone.
+   -------------------------------------------------------------------------- */
+
+:root[data-a11y="on"] {
+  --ui-scale: 1.15;
+  --bg:        #ffffff;
+  --panel:     #ffffff;
+  --sunken:    #eef1f5;
+  --ink:       #000000;   /* 21:1 */
+  --ink-soft:  #1f2530;   /* 15.3:1 — no low-contrast greys in this mode */
+  --line:      #5c6673;
+  --line-firm: #2b323d;
+  --accent:    #0a3d7a;   /* 10.5:1 */
+  --accent-ink:#ffffff;
+  --accent-bg: #dce7f5;
+  --ok:        #04513a;
+  --warn:      #5c3d00;
+  --bad:       #8a1410;
+  --focus:     #0a3d7a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-a11y="on"]:not([data-theme="light"]) {
+    --bg:        #000000;
+    --panel:     #0b0e13;
+    --sunken:    #141922;
+    --ink:       #ffffff;
+    --ink-soft:  #dfe5ee;
+    --line:      #7d8794;
+    --line-firm: #aeb7c4;
+    --accent:    #9ec8ff;   /* 11.4:1 on --panel */
+    --accent-ink:#000000;
+    --accent-bg: #16233a;
+    --ok:        #8fe0b8;
+    --warn:      #ffd479;
+    --bad:       #ffb0a8;
+    --focus:     #9ec8ff;
+  }
+}
+
+:root[data-a11y="on"][data-theme="dark"] {
+  --bg:        #000000;
+  --panel:     #0b0e13;
+  --sunken:    #141922;
+  --ink:       #ffffff;
+  --ink-soft:  #dfe5ee;
+  --line:      #7d8794;
+  --line-firm: #aeb7c4;
+  --accent:    #9ec8ff;
+  --accent-ink:#000000;
+  --accent-bg: #16233a;
+  --ok:        #8fe0b8;
+  --warn:      #ffd479;
+  --bad:       #ffb0a8;
+  --focus:     #9ec8ff;
+}
+
+:root[data-a11y="on"] body { line-height: 1.8; letter-spacing: 0.01em; }
+:root[data-a11y="on"] main { max-width: 60rem; }
+:root[data-a11y="on"] :focus-visible { outline-width: 4px; outline-offset: 3px; }
+:root[data-a11y="on"] a:not(.at-home):not(.at-card):not(.at-skip) { text-decoration: underline; }
+:root[data-a11y="on"] a.at-card { border-width: 2px; }
+:root[data-a11y="on"] button,
+:root[data-a11y="on"] select,
+:root[data-a11y="on"] input[type="number"],
+:root[data-a11y="on"] input[type="text"] { min-height: 2.75rem; border-width: 2px; }
+:root[data-a11y="on"] .at-seg button { min-height: 2.4rem; padding: 0.4rem 0.75rem; }
+:root[data-a11y="on"] .at-lede,
+:root[data-a11y="on"] section.at-panel > .at-hint,
+:root[data-a11y="on"] .at-caption,
+:root[data-a11y="on"] .at-status { color: var(--ink); }
+:root[data-a11y="on"] .at-check input { width: 1.3rem; height: 1.3rem; }
+:root[data-a11y="on"] section.at-panel { border-width: 2px; }
+:root[data-a11y="on"] .at-drop { border-width: 3px; }
+:root[data-a11y="on"] table.at-table tbody tr:nth-child(even) { background: var(--sunken); }
+:root[data-a11y="on"] canvas.at-canvas { border-width: 2px; }
+:root[data-a11y="on"] .at-playhead { width: 4px; }
+
+/* --- responsive / print --------------------------------------------------- */
+
+@media (max-width: 44rem) {
+  .at-header { padding: 0.6rem 0.9rem; }
+  .at-titles { flex-basis: 100%; order: 3; }
+  main { padding: 1.1rem 0.9rem 4rem; }
+  .at-console-bar, .at-console-body { padding-left: 0.9rem; padding-right: 0.9rem; }
+}
+
+@media print {
+  .at-header, .at-console, .at-controls, .at-drop, .at-skip, button { display: none !important; }
+  body { background: #fff; color: #000; }
+  section.at-panel { border: none; padding: 0; break-inside: avoid; }
+  .at-table-wrap { max-height: none; }
+}
+
+/* the accessible-mode toggle sits beside the segmented controls */
+.at-toggle {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+}
+.at-toggle:hover { background: var(--accent-bg); color: var(--ink); }
+.at-toggle[aria-pressed="true"] {
+  background: var(--accent); color: var(--accent-ink);
+  border-color: var(--accent); font-weight: 650;
+}
+.at-toggle::before { content: "◐ "; }
+
+/* --- collapsing the chrome -------------------------------------------------
+   The header and the console each shrink to a slim strip, so a projector or a
+   small laptop screen gives its height to the tool instead. Both states persist.
+   -------------------------------------------------------------------------- */
+
+.at-chev {
+  flex: none;
+  padding: 0.25rem 0.5rem;
+  min-height: 0;
+  line-height: 1;
+  font-size: 0.9rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+}
+.at-chev:hover { background: var(--accent-bg); color: var(--ink); }
+
+.at-header.at-min { padding-top: 0.2rem; padding-bottom: 0.2rem; }
+.at-header.at-min .at-tools { display: none; }
+.at-header.at-min .at-titles p { display: none; }
+.at-header.at-min .at-titles h1 { font-size: 0.88rem; font-weight: 600; }
+.at-header.at-min .at-home { padding: 0.2rem 0.5rem; font-size: 0.82rem; }
+
+.at-console.at-min .at-console-bar { padding-top: 0.2rem; padding-bottom: 0.2rem; }
+.at-console.at-min .at-only-open { display: none; }
+.at-console.at-min .at-console-bar h2 { font-size: 0.72rem; }
+</style>
+<style>
+  canvas.da-sketch { cursor: crosshair; touch-action: none; }
+  .da-legend { font-size: 0.8rem; color: var(--ink-soft); margin: 0.2rem 0 0.6rem; }
+  .da-legend b { color: var(--warn); }
+</style>
+</head>
+<body data-title="Descripteurs audio"
+      data-title-en="Audio descriptors"
+      data-subtitle="Ce que la machine mesure dans un son"
+      data-subtitle-en="What the machine measures in a sound"
+      data-card="Importer un son, dessiner la courbe que vous attendez, puis calculer ce que la machine mesure vraiment — intensité, hauteur, centroïde, planéité, MFCC."
+      data-card-en="Load a sound, sketch the curve you expect, then compute what the machine really measures — intensity, pitch, centroid, flatness, MFCC."
+      data-tag="Écoute et analyse"
+      data-tag-en="Listening and analysis"
+      data-home="index.html">
+
+<main>
+
+<p class="at-lede" data-i18n="lede"></p>
+
+<section class="at-panel" aria-labelledby="h-sound">
+  <h2 id="h-sound" data-i18n="s1.title"></h2>
+  <p class="at-hint" data-i18n="s1.hint"></p>
+
+  <div class="at-drop" id="drop" data-i18n-attr="aria-label:drop.aria">
+    <span data-i18n="drop.main"></span>
+    <small data-i18n="drop.formats"></small>
+  </div>
+  <input type="file" id="file" accept="audio/*" class="at-visually-hidden"
+         data-i18n-attr="aria-label:drop.aria">
+
+  <div class="at-controls" style="margin-top:0.9rem">
+    <div class="at-field">
+      <label for="demo" data-i18n="demo.label"></label>
+      <select id="demo">
+        <option value="" data-i18n="demo.none"></option>
+        <option value="sine" data-i18n="demo.sine"></option>
+        <option value="sweep" data-i18n="demo.sweep"></option>
+        <option value="noise" data-i18n="demo.noise"></option>
+        <option value="bell" data-i18n="demo.bell"></option>
+        <option value="pluck" data-i18n="demo.pluck"></option>
+        <option value="texture" data-i18n="demo.texture"></option>
+      </select>
+    </div>
+  </div>
+  <div id="transport"></div>
+
+  <p class="at-caption" id="wave-caption" data-i18n="caption.none"></p>
+  <div class="at-canvas-wrap"><canvas class="at-canvas" id="wave" role="img"></canvas></div>
+  <p class="at-status" id="load-status"></p>
+</section>
+
+<section class="at-panel" aria-labelledby="h-predict">
+  <h2 id="h-predict" data-i18n="sp.title"></h2>
+  <p class="at-hint" data-i18n="sp.hint"></p>
+  <div class="at-controls">
+    <div class="at-field">
+      <label for="predict-for" data-i18n="sp.for"></label>
+      <select id="predict-for">
+        <option value="rms" data-i18n="f.rms"></option>
+        <option value="spectralCentroid" data-i18n="f.spectralCentroid"></option>
+        <option value="pitch" data-i18n="f.pitch"></option>
+        <option value="spectralFlatness" data-i18n="f.spectralFlatness"></option>
+      </select>
+    </div>
+    <button type="button" id="predict-clear" data-i18n="sp.clear"></button>
+  </div>
+  <p class="da-legend" data-i18n="sp.legend"></p>
+  <div class="at-canvas-wrap"><canvas class="at-canvas da-sketch" id="sketch" role="img" data-i18n-attr="aria-label:sp.aria"></canvas></div>
+</section>
+
+<section class="at-panel" aria-labelledby="h-analysis">
+  <h2 id="h-analysis" data-i18n="s2.title"></h2>
+  <p class="at-hint" data-i18n="s2.hint"></p>
+
+  <div class="at-controls">
+    <div class="at-field">
+      <label for="fftsize" data-i18n="opt.frame"></label>
+      <select id="fftsize">
+        <option value="256">256</option>
+        <option value="512">512</option>
+        <option value="1024" selected>1024</option>
+        <option value="2048">2048</option>
+        <option value="4096">4096</option>
+      </select>
+    </div>
+    <div class="at-field">
+      <label for="overlap" data-i18n="opt.overlap"></label>
+      <select id="overlap">
+        <option value="0" data-i18n="opt.none"></option>
+        <option value="0.5" selected>50 %</option>
+        <option value="0.75">75 %</option>
+      </select>
+    </div>
+  </div>
+
+  <fieldset class="at-fieldset">
+    <legend data-i18n="opt.features"></legend>
+    <div class="at-checks" id="features"></div>
+  </fieldset>
+
+  <div class="at-controls" style="margin-top:0.9rem">
+    <button type="button" class="at-primary" id="run" disabled data-i18n="btn.run"></button>
+  </div>
+
+  <progress id="prog" max="1" value="0" hidden
+            data-i18n-attr="aria-label:prog.aria"></progress>
+  <p class="at-status" id="run-status"></p>
+</section>
+
+<section class="at-panel" id="results" hidden aria-labelledby="h-curves">
+  <h2 id="h-curves" data-i18n="s3.title"></h2>
+  <p class="at-hint" id="results-hint"></p>
+  <div id="curves"></div>
+  <div class="at-controls" id="mfcc-controls" hidden>
+    <div class="at-field">
+      <label for="mfcc-view" data-i18n="mfcc.view"></label>
+      <select id="mfcc-view">
+        <option value="heat" data-i18n="mfcc.viewHeat"></option>
+        <option value="curves" data-i18n="mfcc.viewCurves"></option>
+      </select>
+    </div>
+  </div>
+  <p class="at-hint" id="mfcc-explain" hidden data-i18n="mfcc.explain"></p>
+
+  <div class="at-controls" style="margin-top:1rem">
+    <button type="button" id="csv" data-i18n="btn.csv"></button>
+    <button type="button" id="png" data-i18n="btn.png"></button>
+  </div>
+
+  <h2 id="h-table" style="margin-top:1.4rem" data-i18n="s4.title"></h2>
+  <p class="at-hint" data-i18n="s4.hint"></p>
+  <div class="at-table-wrap">
+    <table class="at-table" id="table" aria-labelledby="h-table"></table>
+  </div>
+</section>
+
+</main>
+
+<script>
+!function(r,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(r="undefined"!=typeof globalThis?globalThis:r||self).Meyda=t()}(this,(function(){"use strict";function r(r,t,e){if(e||2===arguments.length)for(var a,n=0,o=t.length;n<o;n++)!a&&n in t||(a||(a=Array.prototype.slice.call(t,0,n)),a[n]=t[n]);return r.concat(a||Array.prototype.slice.call(t))}var t=Object.freeze({__proto__:null,blackman:function(r){for(var t=new Float32Array(r),e=2*Math.PI/(r-1),a=2*e,n=0;n<r/2;n++)t[n]=.42-.5*Math.cos(n*e)+.08*Math.cos(n*a);for(n=Math.ceil(r/2);n>0;n--)t[r-n]=t[n-1];return t},hamming:function(r){for(var t=new Float32Array(r),e=0;e<r;e++)t[e]=.54-.46*Math.cos(2*Math.PI*(e/r-1));return t},hanning:function(r){for(var t=new Float32Array(r),e=0;e<r;e++)t[e]=.5-.5*Math.cos(2*Math.PI*e/(r-1));return t},sine:function(r){for(var t=Math.PI/(r-1),e=new Float32Array(r),a=0;a<r;a++)e[a]=Math.sin(t*a);return e}}),e={};function a(r){for(;r%2==0&&r>1;)r/=2;return 1===r}function n(r,a){if("rect"!==a){if(""!==a&&a||(a="hanning"),e[a]||(e[a]={}),!e[a][r.length])try{e[a][r.length]=t[a](r.length)}catch(r){throw new Error("Invalid windowing function")}r=function(r,t){for(var e=[],a=0;a<Math.min(r.length,t.length);a++)e[a]=r[a]*t[a];return e}(r,e[a][r.length])}return r}function o(r,t,e){for(var a=new Float32Array(r),n=0;n<a.length;n++)a[n]=n*t/e,a[n]=13*Math.atan(a[n]/1315.8)+3.5*Math.atan(Math.pow(a[n]/7518,2));return a}function i(r){return Float32Array.from(r)}function u(r){return 1125*Math.log(1+r/700)}function f(r,t,e){for(var a,n=new Float32Array(r+2),o=new Float32Array(r+2),i=t/2,f=u(0),c=(u(i)-f)/(r+1),l=new Array(r+2),s=0;s<n.length;s++)n[s]=s*c,o[s]=(a=n[s],700*(Math.exp(a/1125)-1)),l[s]=Math.floor((e+1)*o[s]/t);for(var m=new Array(r),p=0;p<m.length;p++){m[p]=new Array(e/2+1).fill(0);for(s=l[p];s<l[p+1];s++)m[p][s]=(s-l[p])/(l[p+1]-l[p]);for(s=l[p+1];s<l[p+2];s++)m[p][s]=(l[p+2]-s)/(l[p+2]-l[p+1])}return m}function c(t,e,a,n,o,i,u){void 0===n&&(n=5),void 0===o&&(o=2),void 0===i&&(i=!0),void 0===u&&(u=440);var f=Math.floor(a/2)+1,c=new Array(a).fill(0).map((function(r,n){return t*function(r,t){return Math.log2(16*r/t)}(e*n/a,u)}));c[0]=c[1]-1.5*t;var l,s,m,p=c.slice(1).map((function(r,t){return Math.max(r-c[t])}),1).concat([1]),h=Math.round(t/2),g=new Array(t).fill(0).map((function(r,e){return c.map((function(r){return(10*t+h+r-e)%t-h}))})),w=g.map((function(r,t){return r.map((function(r,e){return Math.exp(-.5*Math.pow(2*g[t][e]/p[e],2))}))}));if(s=(l=w)[0].map((function(){return 0})),m=l.reduce((function(r,t){return t.forEach((function(t,e){r[e]+=Math.pow(t,2)})),r}),s).map(Math.sqrt),w=l.map((function(r,t){return r.map((function(r,t){return r/(m[t]||1)}))})),o){var v=c.map((function(r){return Math.exp(-.5*Math.pow((r/t-n)/o,2))}));w=w.map((function(r){return r.map((function(r,t){return r*v[t]}))}))}return i&&(w=r(r([],w.slice(3),!0),w.slice(0,3),!0)),w.map((function(r){return r.slice(0,f)}))}function l(r,t){for(var e=0,a=0,n=0;n<t.length;n++)e+=Math.pow(n,r)*Math.abs(t[n]),a+=t[n];return e/a}function s(r){var t=r.ampSpectrum,e=r.barkScale,a=r.numberOfBarkBands,n=void 0===a?24:a;if("object"!=typeof t||"object"!=typeof e)throw new TypeError;var o=n,i=new Float32Array(o),u=0,f=t,c=new Int32Array(o+1);c[0]=0;for(var l=e[f.length-1]/o,s=1,m=0;m<f.length;m++)for(;e[m]>l;)c[s++]=m,l=s*e[f.length-1]/o;c[o]=f.length-1;for(m=0;m<o;m++){for(var p=0,h=c[m];h<c[m+1];h++)p+=f[h];i[m]=Math.pow(p,.23)}for(m=0;m<i.length;m++)u+=i[m];return{specific:i,total:u}}function m(r){var t=r.ampSpectrum;if("object"!=typeof t)throw new TypeError;for(var e=new Float32Array(t.length),a=0;a<e.length;a++)e[a]=Math.pow(t[a],2);return e}function p(r){var t=r.ampSpectrum,e=r.melFilterBank,a=r.bufferSize;if("object"!=typeof t)throw new TypeError("Valid ampSpectrum is required to generate melBands");if("object"!=typeof e)throw new TypeError("Valid melFilterBank is required to generate melBands");for(var n=m({ampSpectrum:t}),o=e.length,i=Array(o),u=new Float32Array(o),f=0;f<u.length;f++){i[f]=new Float32Array(a/2),u[f]=0;for(var c=0;c<a/2;c++)i[f][c]=e[f][c]*n[c],u[f]+=i[f][c];u[f]=Math.log(u[f]+1)}return Array.prototype.slice.call(u)}function h(r){return r&&r.__esModule&&Object.prototype.hasOwnProperty.call(r,"default")?r.default:r}var g=null;var w=h((function(r,t){var e=r.length;return t=t||2,g&&g[e]||function(r){(g=g||{})[r]=new Array(r*r);for(var t=Math.PI/r,e=0;e<r;e++)for(var a=0;a<r;a++)g[r][a+e*r]=Math.cos(t*(a+.5)*e)}(e),r.map((function(){return 0})).map((function(a,n){return t*r.reduce((function(r,t,a,o){return r+t*g[e][a+n*e]}),0)}))}));var v=Object.freeze({__proto__:null,amplitudeSpectrum:function(r){return r.ampSpectrum},buffer:function(r){return r.signal},chroma:function(r){var t=r.ampSpectrum,e=r.chromaFilterBank;if("object"!=typeof t)throw new TypeError("Valid ampSpectrum is required to generate chroma");if("object"!=typeof e)throw new TypeError("Valid chromaFilterBank is required to generate chroma");var a=e.map((function(r,e){return t.reduce((function(t,e,a){return t+e*r[a]}),0)})),n=Math.max.apply(Math,a);return n?a.map((function(r){return r/n})):a},complexSpectrum:function(r){return r.complexSpectrum},energy:function(r){var t=r.signal;if("object"!=typeof t)throw new TypeError;for(var e=0,a=0;a<t.length;a++)e+=Math.pow(Math.abs(t[a]),2);return e},loudness:s,melBands:p,mfcc:function(r){var t=r.ampSpectrum,e=r.melFilterBank,a=r.numberOfMFCCCoefficients,n=r.bufferSize,o=Math.min(40,Math.max(1,a||13));if(e.length<o)throw new Error("Insufficient filter bank for requested number of coefficients");var i=p({ampSpectrum:t,melFilterBank:e,bufferSize:n});return w(i).slice(0,o)},perceptualSharpness:function(r){for(var t=s({ampSpectrum:r.ampSpectrum,barkScale:r.barkScale}),e=t.specific,a=0,n=0;n<e.length;n++)a+=n<15?(n+1)*e[n+1]:.066*Math.exp(.171*(n+1));return a*=.11/t.total},perceptualSpread:function(r){for(var t=s({ampSpectrum:r.ampSpectrum,barkScale:r.barkScale}),e=0,a=0;a<t.specific.length;a++)t.specific[a]>e&&(e=t.specific[a]);return Math.pow((t.total-e)/t.total,2)},powerSpectrum:m,rms:function(r){var t=r.signal;if("object"!=typeof t)throw new TypeError;for(var e=0,a=0;a<t.length;a++)e+=Math.pow(t[a],2);return e/=t.length,e=Math.sqrt(e)},spectralCentroid:function(r){var t=r.ampSpectrum;if("object"!=typeof t)throw new TypeError;return l(1,t)},spectralCrest:function(r){var t=r.ampSpectrum;if("object"!=typeof t)throw new TypeError;var e=0,a=-1/0;return t.forEach((function(r){e+=Math.pow(r,2),a=r>a?r:a})),e/=t.length,e=Math.sqrt(e),a/e},spectralFlatness:function(r){var t=r.ampSpectrum;if("object"!=typeof t)throw new TypeError;for(var e=0,a=0,n=0;n<t.length;n++)e+=Math.log(t[n]),a+=t[n];return Math.exp(e/t.length)*t.length/a},spectralFlux:function(r){var t=r.signal,e=r.previousSignal,a=r.bufferSize;if("object"!=typeof t||"object"!=typeof e)throw new TypeError;for(var n=0,o=-a/2;o<t.length/2-1;o++)x=Math.abs(t[o])-Math.abs(e[o]),n+=(x+Math.abs(x))/2;return n},spectralKurtosis:function(r){var t=r.ampSpectrum;if("object"!=typeof t)throw new TypeError;var e=t,a=l(1,e),n=l(2,e),o=l(3,e),i=l(4,e);return(-3*Math.pow(a,4)+6*a*n-4*a*o+i)/Math.pow(Math.sqrt(n-Math.pow(a,2)),4)},spectralRolloff:function(r){var t=r.ampSpectrum,e=r.sampleRate;if("object"!=typeof t)throw new TypeError;for(var a=t,n=e/(2*(a.length-1)),o=0,i=0;i<a.length;i++)o+=a[i];for(var u=.99*o,f=a.length-1;o>u&&f>=0;)o-=a[f],--f;return(f+1)*n},spectralSkewness:function(r){var t=r.ampSpectrum;if("object"!=typeof t)throw new TypeError;var e=l(1,t),a=l(2,t),n=l(3,t);return(2*Math.pow(e,3)-3*e*a+n)/Math.pow(Math.sqrt(a-Math.pow(e,2)),3)},spectralSlope:function(r){var t=r.ampSpectrum,e=r.sampleRate,a=r.bufferSize;if("object"!=typeof t)throw new TypeError;for(var n=0,o=0,i=new Float32Array(t.length),u=0,f=0,c=0;c<t.length;c++){n+=t[c];var l=c*e/a;i[c]=l,u+=l*l,o+=l,f+=l*t[c]}return(t.length*f-o*n)/(n*(u-Math.pow(o,2)))},spectralSpread:function(r){var t=r.ampSpectrum;if("object"!=typeof t)throw new TypeError;return Math.sqrt(l(2,t)-Math.pow(l(1,t),2))},zcr:function(r){var t=r.signal;if("object"!=typeof t)throw new TypeError;for(var e=0,a=1;a<t.length;a++)(t[a-1]>=0&&t[a]<0||t[a-1]<0&&t[a]>=0)&&e++;return e}});function d(r){if(Array.isArray(r)){for(var t=0,e=Array(r.length);t<r.length;t++)e[t]=r[t];return e}return Array.from(r)}var y={},S={},_={bitReverseArray:function(r){if(void 0===y[r]){for(var t=(r-1).toString(2).length,e="0".repeat(t),a={},n=0;n<r;n++){var o=n.toString(2);o=e.substr(o.length)+o,o=[].concat(d(o)).reverse().join(""),a[n]=parseInt(o,2)}y[r]=a}return y[r]},multiply:function(r,t){return{real:r.real*t.real-r.imag*t.imag,imag:r.real*t.imag+r.imag*t.real}},add:function(r,t){return{real:r.real+t.real,imag:r.imag+t.imag}},subtract:function(r,t){return{real:r.real-t.real,imag:r.imag-t.imag}},euler:function(r,t){var e=-2*Math.PI*r/t;return{real:Math.cos(e),imag:Math.sin(e)}},conj:function(r){return r.imag*=-1,r},constructComplexArray:function(r){var t={};t.real=void 0===r.real?r.slice():r.real.slice();var e=t.real.length;return void 0===S[e]&&(S[e]=Array.apply(null,Array(e)).map(Number.prototype.valueOf,0)),t.imag=S[e].slice(),t}},b=function(r){var t={};void 0===r.real||void 0===r.imag?t=_.constructComplexArray(r):(t.real=r.real.slice(),t.imag=r.imag.slice());var e=t.real.length,a=Math.log2(e);if(Math.round(a)!=a)throw new Error("Input size must be a power of 2.");if(t.real.length!=t.imag.length)throw new Error("Real and imaginary components must have the same length.");for(var n=_.bitReverseArray(e),o={real:[],imag:[]},i=0;i<e;i++)o.real[n[i]]=t.real[i],o.imag[n[i]]=t.imag[i];for(var u=0;u<e;u++)t.real[u]=o.real[u],t.imag[u]=o.imag[u];for(var f=1;f<=a;f++)for(var c=Math.pow(2,f),l=0;l<c/2;l++)for(var s=_.euler(l,c),m=0;m<e/c;m++){var p=c*m+l,h=c*m+l+c/2,g={real:t.real[p],imag:t.imag[p]},w={real:t.real[h],imag:t.imag[h]},v=_.multiply(s,w),d=_.subtract(g,v);t.real[h]=d.real,t.imag[h]=d.imag;var y=_.add(v,g);t.real[p]=y.real,t.imag[p]=y.imag}return t},M=b,F=function(){function r(r,t){var e=this;if(this._m=t,!r.audioContext)throw this._m.errors.noAC;if(r.bufferSize&&!a(r.bufferSize))throw this._m._errors.notPow2;if(!r.source)throw this._m._errors.noSource;this._m.audioContext=r.audioContext,this._m.bufferSize=r.bufferSize||this._m.bufferSize||256,this._m.hopSize=r.hopSize||this._m.hopSize||this._m.bufferSize,this._m.sampleRate=r.sampleRate||this._m.audioContext.sampleRate||44100,this._m.callback=r.callback,this._m.windowingFunction=r.windowingFunction||"hanning",this._m.featureExtractors=v,this._m.EXTRACTION_STARTED=r.startImmediately||!1,this._m.channel="number"==typeof r.channel?r.channel:0,this._m.inputs=r.inputs||1,this._m.outputs=r.outputs||1,this._m.numberOfMFCCCoefficients=r.numberOfMFCCCoefficients||this._m.numberOfMFCCCoefficients||13,this._m.numberOfBarkBands=r.numberOfBarkBands||this._m.numberOfBarkBands||24,this._m.spn=this._m.audioContext.createScriptProcessor(this._m.bufferSize,this._m.inputs,this._m.outputs),this._m.spn.connect(this._m.audioContext.destination),this._m._featuresToExtract=r.featureExtractors||[],this._m.barkScale=o(this._m.bufferSize,this._m.sampleRate,this._m.bufferSize),this._m.melFilterBank=f(Math.max(this._m.melBands,this._m.numberOfMFCCCoefficients),this._m.sampleRate,this._m.bufferSize),this._m.inputData=null,this._m.previousInputData=null,this._m.frame=null,this._m.previousFrame=null,this.setSource(r.source),this._m.spn.onaudioprocess=function(r){var t;null!==e._m.inputData&&(e._m.previousInputData=e._m.inputData),e._m.inputData=r.inputBuffer.getChannelData(e._m.channel),e._m.previousInputData?((t=new Float32Array(e._m.previousInputData.length+e._m.inputData.length-e._m.hopSize)).set(e._m.previousInputData.slice(e._m.hopSize)),t.set(e._m.inputData,e._m.previousInputData.length-e._m.hopSize)):t=e._m.inputData;var a=function(r,t,e){if(r.length<t)throw new Error("Buffer is too short for frame length");if(e<1)throw new Error("Hop length cannot be less that 1");if(t<1)throw new Error("Frame length cannot be less that 1");var a=1+Math.floor((r.length-t)/e);return new Array(a).fill(0).map((function(a,n){return r.slice(n*e,n*e+t)}))}(t,e._m.bufferSize,e._m.hopSize);a.forEach((function(r){e._m.frame=r;var t=e._m.extract(e._m._featuresToExtract,e._m.frame,e._m.previousFrame);"function"==typeof e._m.callback&&e._m.EXTRACTION_STARTED&&e._m.callback(t),e._m.previousFrame=e._m.frame}))}}return r.prototype.start=function(r){this._m._featuresToExtract=r||this._m._featuresToExtract,this._m.EXTRACTION_STARTED=!0},r.prototype.stop=function(){this._m.EXTRACTION_STARTED=!1},r.prototype.setSource=function(r){this._m.source&&this._m.source.disconnect(this._m.spn),this._m.source=r,this._m.source.connect(this._m.spn)},r.prototype.setChannel=function(r){r<=this._m.inputs?this._m.channel=r:console.error("Channel ".concat(r," does not exist. Make sure you've provided a value for 'inputs' that is greater than ").concat(r," when instantiating the MeydaAnalyzer"))},r.prototype.get=function(r){return this._m.inputData?this._m.extract(r||this._m._featuresToExtract,this._m.inputData,this._m.previousInputData):null},r}(),A={audioContext:null,spn:null,bufferSize:512,sampleRate:44100,melBands:26,chromaBands:12,callback:null,windowingFunction:"hanning",featureExtractors:v,EXTRACTION_STARTED:!1,numberOfMFCCCoefficients:13,numberOfBarkBands:24,_featuresToExtract:[],windowing:n,_errors:{notPow2:new Error("Meyda: Buffer size must be a power of 2, e.g. 64 or 512"),featureUndef:new Error("Meyda: No features defined."),invalidFeatureFmt:new Error("Meyda: Invalid feature format"),invalidInput:new Error("Meyda: Invalid input."),noAC:new Error("Meyda: No AudioContext specified."),noSource:new Error("Meyda: No source node specified.")},createMeydaAnalyzer:function(r){return new F(r,Object.assign({},A))},listAvailableFeatureExtractors:function(){return Object.keys(this.featureExtractors)},extract:function(r,t,e){var n=this;if(!t)throw this._errors.invalidInput;if("object"!=typeof t)throw this._errors.invalidInput;if(!r)throw this._errors.featureUndef;if(!a(t.length))throw this._errors.notPow2;void 0!==this.barkScale&&this.barkScale.length==this.bufferSize||(this.barkScale=o(this.bufferSize,this.sampleRate,this.bufferSize)),void 0!==this.melFilterBank&&this.barkScale.length==this.bufferSize&&this.melFilterBank.length==this.melBands||(this.melFilterBank=f(Math.max(this.melBands,this.numberOfMFCCCoefficients),this.sampleRate,this.bufferSize)),void 0!==this.chromaFilterBank&&this.chromaFilterBank.length==this.chromaBands||(this.chromaFilterBank=c(this.chromaBands,this.sampleRate,this.bufferSize)),"buffer"in t&&void 0===t.buffer?this.signal=i(t):this.signal=t;var u=E(t,this.windowingFunction,this.bufferSize);if(this.signal=u.windowedSignal,this.complexSpectrum=u.complexSpectrum,this.ampSpectrum=u.ampSpectrum,e){var l=E(e,this.windowingFunction,this.bufferSize);this.previousSignal=l.windowedSignal,this.previousComplexSpectrum=l.complexSpectrum,this.previousAmpSpectrum=l.ampSpectrum}var s=function(r){return n.featureExtractors[r]({ampSpectrum:n.ampSpectrum,chromaFilterBank:n.chromaFilterBank,complexSpectrum:n.complexSpectrum,signal:n.signal,bufferSize:n.bufferSize,sampleRate:n.sampleRate,barkScale:n.barkScale,melFilterBank:n.melFilterBank,previousSignal:n.previousSignal,previousAmpSpectrum:n.previousAmpSpectrum,previousComplexSpectrum:n.previousComplexSpectrum,numberOfMFCCCoefficients:n.numberOfMFCCCoefficients,numberOfBarkBands:n.numberOfBarkBands})};if("object"==typeof r)return r.reduce((function(r,t){var e;return Object.assign({},r,((e={})[t]=s(t),e))}),{});if("string"==typeof r)return s(r);throw this._errors.invalidFeatureFmt}},E=function(r,t,e){var a={};void 0===r.buffer?a.signal=i(r):a.signal=r,a.windowedSignal=n(a.signal,t),a.complexSpectrum=M(a.windowedSignal),a.ampSpectrum=new Float32Array(e/2);for(var o=0;o<e/2;o++)a.ampSpectrum[o]=Math.sqrt(Math.pow(a.complexSpectrum.real[o],2)+Math.pow(a.complexSpectrum.imag[o],2));return a};return"undefined"!=typeof window&&(window.Meyda=A),A}));
+//# sourceMappingURL=meyda.min.js.map
+</script>
+<script>
+/* ---------------------------------------------------------------------------
+   Atelier — shared runtime for the course web tools.
+
+   Design constraints (do not break these):
+     * Must run from file:// in Chrome, off a USB stick, with no installation.
+     * Therefore: classic scripts only (no ES modules), and NO fetch()/XHR of
+       local files — Chrome blocks both on file://. Audio comes from the user's
+       file picker, or is synthesised here.
+     * No external network requests at runtime. Libraries are vendored.
+     * Long files are normal. Nothing here may be O(n) in the *argument list*
+       (no Function.apply / spread over sample or frame arrays) and nothing may
+       block the main thread for more than a tick.
+
+   Provides: theme (light/dark/auto), language (fr/en), an on-page console,
+   audio loading and synthesis, Meyda descriptor extraction, canvas drawing,
+   CSV/PNG export.
+
+   Depends on: web/vendor/meyda.min.js (loaded before this file).
+   --------------------------------------------------------------------------- */
+
+(function (global) {
+  'use strict';
+
+  var Atelier = {};
+  var audioCtx = null;
+  var currentSource = null;
+  var doc = global.document;
+
+  /* === safe storage ======================================================= */
+  /* localStorage can throw on file:// or with site data blocked. Never let a
+     preference lookup break the page. */
+
+  var memory = {};
+  var store = {
+    get: function (k) {
+      try { var v = global.localStorage.getItem(k); return v === null ? memory[k] : v; }
+      catch (e) { return memory[k]; }
+    },
+    set: function (k, v) {
+      memory[k] = v;
+      try { global.localStorage.setItem(k, v); } catch (e) { /* in-memory only */ }
+    }
+  };
+
+  /* === i18n =============================================================== */
+
+  var STRINGS = {
+    fr: {
+      'home': 'Accueil',
+      'skip': 'Aller au contenu',
+      'lang.label': 'Langue',
+      'theme.label': 'Thème',
+      'theme.auto': 'Auto', 'theme.light': 'Clair', 'theme.dark': 'Sombre',
+      'theme.autoFull': 'Thème automatique (réglage du système)',
+      'theme.lightFull': 'Thème clair', 'theme.darkFull': 'Thème sombre',
+      'a11y.label': 'Confort de lecture',
+      'a11y.button': 'Accessibilité',
+      'a11y.on': 'Mode accessible activé : contraste renforcé, texte agrandi, liens soulignés.',
+      'a11y.off': 'Mode accessible désactivé.',
+      'a11y.title': 'Mode accessible — contraste renforcé, texte plus grand, cibles plus larges',
+      'console.title': 'Console',
+      'console.show': 'Ouvrir la console', 'console.hide': 'Réduire la console',
+      'console.clear': 'Vider',
+      'header.hide': 'Réduire la barre', 'header.show': 'Afficher la barre',
+      'console.copy': 'Copier',
+      'console.copied': 'Console copiée dans le presse-papiers.',
+      'console.entries': '{n} ligne(s)',
+      'console.errors': '{n} erreur(s)',
+      'console.region': 'Journal de la page',
+      'env.header': 'État au chargement :',
+      'env.protocol': 'Page ouverte via {p}',
+      'env.file': 'depuis le disque — mode hors ligne, tout fonctionne sauf le micro',
+      'env.served': 'servie par un serveur',
+      'env.webaudio': 'Web Audio API',
+      'env.offline': 'Analyse hors ligne (OfflineAudioContext)',
+      'env.meyda': 'Bibliothèque de descripteurs (Meyda)',
+      'env.meydaOk': 'version embarquée, aucun téléchargement',
+      'env.meydaNo': 'vendor/meyda.min.js introuvable',
+      'env.files': 'Lecture de fichiers locaux',
+      'env.mic': 'Micro',
+      'env.micNo': 'indisponible quand la page est ouverte depuis le disque (normal)',
+      'env.download': 'Export de fichiers',
+      'env.ready': 'Prêt.',
+      'err.noWebAudio': 'Web Audio API indisponible — utilisez Chrome ou Firefox à jour.',
+      'err.read': 'Lecture du fichier impossible.',
+      'err.decode': 'Format audio non reconnu (essayez WAV, MP3, FLAC, M4A).',
+      'err.noMeyda': 'Meyda n’est pas chargé.',
+      'err.pow2': 'La taille de fenêtre doit être une puissance de 2.',
+      'err.unknownDemo': 'Son de démonstration inconnu : {k}',
+      'tp.play': '▶ Lecture', 'tp.pause': '‖ Pause', 'tp.stop': '■ Stop',
+      'tp.scrub': 'Position dans le son',
+      'err.corpusFormat': 'Ce fichier n’est pas un corpus exporté par les outils (format « atelier-corpus » attendu).',
+      'err.noRecord': 'L’enregistrement n’est pas disponible dans ce navigateur.',
+      'err.emptyRecord': 'Rien n’a été enregistré : déclenchez des sons pendant que le compteur tourne.',
+      'err.segmentsCsv': 'Le CSV de segments doit avoir les colonnes file, start, end.'
+    },
+    en: {
+      'home': 'Home',
+      'skip': 'Skip to content',
+      'lang.label': 'Language',
+      'theme.label': 'Theme',
+      'theme.auto': 'Auto', 'theme.light': 'Light', 'theme.dark': 'Dark',
+      'theme.autoFull': 'Automatic theme (follow the system)',
+      'theme.lightFull': 'Light theme', 'theme.darkFull': 'Dark theme',
+      'a11y.label': 'Reading comfort',
+      'a11y.button': 'Accessibility',
+      'a11y.on': 'Accessible mode on: stronger contrast, larger text, underlined links.',
+      'a11y.off': 'Accessible mode off.',
+      'a11y.title': 'Accessible mode — stronger contrast, larger text, bigger targets',
+      'console.title': 'Console',
+      'console.show': 'Open the console', 'console.hide': 'Collapse the console',
+      'console.clear': 'Clear',
+      'header.hide': 'Collapse the bar', 'header.show': 'Show the bar',
+      'console.copy': 'Copy',
+      'console.copied': 'Console copied to the clipboard.',
+      'console.entries': '{n} line(s)',
+      'console.errors': '{n} error(s)',
+      'console.region': 'Page log',
+      'env.header': 'State on load:',
+      'env.protocol': 'Page opened over {p}',
+      'env.file': 'from disk — offline mode, everything works except the microphone',
+      'env.served': 'served by a server',
+      'env.webaudio': 'Web Audio API',
+      'env.offline': 'Offline analysis (OfflineAudioContext)',
+      'env.meyda': 'Descriptor library (Meyda)',
+      'env.meydaOk': 'bundled, nothing downloaded',
+      'env.meydaNo': 'vendor/meyda.min.js not found',
+      'env.files': 'Local file reading',
+      'env.mic': 'Microphone',
+      'env.micNo': 'unavailable when the page is opened from disk (expected)',
+      'env.download': 'File export',
+      'env.ready': 'Ready.',
+      'err.noWebAudio': 'Web Audio API unavailable — use an up-to-date Chrome or Firefox.',
+      'err.read': 'Could not read the file.',
+      'err.decode': 'Audio format not recognised (try WAV, MP3, FLAC, M4A).',
+      'err.noMeyda': 'Meyda is not loaded.',
+      'err.pow2': 'Frame size must be a power of 2.',
+      'err.unknownDemo': 'Unknown demo sound: {k}',
+      'tp.play': '▶ Play', 'tp.pause': '‖ Pause', 'tp.stop': '■ Stop',
+      'tp.scrub': 'Position in the sound',
+      'err.corpusFormat': 'This file is not a corpus exported by the tools (expected format “atelier-corpus”).',
+      'err.noRecord': 'Recording is not available in this browser.',
+      'err.emptyRecord': 'Nothing was recorded: trigger sounds while the counter is running.',
+      'err.segmentsCsv': 'The segments CSV needs the columns file, start, end.'
+    }
+  };
+
+  var lang = null;
+  var langListeners = [];
+
+  function interpolate(s, vars) {
+    if (!vars) return s;
+    return s.replace(/\{(\w+)\}/g, function (m, k) {
+      return vars[k] !== undefined ? vars[k] : m;
+    });
+  }
+
+  Atelier.i18n = {};
+
+  /** Merge extra strings, e.g. Atelier.i18n.add({fr:{...}, en:{...}}) */
+  Atelier.i18n.add = function (dict) {
+    Object.keys(dict).forEach(function (code) {
+      STRINGS[code] = STRINGS[code] || {};
+      Object.keys(dict[code]).forEach(function (k) { STRINGS[code][k] = dict[code][k]; });
+    });
+    return Atelier;
+  };
+
+  Atelier.t = function (key, vars) {
+    var table = STRINGS[lang] || STRINGS.fr;
+    var s = table[key];
+    if (s === undefined) s = (STRINGS.fr[key] !== undefined ? STRINGS.fr[key] : key);
+    return interpolate(s, vars);
+  };
+
+  Atelier.lang = function () { return lang; };
+
+  /** Called after every language change, and once at init. */
+  Atelier.onLanguageChange = function (fn) { langListeners.push(fn); return Atelier; };
+
+  /**
+   * Translate a subtree.
+   *   data-i18n="key"                  -> textContent
+   *   data-i18n-attr="aria-label:key"  -> attribute(s), semicolon-separated
+   */
+  Atelier.i18n.apply = function (root) {
+    root = root || doc.body;
+    var nodes = root.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].textContent = Atelier.t(nodes[i].getAttribute('data-i18n'));
+    }
+    var attrNodes = root.querySelectorAll('[data-i18n-attr]');
+    for (var j = 0; j < attrNodes.length; j++) {
+      attrNodes[j].getAttribute('data-i18n-attr').split(';').forEach(function (pair) {
+        var bits = pair.split(':');
+        if (bits.length === 2) {
+          attrNodes[j].setAttribute(bits[0].trim(), Atelier.t(bits[1].trim()));
+        }
+      });
+    }
+  };
+
+  Atelier.setLanguage = function (code) {
+    if (!STRINGS[code]) return;
+    lang = code;
+    store.set('atelier.lang', code);
+    doc.documentElement.lang = code;
+    Atelier.i18n.apply(doc.body);
+    langListeners.forEach(function (fn) { try { fn(code); } catch (e) { /* keep going */ } });
+    var seg = doc.getElementById('at-lang');
+    if (seg) {
+      Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-value') === code));
+      });
+    }
+  };
+
+  /* === theme & text size ================================================== */
+
+  Atelier.setTheme = function (mode) {          // 'auto' | 'light' | 'dark'
+    if (mode === 'auto') doc.documentElement.removeAttribute('data-theme');
+    else doc.documentElement.setAttribute('data-theme', mode);
+    store.set('atelier.theme', mode);
+    var seg = doc.getElementById('at-theme');
+    if (seg) {
+      Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-value') === mode));
+      });
+    }
+    if (Atelier._redraw) Atelier._redraw();
+  };
+
+  /** Optional finer control; not surfaced in the header by default. */
+  Atelier.setTextSize = function (scale) {      // 1 = normal
+    doc.documentElement.style.setProperty('--ui-scale', String(scale));
+    store.set('atelier.scale', String(scale));
+    if (Atelier._redraw) Atelier._redraw();
+  };
+
+  /**
+   * Accessible mode. Opt-in, not imposed: the baseline is already AA-contrast,
+   * keyboard-operable and motion-safe. This turns the dial further — near-maximum
+   * contrast, larger type, more spacing, underlined links, bigger hit targets.
+   */
+  Atelier.setAccessible = function (on, quiet) {
+    if (on) doc.documentElement.setAttribute('data-a11y', 'on');
+    else doc.documentElement.removeAttribute('data-a11y');
+    store.set('atelier.a11y', on ? 'on' : 'off');
+    var btn = doc.getElementById('at-a11y');
+    if (btn) btn.setAttribute('aria-pressed', String(!!on));
+    if (!quiet) Atelier.log.info(Atelier.t(on ? 'a11y.on' : 'a11y.off'));
+    if (Atelier._redraw) Atelier._redraw();
+  };
+
+  Atelier.isAccessible = function () {
+    return doc.documentElement.getAttribute('data-a11y') === 'on';
+  };
+
+  /** Register a callback used to redraw canvases after theme/size/resize changes. */
+  Atelier.onRedraw = function (fn) { Atelier._redraw = fn; return Atelier; };
+
+  /* === console ============================================================ */
+
+  var logEntries = [];
+  var errorCount = 0;
+  var logBody = null, logCount = null, logToggle = null;
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  function renderEntry(entry) {
+    if (!logBody) return;
+    var li = doc.createElement('li');
+    var t = doc.createElement('span');
+    t.className = 'at-time';
+    t.textContent = entry.time;
+    var l = doc.createElement('span');
+    l.className = 'at-lvl ' + entry.level;
+    l.textContent = entry.label;
+    var m = doc.createElement('span');
+    m.className = 'at-msg';
+    m.textContent = entry.message;
+    li.appendChild(t); li.appendChild(l); li.appendChild(m);
+    logBody.appendChild(li);
+    logBody.scrollTop = logBody.scrollHeight;
+  }
+
+  function updateCount() {
+    if (!logCount) return;
+    logCount.textContent = errorCount
+      ? Atelier.t('console.errors', { n: errorCount })
+      : Atelier.t('console.entries', { n: logEntries.length });
+    logCount.className = 'at-console-count' + (errorCount ? ' bad' : '');
+  }
+
+  var LEVELS = { info: 'INFO', ok: 'OK', warn: 'WARN', err: 'ERROR' };
+
+  function log(level, message) {
+    var d = new Date();
+    var entry = {
+      time: pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()),
+      level: level,
+      label: LEVELS[level] || 'INFO',
+      message: String(message)
+    };
+    logEntries.push(entry);
+    if (level === 'err') {
+      errorCount++;
+      if (logBody && logBody.hidden && Atelier._setConsole) Atelier._setConsole(true, true);
+    }
+    renderEntry(entry);
+    updateCount();
+    return entry;
+  }
+
+  Atelier.log = {
+    info: function (m) { return log('info', m); },
+    ok: function (m) { return log('ok', m); },
+    warn: function (m) { return log('warn', m); },
+    error: function (m) { return log('err', m); },
+    text: function () {
+      return logEntries.map(function (e) {
+        return e.time + '  ' + e.label + '  ' + e.message;
+      }).join('\n');
+    },
+    clear: function () {
+      logEntries = []; errorCount = 0;
+      if (logBody) logBody.innerHTML = '';
+      updateCount();
+    }
+  };
+
+  /* === environment ======================================================== */
+
+  function detectEnv() {
+    var isFile = global.location.protocol === 'file:';
+    return {
+      protocol: global.location.protocol,
+      isFile: isFile,
+      webAudio: !!(global.AudioContext || global.webkitAudioContext),
+      offlineAudio: !!(global.OfflineAudioContext || global.webkitOfflineAudioContext),
+      meyda: typeof global.Meyda !== 'undefined',
+      fileApi: !!(global.File && global.FileReader),
+      // Chrome treats file:// as an opaque origin: getUserMedia is refused there.
+      mic: !!(global.navigator && global.navigator.mediaDevices &&
+              global.navigator.mediaDevices.getUserMedia) && !isFile,
+      download: 'download' in doc.createElement('a')
+    };
+  }
+
+  Atelier.env = detectEnv();
+
+  function logEnvironment() {
+    var e = Atelier.env;
+    Atelier.log.info(Atelier.t('env.header'));
+    Atelier.log[e.isFile ? 'warn' : 'ok'](
+      Atelier.t('env.protocol', { p: e.protocol }) + ' — ' +
+      Atelier.t(e.isFile ? 'env.file' : 'env.served'));
+    Atelier.log[e.webAudio ? 'ok' : 'err'](Atelier.t('env.webaudio'));
+    Atelier.log[e.offlineAudio ? 'ok' : 'warn'](Atelier.t('env.offline'));
+    Atelier.log[e.meyda ? 'ok' : 'err'](
+      Atelier.t('env.meyda') + ' — ' + Atelier.t(e.meyda ? 'env.meydaOk' : 'env.meydaNo'));
+    Atelier.log[e.fileApi ? 'ok' : 'err'](Atelier.t('env.files'));
+    Atelier.log[e.mic ? 'ok' : 'warn'](
+      Atelier.t('env.mic') + (e.mic ? '' : ' — ' + Atelier.t('env.micNo')));
+    Atelier.log[e.download ? 'ok' : 'warn'](Atelier.t('env.download'));
+    Atelier.log.ok(Atelier.t('env.ready'));
+  }
+
+  /* === chrome (header + console) ========================================== */
+
+  function segmented(id, labelKey, options, onPick) {
+    var wrap = doc.createElement('div');
+    wrap.className = 'at-seg';
+    wrap.id = id;
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('data-i18n-attr', 'aria-label:' + labelKey);
+    options.forEach(function (opt) {
+      var b = doc.createElement('button');
+      b.type = 'button';
+      b.setAttribute('data-value', String(opt.value));
+      b.setAttribute('data-i18n', opt.key);
+      b.setAttribute('data-i18n-attr', 'title:' + (opt.titleKey || opt.key));
+      b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function () { onPick(opt.value); });
+      wrap.appendChild(b);
+    });
+    return wrap;
+  }
+
+  Atelier.init = function (opts) {
+    opts = opts || {};
+    var body = doc.body;
+    var home = opts.home || body.getAttribute('data-home') || '../../../index.html';
+    var titleFr = opts.title || body.getAttribute('data-title') || doc.title;
+    var titleEn = opts.titleEn || body.getAttribute('data-title-en') || titleFr;
+    var subFr = opts.subtitle || body.getAttribute('data-subtitle') || '';
+    var subEn = opts.subtitleEn || body.getAttribute('data-subtitle-en') || subFr;
+
+    lang = store.get('atelier.lang') || (opts.defaultLang || 'fr');
+    if (!STRINGS[lang]) lang = 'fr';
+
+    /* skip link */
+    var skip = doc.createElement('a');
+    skip.className = 'at-skip';
+    skip.href = '#at-main';
+    skip.setAttribute('data-i18n', 'skip');
+    body.insertBefore(skip, body.firstChild);
+
+    /* header */
+    var header = doc.createElement('header');
+    header.className = 'at-header';
+
+    var homeLink = doc.createElement('a');
+    homeLink.className = 'at-home';
+    homeLink.href = home;
+    homeLink.setAttribute('data-i18n', 'home');
+    header.appendChild(homeLink);
+
+    var titles = doc.createElement('div');
+    titles.className = 'at-titles';
+    var h1 = doc.createElement('h1');
+    titles.appendChild(h1);
+    var sub = doc.createElement('p');
+    titles.appendChild(sub);
+    header.appendChild(titles);
+
+    var tools = doc.createElement('div');
+    tools.className = 'at-tools';
+    tools.appendChild(segmented('at-lang', 'lang.label', [
+      { value: 'fr', key: 'lang.fr' }, { value: 'en', key: 'lang.en' }
+    ], Atelier.setLanguage));
+    tools.appendChild(segmented('at-theme', 'theme.label', [
+      { value: 'auto', key: 'theme.auto', titleKey: 'theme.autoFull' },
+      { value: 'light', key: 'theme.light', titleKey: 'theme.lightFull' },
+      { value: 'dark', key: 'theme.dark', titleKey: 'theme.darkFull' }
+    ], Atelier.setTheme));
+    var a11yBtn = doc.createElement('button');
+    a11yBtn.type = 'button';
+    a11yBtn.id = 'at-a11y';
+    a11yBtn.className = 'at-toggle';
+    a11yBtn.setAttribute('aria-pressed', 'false');
+    a11yBtn.setAttribute('data-i18n', 'a11y.button');
+    a11yBtn.setAttribute('data-i18n-attr', 'title:a11y.title');
+    a11yBtn.addEventListener('click', function () {
+      Atelier.setAccessible(!Atelier.isAccessible());
+    });
+    tools.appendChild(a11yBtn);
+    header.appendChild(tools);
+
+    var hdrChev = doc.createElement('button');
+    hdrChev.type = 'button';
+    hdrChev.className = 'at-chev';
+    hdrChev.setAttribute('aria-controls', 'at-header');
+    header.appendChild(hdrChev);
+    header.id = 'at-header';
+
+    function setHeader(open, quiet) {
+      header.classList.toggle('at-min', !open);
+      hdrChev.textContent = open ? '\u25B4' : '\u25BE';
+      hdrChev.setAttribute('aria-expanded', String(open));
+      hdrChev.title = Atelier.t(open ? 'header.hide' : 'header.show');
+      if (!quiet) store.set('atelier.header', open ? 'open' : 'min');
+      if (Atelier._redraw) Atelier._redraw();
+    }
+    hdrChev.addEventListener('click', function () {
+      setHeader(header.classList.contains('at-min'));
+    });
+    Atelier._setHeader = setHeader;
+
+    body.insertBefore(header, skip.nextSibling);
+
+    var main = doc.querySelector('main');
+    if (main) { main.id = 'at-main'; main.setAttribute('tabindex', '-1'); }
+
+    /* console */
+    var cons = doc.createElement('div');
+    cons.className = 'at-console';
+
+    var bar = doc.createElement('div');
+    bar.className = 'at-console-bar';
+    var h2 = doc.createElement('h2');
+    h2.setAttribute('data-i18n', 'console.title');
+    bar.appendChild(h2);
+    logCount = doc.createElement('span');
+    logCount.className = 'at-console-count';
+    bar.appendChild(logCount);
+    var spacer = doc.createElement('span');
+    spacer.className = 'at-spacer';
+    bar.appendChild(spacer);
+
+    var copyBtn = doc.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'at-only-open';
+    copyBtn.setAttribute('data-i18n', 'console.copy');
+    bar.appendChild(copyBtn);
+
+    var clearBtn = doc.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.className = 'at-only-open';
+    clearBtn.setAttribute('data-i18n', 'console.clear');
+    clearBtn.addEventListener('click', function () { Atelier.log.clear(); });
+    bar.appendChild(clearBtn);
+
+    logToggle = doc.createElement('button');
+    logToggle.type = 'button';
+    logToggle.className = 'at-chev';
+    logToggle.setAttribute('aria-expanded', 'false');
+    logToggle.setAttribute('aria-controls', 'at-console-body');
+    bar.appendChild(logToggle);
+    cons.appendChild(bar);
+    cons.id = 'at-console';
+
+    logBody = doc.createElement('ul');
+    logBody.className = 'at-console-body';
+    logBody.id = 'at-console-body';
+    logBody.hidden = true;
+    logBody.setAttribute('role', 'log');
+    logBody.setAttribute('aria-live', 'polite');
+    logBody.setAttribute('data-i18n-attr', 'aria-label:console.region');
+    cons.appendChild(logBody);
+    body.appendChild(cons);
+
+    function setConsole(open, quiet) {
+      logBody.hidden = !open;
+      cons.classList.toggle('at-min', !open);
+      logToggle.textContent = open ? '\u25BE' : '\u25B4';
+      logToggle.setAttribute('aria-expanded', String(open));
+      logToggle.title = Atelier.t(open ? 'console.hide' : 'console.show');
+      if (!quiet) store.set('atelier.console', open ? 'open' : 'min');
+      if (Atelier._redraw) Atelier._redraw();
+    }
+    function setToggle() { setConsole(!logBody.hidden, true); }
+    logToggle.addEventListener('click', function () { setConsole(logBody.hidden); });
+    Atelier._setConsole = setConsole;
+    copyBtn.addEventListener('click', function () {
+      var text = Atelier.log.text();
+      if (global.navigator.clipboard) {
+        global.navigator.clipboard.writeText(text).then(function () {
+          Atelier.log.ok(Atelier.t('console.copied'));
+        });
+      }
+    });
+
+    /* strings that depend on the language for the title block */
+    Atelier.onLanguageChange(function (code) {
+      h1.textContent = code === 'en' ? titleEn : titleFr;
+      var s = code === 'en' ? subEn : subFr;
+      sub.textContent = s;
+      sub.hidden = !s;
+      doc.title = h1.textContent;
+      setToggle();
+      updateCount();
+    });
+
+    Atelier.i18n.add({
+      fr: { 'lang.fr': 'FR', 'lang.en': 'EN' },
+      en: { 'lang.fr': 'FR', 'lang.en': 'EN' }
+    });
+
+    /* restore preferences */
+    Atelier.setTheme(store.get('atelier.theme') || 'auto');
+    Atelier.setAccessible(store.get('atelier.a11y') === 'on', true);
+    var savedScale = parseFloat(store.get('atelier.scale') || '1');
+    if (savedScale && savedScale !== 1) Atelier.setTextSize(savedScale);
+    Atelier.setLanguage(lang);
+    setHeader(store.get('atelier.header') !== 'min', true);
+    setConsole(store.get('atelier.console') === 'open', true);
+
+    /* catch what the page does not catch itself */
+    global.addEventListener('error', function (e) {
+      Atelier.log.error((e.message || 'Error') +
+        (e.filename ? ' — ' + String(e.filename).split('/').pop() + ':' + e.lineno : ''));
+    });
+    global.addEventListener('unhandledrejection', function (e) {
+      var r = e.reason;
+      Atelier.log.error('Unhandled: ' + ((r && r.message) ? r.message : String(r)));
+    });
+
+    logEnvironment();
+
+    /* theme follows the system while in auto mode */
+    if (global.matchMedia) {
+      var mq = global.matchMedia('(prefers-color-scheme: dark)');
+      var onScheme = function () {
+        if (!doc.documentElement.hasAttribute('data-theme') && Atelier._redraw) Atelier._redraw();
+      };
+      if (mq.addEventListener) mq.addEventListener('change', onScheme);
+      else if (mq.addListener) mq.addListener(onScheme);
+    }
+
+    return Atelier;
+  };
+
+  /* === audio ============================================================== */
+
+  Atelier.audio = {};
+
+  Atelier.audio.ctx = function () {
+    if (!audioCtx) {
+      var C = global.AudioContext || global.webkitAudioContext;
+      if (!C) throw new Error(Atelier.t('err.noWebAudio'));
+      audioCtx = new C();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  };
+
+  /** Decode a File chosen by the user. FileReader, never fetch(). */
+  Atelier.audio.decodeFile = function (file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onerror = function () { reject(new Error(Atelier.t('err.read'))); };
+      reader.onload = function () {
+        var ctx = Atelier.audio.ctx();
+        ctx.decodeAudioData(reader.result,
+          function (buf) { resolve(buf); },
+          function () { reject(new Error(Atelier.t('err.decode'))); });
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  /** Synthesised demo sounds — the fallback when nobody has a file to hand. */
+  Atelier.audio.generate = function (kind, opts) {
+    opts = opts || {};
+    var ctx = Atelier.audio.ctx();
+    var sr = ctx.sampleRate;
+    var dur = opts.duration || 3;
+    var n = Math.floor(sr * dur);
+    var buf = ctx.createBuffer(1, n, sr);
+    var x = buf.getChannelData(0);
+    var i, t;
+
+    if (kind === 'sine') {
+      var f = opts.frequency || 440;
+      for (i = 0; i < n; i++) x[i] = 0.7 * Math.sin(2 * Math.PI * f * i / sr);
+
+    } else if (kind === 'sweep') {
+      var f0 = 80, f1 = 8000, phase = 0;
+      for (i = 0; i < n; i++) {
+        phase += 2 * Math.PI * (f0 * Math.pow(f1 / f0, i / n)) / sr;
+        x[i] = 0.6 * Math.sin(phase);
+      }
+
+    } else if (kind === 'noise') {
+      for (i = 0; i < n; i++) x[i] = 0.5 * (Math.random() * 2 - 1);
+
+    } else if (kind === 'bell') {
+      var carrier = 520, ratio = 1.41;
+      for (i = 0; i < n; i++) {
+        t = i / sr;
+        x[i] = 0.7 * Math.exp(-t * 2.2) *
+               Math.sin(2 * Math.PI * carrier * t +
+                        7 * Math.exp(-t * 5) * Math.sin(2 * Math.PI * carrier * ratio * t));
+      }
+
+    } else if (kind === 'pluck') {
+      var freq = opts.frequency || 196;
+      var len = Math.round(sr / freq);
+      var ring = new Float32Array(len);
+      for (i = 0; i < len; i++) ring[i] = Math.random() * 2 - 1;
+      var idx = 0;
+      for (i = 0; i < n; i++) {
+        var next = (idx + 1) % len;
+        ring[idx] = 0.498 * (ring[idx] + ring[next]);
+        x[i] = 0.8 * ring[idx] * Math.exp(-i / sr * 0.8);
+        idx = next;
+      }
+
+    } else if (kind === 'texture') {
+      var y1 = 0, y2 = 0;
+      for (i = 0; i < n; i++) {
+        t = i / sr;
+        var cut = 0.02 + 0.35 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 0.25 * t));
+        var w = Math.random() * 2 - 1;
+        y1 += cut * (w - y1);
+        y2 += cut * (y1 - y2);
+        x[i] = 0.9 * (y1 - y2) * 6;
+      }
+
+    } else {
+      throw new Error(Atelier.t('err.unknownDemo', { k: kind }));
+    }
+
+    var fade = Math.min(Math.floor(sr * 0.01), Math.floor(n / 2));
+    for (i = 0; i < fade; i++) { x[i] *= i / fade; x[n - 1 - i] *= i / fade; }
+    return buf;
+  };
+
+  Atelier.audio.play = function (buffer, onEnded) {
+    Atelier.audio.stop();
+    var ctx = Atelier.audio.ctx();
+    var src = ctx.createBufferSource();
+    src.buffer = buffer;
+    src.connect(Atelier.audio.master());
+    src.onended = function () {
+      if (currentSource === src) currentSource = null;
+      if (onEnded) onEnded();
+    };
+    src.start();
+    currentSource = src;
+    return src;
+  };
+
+  Atelier.audio.stop = function () {
+    if (currentSource) {
+      try { currentSource.stop(); } catch (e) { /* already stopped */ }
+      currentSource = null;
+    }
+  };
+
+  /* === dsp ================================================================ */
+
+  Atelier.dsp = {};
+
+  Atelier.dsp.mono = function (buffer) {
+    var n = buffer.length, ch = buffer.numberOfChannels;
+    if (ch === 1) return buffer.getChannelData(0).slice();
+    var out = new Float32Array(n);
+    for (var c = 0; c < ch; c++) {
+      var d = buffer.getChannelData(c);
+      for (var i = 0; i < n; i++) out[i] += d[i] / ch;
+    }
+    return out;
+  };
+
+  Atelier.dsp.isPowerOfTwo = function (v) { return v > 0 && (v & (v - 1)) === 0; };
+
+  /** Min/max of a long array — a loop, never Function.apply (which overflows
+      the argument stack somewhere above ~100k entries). */
+  Atelier.dsp.extent = function (values) {
+    var lo = Infinity, hi = -Infinity, seen = false;
+    for (var i = 0; i < values.length; i++) {
+      var v = values[i];
+      if (typeof v !== 'number' || !isFinite(v)) continue;
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+      seen = true;
+    }
+    return seen ? { min: lo, max: hi } : null;
+  };
+
+  /**
+   * Run Meyda over a signal frame by frame, yielding to the browser so the page
+   * stays responsive on long files (a one-hour recording is ~300 000 frames).
+   *
+   * returns Promise<{times, sampleRate, frameSize, hopSize, nFrames, features}>
+   * spectralCentroid is converted from bins to hertz; loudness is reduced to its
+   * total.
+   */
+  Atelier.dsp.describe = function (signal, sampleRate, features, opts) {
+    opts = opts || {};
+    var size = opts.frameSize || 1024;
+    var hop = opts.hopSize || Math.floor(size / 2);
+    var onProgress = opts.onProgress;
+
+    if (!global.Meyda) return Promise.reject(new Error(Atelier.t('err.noMeyda')));
+    if (!Atelier.dsp.isPowerOfTwo(size)) return Promise.reject(new Error(Atelier.t('err.pow2')));
+
+    var M = global.Meyda;
+    M.sampleRate = sampleRate;
+    M.bufferSize = size;
+    M.windowingFunction = 'hanning';
+
+    var nFrames = Math.max(0, Math.floor((signal.length - size) / hop) + 1);
+    var out = { times: new Float64Array(nFrames), sampleRate: sampleRate,
+                frameSize: size, hopSize: hop, nFrames: nFrames, features: {} };
+    // Typed arrays: a one-hour file at 1024/512 is 300k frames per feature.
+    features.forEach(function (f) { out.features[f] = new Float64Array(nFrames); });
+
+    var frame = new Float32Array(size);
+    var i = 0;
+    var CHUNK = 300;
+
+    return new Promise(function (resolve, reject) {
+      function step() {
+        try {
+          var end = Math.min(i + CHUNK, nFrames);
+          for (; i < end; i++) {
+            var off = i * hop;
+            frame.set(signal.subarray(off, off + size));
+            var f = M.extract(features, frame);
+            out.times[i] = (off + size / 2) / sampleRate;
+            for (var k = 0; k < features.length; k++) {
+              var name = features[k];
+              var v = f[name];
+              if (name === 'spectralCentroid') v = v * sampleRate / size;
+              else if (name === 'loudness') v = v ? v.total : NaN;
+              out.features[name][i] = (typeof v === 'number') ? v : NaN;
+            }
+          }
+          if (onProgress) onProgress(nFrames ? i / nFrames : 1);
+          if (i < nFrames) setTimeout(step, 0);
+          else resolve(out);
+        } catch (err) { reject(err); }
+      }
+      step();
+    });
+  };
+
+  /** Peak envelope decimated to `width` columns — for waveform drawing. */
+  Atelier.dsp.envelope = function (signal, width) {
+    var per = signal.length / width;
+    var mins = new Float32Array(width), maxs = new Float32Array(width);
+    for (var c = 0; c < width; c++) {
+      var start = Math.floor(c * per), stop = Math.min(Math.floor((c + 1) * per), signal.length);
+      if (stop <= start) stop = Math.min(start + 1, signal.length);
+      var lo = Infinity, hi = -Infinity;
+      for (var i = start; i < stop; i++) {
+        var v = signal[i];
+        if (v < lo) lo = v;
+        if (v > hi) hi = v;
+      }
+      mins[c] = isFinite(lo) ? lo : 0;
+      maxs[c] = isFinite(hi) ? hi : 0;
+    }
+    return { mins: mins, maxs: maxs };
+  };
+
+  /* === drawing ============================================================ */
+
+  Atelier.draw = {};
+
+  function css(name) {
+    return getComputedStyle(doc.body).getPropertyValue(name).trim() || '#888';
+  }
+
+  Atelier.draw.fit = function (canvas, cssHeight) {
+    var dpr = global.devicePixelRatio || 1;
+    var w = canvas.clientWidth || 800;
+    var h = cssHeight || 130;
+    canvas.style.height = h + 'px';
+    canvas.width = Math.max(1, Math.round(w * dpr));
+    canvas.height = Math.max(1, Math.round(h * dpr));
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx: ctx, w: w, h: h };
+  };
+
+  Atelier.draw.waveform = function (canvas, signal, opts) {
+    opts = opts || {};
+    var f = Atelier.draw.fit(canvas, opts.height || 130);
+    var ctx = f.ctx, w = f.w, h = f.h, mid = h / 2;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = css('--line');
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, mid); ctx.lineTo(w, mid); ctx.stroke();
+
+    canvas._atGeom = { padL: 0, padT: 0, plotW: w, plotH: h };
+
+    var env = Atelier.dsp.envelope(signal, Math.max(1, Math.floor(w)));
+    ctx.strokeStyle = opts.color || css('--accent');
+    ctx.beginPath();
+    for (var c = 0; c < env.mins.length; c++) {
+      ctx.moveTo(c + 0.5, mid - env.maxs[c] * mid * 0.94);
+      ctx.lineTo(c + 0.5, mid - env.mins[c] * mid * 0.94);
+    }
+    ctx.stroke();
+    if (opts.label) canvas.setAttribute('aria-label', opts.label);
+  };
+
+  /**
+   * Plot one descriptor curve against time. Series longer than the canvas are
+   * reduced to a per-pixel min/max band, so a 300 000-point series draws in one
+   * pass and still shows its range.
+   */
+  Atelier.draw.curve = function (canvas, times, values, opts) {
+    opts = opts || {};
+    var f = Atelier.draw.fit(canvas, opts.height || 130);
+    var ctx = f.ctx, w = f.w, h = f.h;
+    var padL = 3.6 * parseFloat(getComputedStyle(doc.documentElement).fontSize);
+    var padB = 18, padT = 10;
+    ctx.clearRect(0, 0, w, h);
+
+    var ext = Atelier.dsp.extent(values);
+    if (!ext) return;
+    var lo = opts.min !== undefined ? opts.min : ext.min;
+    var hi = opts.max !== undefined ? opts.max : ext.max;
+    if (hi - lo < 1e-12) hi = lo + 1;
+
+    var plotW = Math.max(10, w - padL - 8), plotH = Math.max(10, h - padT - padB);
+    var n = values.length;
+    var tMax = n ? times[n - 1] : 1;
+
+    ctx.strokeStyle = css('--line-firm');
+    ctx.fillStyle = css('--ink-soft');
+    ctx.font = '11px ' + css('--mono');
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, padT); ctx.lineTo(padL, padT + plotH); ctx.lineTo(padL + plotW, padT + plotH);
+    ctx.stroke();
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(Atelier.fmt(hi), padL - 6, padT + 5);
+    ctx.fillText(Atelier.fmt(lo), padL - 6, padT + plotH - 5);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('0 s', padL, h - 4);
+    ctx.textAlign = 'right';
+    ctx.fillText(tMax.toFixed(1) + ' s', padL + plotW, h - 4);
+    if (opts.label) {
+      ctx.textAlign = 'left';
+      ctx.fillStyle = css('--ink');
+      ctx.font = '12px ' + css('--sans');
+      ctx.fillText(opts.label + (opts.unit ? ' (' + opts.unit + ')' : ''), padL + 6, padT + 11);
+    }
+
+    canvas._atGeom = { padL: padL, padT: padT, plotW: plotW, plotH: plotH };
+
+    var y = function (v) { return padT + plotH - ((v - lo) / (hi - lo)) * plotH; };
+    ctx.strokeStyle = opts.color || css('--accent');
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+
+    if (n > plotW * 1.5) {
+      // Dense series: one vertical min/max stroke per pixel column.
+      var cols = Math.floor(plotW);
+      var per = n / cols;
+      for (var c = 0; c < cols; c++) {
+        var s = Math.floor(c * per), e = Math.min(Math.floor((c + 1) * per), n);
+        if (e <= s) e = Math.min(s + 1, n);
+        var mn = Infinity, mx = -Infinity;
+        for (var i = s; i < e; i++) {
+          var v = values[i];
+          if (typeof v !== 'number' || !isFinite(v)) continue;
+          if (v < mn) mn = v;
+          if (v > mx) mx = v;
+        }
+        if (!isFinite(mn)) continue;
+        var xp = padL + c + 0.5;
+        ctx.moveTo(xp, y(mx));
+        ctx.lineTo(xp, y(mn) + 0.6);
+      }
+    } else {
+      var started = false;
+      for (var j = 0; j < n; j++) {
+        var val = values[j];
+        if (typeof val !== 'number' || !isFinite(val)) { started = false; continue; }
+        var xx = padL + (tMax ? times[j] / tMax : 0) * plotW;
+        if (!started) { ctx.moveTo(xx, y(val)); started = true; } else { ctx.lineTo(xx, y(val)); }
+      }
+    }
+    ctx.stroke();
+
+    canvas.setAttribute('role', 'img');
+    canvas.setAttribute('aria-label',
+      (opts.label || '') + ' — ' + Atelier.fmt(lo) + ' … ' + Atelier.fmt(hi) +
+      (opts.unit ? ' ' + opts.unit : ''));
+  };
+
+  /* === formatting / export ================================================ */
+
+  Atelier.fmt = function (v) {
+    if (typeof v !== 'number' || !isFinite(v)) return '—';
+    var a = Math.abs(v);
+    if (a === 0) return '0';
+    if (a >= 1000) return v.toFixed(0);
+    if (a >= 10) return v.toFixed(1);
+    if (a >= 1) return v.toFixed(2);
+    if (a >= 0.001) return v.toFixed(4);
+    return v.toExponential(1);
+  };
+
+  Atelier.io = {};
+
+  function saveBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = doc.createElement('a');
+    a.href = url;
+    a.download = filename;
+    doc.body.appendChild(a);
+    a.click();
+    doc.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function csvCell(v) {
+    var s = (v === null || v === undefined) ? '' : String(v);
+    return /[",;\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  /**
+   * Write a CSV. `getRow(i)` returns an array; streaming by index avoids
+   * building a second copy of a 300 000-row table in memory.
+   */
+  Atelier.io.csvRows = function (header, nRows, getRow, filename) {
+    var parts = ['﻿' + header.map(csvCell).join(',') + '\n'];
+    var chunk = [];
+    for (var i = 0; i < nRows; i++) {
+      chunk.push(getRow(i).map(csvCell).join(','));
+      if (chunk.length >= 2000) { parts.push(chunk.join('\n') + '\n'); chunk = []; }
+    }
+    if (chunk.length) parts.push(chunk.join('\n') + '\n');
+    saveBlob(new Blob(parts, { type: 'text/csv;charset=utf-8' }), filename);
+  };
+
+  Atelier.io.csv = function (rows, filename) {
+    Atelier.io.csvRows(rows[0], rows.length - 1, function (i) { return rows[i + 1]; }, filename);
+  };
+
+  Atelier.io.png = function (canvas, filename) {
+    canvas.toBlob(function (blob) { saveBlob(blob, filename); });
+  };
+
+  /** Drop zone + file input, operable by mouse, touch and keyboard. */
+  Atelier.io.dropzone = function (el, input, onFile) {
+    if (el.tagName !== 'BUTTON') {
+      el.setAttribute('role', 'button');
+      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+    }
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      el.addEventListener(ev, function (e) {
+        e.preventDefault(); e.stopPropagation(); el.classList.add('at-over');
+      });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+      el.addEventListener(ev, function (e) {
+        e.preventDefault(); e.stopPropagation(); el.classList.remove('at-over');
+      });
+    });
+    el.addEventListener('drop', function (e) {
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]);
+    });
+    el.addEventListener('click', function () { input.click(); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault(); input.click();
+      }
+    });
+    input.addEventListener('change', function () {
+      if (input.files && input.files[0]) onFile(input.files[0]);
+    });
+  };
+
+  /** Status line. Also mirrored to the console so failures leave a trace. */
+  Atelier.status = function (el, message, kind) {
+    el.textContent = message;
+    el.className = 'at-status' + (kind ? ' ' + kind : '');
+    if (!el.hasAttribute('role')) {
+      el.setAttribute('role', 'status');
+      el.setAttribute('aria-live', 'polite');
+    }
+    if (kind === 'bad') Atelier.log.error(message);
+  };
+
+  /* === spectral analysis ==================================================
+     A small FFT of our own, so the spectrogram, the novelty curve and the
+     pitch tracker do not depend on Meyda's internals. Radix-2, in place.
+     ======================================================================= */
+
+  var windowCache = {};
+
+  /** Analysis window of `size` samples: 'hann' | 'hamming' | 'blackman' | 'rect'. */
+  Atelier.dsp.window = function (size, type) {
+    type = type || 'hann';
+    var key = type + ':' + size;
+    if (windowCache[key]) return windowCache[key];
+    var w = new Float32Array(size), i, x;
+    for (i = 0; i < size; i++) {
+      x = 2 * Math.PI * i / (size - 1);
+      if (type === 'rect') w[i] = 1;
+      else if (type === 'hamming') w[i] = 0.54 - 0.46 * Math.cos(x);
+      else if (type === 'blackman') w[i] = 0.42 - 0.5 * Math.cos(x) + 0.08 * Math.cos(2 * x);
+      else w[i] = 0.5 - 0.5 * Math.cos(x);
+    }
+    windowCache[key] = w;
+    return w;
+  };
+
+  /** In-place complex FFT. `re` and `im` are Float32Array/Float64Array of a
+      power-of-two length. */
+  Atelier.dsp.fft = function (re, im) {
+    var n = re.length, i, j, k, m, len, half, step, ang, wr, wi, cr, ci, tr, ti, tmp;
+    for (i = 1, j = 0; i < n; i++) {
+      var bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) {
+        tmp = re[i]; re[i] = re[j]; re[j] = tmp;
+        tmp = im[i]; im[i] = im[j]; im[j] = tmp;
+      }
+    }
+    for (len = 2; len <= n; len <<= 1) {
+      half = len >> 1;
+      ang = -2 * Math.PI / len;
+      var wlr = Math.cos(ang), wli = Math.sin(ang);
+      for (i = 0; i < n; i += len) {
+        wr = 1; wi = 0;
+        for (k = 0; k < half; k++) {
+          m = i + k; step = m + half;
+          cr = re[step] * wr - im[step] * wi;
+          ci = re[step] * wi + im[step] * wr;
+          re[step] = re[m] - cr; im[step] = im[m] - ci;
+          re[m] += cr; im[m] += ci;
+          tr = wr * wlr - wi * wli; wi = wr * wli + wi * wlr; wr = tr;
+        }
+      }
+    }
+  };
+
+  /** Inverse FFT, in place. */
+  Atelier.dsp.ifft = function (re, im) {
+    var n = re.length, i;
+    for (i = 0; i < n; i++) im[i] = -im[i];
+    Atelier.dsp.fft(re, im);
+    for (i = 0; i < n; i++) { re[i] /= n; im[i] = -im[i] / n; }
+  };
+
+  /**
+   * Magnitude spectrum of one frame: size/2 + 1 bins, windowed. `scratch` is
+   * an optional {re, im} pair reused across calls.
+   */
+  Atelier.dsp.magnitude = function (frame, win, scratch) {
+    var n = frame.length, i;
+    scratch = scratch || {};
+    if (!scratch.re || scratch.re.length !== n) {
+      scratch.re = new Float32Array(n); scratch.im = new Float32Array(n);
+    }
+    var re = scratch.re, im = scratch.im;
+    for (i = 0; i < n; i++) { re[i] = frame[i] * (win ? win[i] : 1); im[i] = 0; }
+    Atelier.dsp.fft(re, im);
+    var bins = (n >> 1) + 1;
+    var out = new Float32Array(bins);
+    var norm = 2 / n;
+    for (i = 0; i < bins; i++) out[i] = Math.sqrt(re[i] * re[i] + im[i] * im[i]) * norm;
+    return out;
+  };
+
+  /**
+   * Walk a signal frame by frame, calling fn(frame, index, offset) for each,
+   * yielding to the browser between chunks. Returns a promise resolved with the
+   * number of frames.
+   */
+  Atelier.dsp.eachFrame = function (signal, size, hop, fn, onProgress) {
+    var nFrames = Math.max(0, Math.floor((signal.length - size) / hop) + 1);
+    var frame = new Float32Array(size);
+    var i = 0, CHUNK = 200;
+    return new Promise(function (resolve, reject) {
+      function step() {
+        try {
+          var end = Math.min(i + CHUNK, nFrames);
+          for (; i < end; i++) {
+            var off = i * hop;
+            frame.set(signal.subarray(off, off + size));
+            fn(frame, i, off);
+          }
+          if (onProgress) onProgress(nFrames ? i / nFrames : 1);
+          if (i < nFrames) setTimeout(step, 0); else resolve(nFrames);
+        } catch (err) { reject(err); }
+      }
+      step();
+    });
+  };
+
+  /**
+   * Spectrogram reduced to at most `maxColumns` columns (max over the frames
+   * each column covers) so an hour of audio stays a few megabytes. Also returns
+   * the spectral flux per frame — the novelty curve segmentation is built on.
+   *
+   * returns Promise<{columns, bins, data, colTimes, flux, fluxTimes, nFrames,
+   *                  frameSize, hopSize, sampleRate, maxMag}>
+   */
+  Atelier.dsp.spectrogram = function (signal, sampleRate, opts) {
+    opts = opts || {};
+    var size = opts.frameSize || 1024;
+    var hop = opts.hopSize || Math.floor(size / 4);
+    if (!Atelier.dsp.isPowerOfTwo(size)) return Promise.reject(new Error(Atelier.t('err.pow2')));
+    var win = Atelier.dsp.window(size, opts.window || 'hann');
+    var nFrames = Math.max(0, Math.floor((signal.length - size) / hop) + 1);
+    var bins = (size >> 1) + 1;
+    var maxCols = opts.maxColumns || 4096;
+    var cols = Math.min(nFrames, maxCols);
+    var per = nFrames / Math.max(1, cols);
+    var data = new Float32Array(cols * bins);
+    var colTimes = new Float64Array(cols);
+    var flux = new Float32Array(nFrames);
+    var fluxTimes = new Float64Array(nFrames);
+    var prev = new Float32Array(bins);
+    var scratch = {};
+    var maxMag = 0;
+    var c;
+    for (c = 0; c < cols; c++) colTimes[c] = ((c + 0.5) * per * hop + size / 2) / sampleRate;
+
+    return Atelier.dsp.eachFrame(signal, size, hop, function (frame, i, off) {
+      var mag = Atelier.dsp.magnitude(frame, win, scratch);
+      var col = Math.min(cols - 1, Math.floor(i / per));
+      var k, f = 0, d;
+      for (k = 0; k < bins; k++) {
+        var v = mag[k];
+        // Row-major: bin k occupies data[k * cols … ], which is the layout
+        // Atelier.draw.heat reads. Storing it column-major shears the image.
+        var idx = k * cols + col;
+        if (v > data[idx]) data[idx] = v;
+        if (v > maxMag) maxMag = v;
+        d = v - prev[k];
+        if (d > 0) f += d;
+        prev[k] = v;
+      }
+      flux[i] = i === 0 ? 0 : f;
+      fluxTimes[i] = (off + size / 2) / sampleRate;
+    }, opts.onProgress).then(function () {
+      return { columns: cols, bins: bins, data: data, colTimes: colTimes,
+               flux: flux, fluxTimes: fluxTimes, nFrames: nFrames,
+               frameSize: size, hopSize: hop, sampleRate: sampleRate, maxMag: maxMag,
+               duration: signal.length / sampleRate };
+    });
+  };
+
+  /**
+   * Fundamental frequency of one frame by the YIN method (difference function,
+   * cumulative mean normalisation, absolute threshold). Returns Hz, or NaN when
+   * the frame is not periodic enough. Lowest detectable pitch ≈ 2·sr/size.
+   */
+  Atelier.dsp.pitch = function (frame, sampleRate, opts) {
+    opts = opts || {};
+    var n = frame.length, half = n >> 1;
+    var thr = opts.threshold || 0.15;
+    var fMin = opts.fMin || 50, fMax = opts.fMax || 2000;
+    var tauMin = Math.max(2, Math.floor(sampleRate / fMax));
+    var tauMax = Math.min(half - 1, Math.ceil(sampleRate / fMin));
+    var d = new Float32Array(half), tau, i, delta;
+    var e = 0;
+    for (i = 0; i < half; i++) e += frame[i] * frame[i];
+    if (e / half < 1e-7) return NaN;                 // silence
+    for (tau = 1; tau < half; tau++) {
+      var s = 0;
+      for (i = 0; i < half; i++) { delta = frame[i] - frame[i + tau]; s += delta * delta; }
+      d[tau] = s;
+    }
+    var run = 0, best = -1;
+    d[0] = 1;
+    for (tau = 1; tau < half; tau++) {
+      run += d[tau];
+      d[tau] = run ? d[tau] * tau / run : 1;
+    }
+    for (tau = tauMin; tau <= tauMax; tau++) {
+      if (d[tau] < thr) {
+        while (tau + 1 <= tauMax && d[tau + 1] < d[tau]) tau++;
+        best = tau; break;
+      }
+    }
+    if (best < 0) return NaN;
+    // parabolic interpolation around the minimum
+    var x0 = d[best - 1], x1 = d[best], x2 = d[best + 1] !== undefined ? d[best + 1] : x1;
+    var denom = (x0 - 2 * x1 + x2);
+    var shift = denom ? 0.5 * (x0 - x2) / denom : 0;
+    return sampleRate / (best + shift);
+  };
+
+  /**
+   * Peak picking on a novelty curve. `sensitivity` in 0..1 (1 = many cuts).
+   * The curve is smoothed, normalised, and a peak counts when it rises above
+   * the local mean by a margin that shrinks as sensitivity grows, with a
+   * minimum gap of `minGapFrames` between two peaks.
+   */
+  Atelier.dsp.peaks = function (values, opts) {
+    opts = opts || {};
+    var n = values.length, i, k;
+    if (!n) return [];
+    var sens = Math.min(1, Math.max(0, opts.sensitivity === undefined ? 0.5 : opts.sensitivity));
+    var gap = Math.max(1, opts.minGapFrames || 1);
+    var w = opts.localWindow || 16;
+    var sm = new Float32Array(n);
+    for (i = 0; i < n; i++) {
+      var s = 0, c = 0;
+      for (k = -1; k <= 1; k++) if (i + k >= 0 && i + k < n) { s += values[i + k]; c++; }
+      sm[i] = s / c;
+    }
+    var ext = Atelier.dsp.extent(sm);
+    var hi = ext ? ext.max : 1;
+    if (hi <= 0) return [];
+    for (i = 0; i < n; i++) sm[i] /= hi;
+    // Sensitivity → threshold above the local mean. The exponent is chosen so the
+    // count changes visibly across the middle of the slider: a dial that does
+    // nothing between 25 % and 50 % is a dial students learn nothing from.
+    var margin = 0.5 * Math.pow(1 - sens, 1.8) + 0.015;  // 0.515 → 0.015
+    var out = [], last = -Infinity;
+    for (i = 1; i < n - 1; i++) {
+      if (sm[i] < sm[i - 1] || sm[i] < sm[i + 1]) continue;
+      var lo = Math.max(0, i - w), up = Math.min(n - 1, i + w), m = 0;
+      for (k = lo; k <= up; k++) m += sm[k];
+      m /= (up - lo + 1);
+      if (sm[i] - m < margin) continue;
+      if (i - last < gap) {
+        if (sm[i] > sm[out[out.length - 1]]) { out[out.length - 1] = i; last = i; }
+        continue;
+      }
+      out.push(i); last = i;
+    }
+    return out;
+  };
+
+  /* --- describe(): pitch and MFCC ---------------------------------------- */
+  /* `describe` understands two extra names on top of Meyda's scalar features:
+       'pitch' — YIN, in hertz (NaN where nothing periodic is found);
+       'mfcc'  — 13 coefficients per frame, returned in result.matrices.mfcc
+                 as {rows: 13, data: Float32Array(rows * nFrames)}.            */
+
+  var describeMeyda = Atelier.dsp.describe;
+  Atelier.dsp.describe = function (signal, sampleRate, features, opts) {
+    opts = opts || {};
+    var wantPitch = features.indexOf('pitch') >= 0;
+    var wantMfcc = features.indexOf('mfcc') >= 0;
+    var scalar = features.filter(function (f) { return f !== 'pitch' && f !== 'mfcc'; });
+    var size = opts.frameSize || 1024;
+    var hop = opts.hopSize || Math.floor(size / 2);
+    var nFrames = Math.max(0, Math.floor((signal.length - size) / hop) + 1);
+    var progress = opts.onProgress;
+    var extra = (wantPitch ? 1 : 0) + (wantMfcc ? 1 : 0);
+    var steps = (scalar.length ? 1 : 0) + extra;
+    var done = 0;
+    function sub(p) { if (progress) progress((done + p) / Math.max(1, steps)); }
+
+    var first;
+    if (scalar.length) {
+      first = describeMeyda(signal, sampleRate, scalar, {
+        frameSize: size, hopSize: hop, onProgress: sub
+      });
+    } else {
+      var times = new Float64Array(nFrames);
+      for (var i = 0; i < nFrames; i++) times[i] = (i * hop + size / 2) / sampleRate;
+      first = Promise.resolve({ times: times, sampleRate: sampleRate, frameSize: size,
+                                hopSize: hop, nFrames: nFrames, features: {} });
+    }
+    return first.then(function (res) {
+      res.matrices = res.matrices || {};
+      if (scalar.length) done++;
+      if (!wantPitch) return res;
+      var p = new Float64Array(nFrames);
+      return Atelier.dsp.eachFrame(signal, size, hop, function (frame, i) {
+        p[i] = Atelier.dsp.pitch(frame, sampleRate);
+      }, sub).then(function () { res.features.pitch = p; done++; return res; });
+    }).then(function (res) {
+      if (!wantMfcc) return res;
+      if (!global.Meyda) throw new Error(Atelier.t('err.noMeyda'));
+      var M = global.Meyda, rows = 13;
+      M.sampleRate = sampleRate; M.bufferSize = size; M.windowingFunction = 'hanning';
+      M.numberOfMFCCCoefficients = rows;
+      var data = new Float32Array(rows * nFrames);
+      return Atelier.dsp.eachFrame(signal, size, hop, function (frame, i) {
+        var m = M.extract('mfcc', frame);
+        if (m) for (var r = 0; r < rows; r++) data[r * nFrames + i] = m[r];
+      }, sub).then(function () {
+        res.matrices.mfcc = { rows: rows, cols: nFrames, data: data };
+        done++;
+        return res;
+      });
+    });
+  };
+
+  /* === corpus: many files, many segments ================================= */
+
+  Atelier.corpus = {};
+
+  /** Descriptors summarised per segment: mean and standard deviation of each
+      scalar series, plus the mean MFCC vector. Used by the batch table and the
+      sound plot. */
+  Atelier.corpus.FEATURES = ['rms', 'spectralCentroid', 'spectralFlatness', 'spectralSpread',
+                             'spectralRolloff', 'zcr', 'pitch', 'mfcc'];
+
+  function meanStd(arr) {
+    var n = 0, s = 0, s2 = 0;
+    for (var i = 0; i < arr.length; i++) {
+      var v = arr[i];
+      if (typeof v !== 'number' || !isFinite(v)) continue;
+      n++; s += v; s2 += v * v;
+    }
+    if (!n) return { mean: NaN, std: NaN, n: 0 };
+    var m = s / n;
+    return { mean: m, std: Math.sqrt(Math.max(0, s2 / n - m * m)), n: n };
+  }
+  Atelier.dsp.meanStd = meanStd;
+
+  /**
+   * Describe one segment of a signal. Returns a flat object of summary values:
+   * <feature>_mean, <feature>_std, mfcc_0…mfcc_12, duration, plus voiced
+   * (fraction of frames with a pitch).
+   */
+  Atelier.corpus.describeSegment = function (signal, sampleRate, start, end, features, opts) {
+    opts = opts || {};
+    var size = opts.frameSize || 1024, hop = opts.hopSize || 512;
+    var a = Math.max(0, Math.floor(start * sampleRate));
+    var b = Math.min(signal.length, Math.floor(end * sampleRate));
+    var slice = signal.subarray(a, b);
+    if (slice.length < size) {
+      // pad very short segments so they still get one frame
+      var padded = new Float32Array(size);
+      padded.set(slice);
+      slice = padded;
+    }
+    return Atelier.dsp.describe(slice, sampleRate, features, {
+      frameSize: size, hopSize: hop, onProgress: opts.onProgress
+    }).then(function (res) {
+      var row = { duration: (b - a) / sampleRate };
+      Object.keys(res.features).forEach(function (f) {
+        var ms = meanStd(res.features[f]);
+        row[f + '_mean'] = ms.mean;
+        row[f + '_std'] = ms.std;
+        if (f === 'pitch') row.voiced = res.nFrames ? ms.n / res.nFrames : 0;
+      });
+      if (res.matrices && res.matrices.mfcc) {
+        var m = res.matrices.mfcc;
+        for (var r = 0; r < m.rows; r++) {
+          row['mfcc_' + r] = meanStd(m.data.subarray(r * m.cols, (r + 1) * m.cols)).mean;
+        }
+      }
+      return row;
+    });
+  };
+
+  /** Column order for tables and CSV, given the features requested. */
+  Atelier.corpus.columns = function (features) {
+    var cols = ['duration'];
+    features.forEach(function (f) {
+      if (f === 'mfcc') { for (var r = 0; r < 13; r++) cols.push('mfcc_' + r); }
+      else { cols.push(f + '_mean'); cols.push(f + '_std'); if (f === 'pitch') cols.push('voiced'); }
+    });
+    return cols;
+  };
+
+  /** Serialise a described corpus for the next tool in the chain. */
+  Atelier.corpus.toJSON = function (segments, features, meta) {
+    return JSON.stringify({
+      format: 'atelier-corpus', version: 1,
+      created: new Date().toISOString(),
+      meta: meta || {},
+      features: features,
+      columns: Atelier.corpus.columns(features),
+      segments: segments.map(function (s) {
+        var o = { id: s.id, file: s.file, start: s.start, end: s.end, label: s.label || '' };
+        Atelier.corpus.columns(features).forEach(function (c) { o[c] = s[c]; });
+        return o;
+      })
+    }, null, 1);
+  };
+
+  Atelier.corpus.fromJSON = function (text) {
+    var o = JSON.parse(text);
+    if (!o || o.format !== 'atelier-corpus' || !Array.isArray(o.segments)) {
+      throw new Error(Atelier.t('err.corpusFormat'));
+    }
+    return o;
+  };
+
+  /** Parse a segments CSV (file,start,end[,label]) as written by the
+      segmentation tool. Header row required; separator , or ; . */
+  Atelier.corpus.parseSegmentsCSV = function (text) {
+    var lines = text.replace(/^﻿/, '').split(/\r?\n/).filter(function (l) { return l.trim(); });
+    if (lines.length < 2) return [];
+    var sep = lines[0].indexOf(';') >= 0 && lines[0].indexOf(',') < 0 ? ';' : ',';
+    function cells(line) {
+      var out = [], cur = '', q = false;
+      for (var i = 0; i < line.length; i++) {
+        var ch = line[i];
+        if (q) {
+          if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+          else if (ch === '"') q = false;
+          else cur += ch;
+        } else if (ch === '"') q = true;
+        else if (ch === sep) { out.push(cur); cur = ''; }
+        else cur += ch;
+      }
+      out.push(cur);
+      return out;
+    }
+    var head = cells(lines[0]).map(function (h) { return h.trim().toLowerCase(); });
+    var fi = head.indexOf('file'), si = head.indexOf('start'), ei = head.indexOf('end'),
+        li = head.indexOf('label');
+    if (fi < 0 || si < 0 || ei < 0) throw new Error(Atelier.t('err.segmentsCsv'));
+    var segs = [];
+    for (var r = 1; r < lines.length; r++) {
+      var c = cells(lines[r]);
+      var st = parseFloat(c[si]), en = parseFloat(c[ei]);
+      if (!isFinite(st) || !isFinite(en)) continue;
+      segs.push({ file: c[fi].trim(), start: st, end: en, label: li >= 0 ? (c[li] || '') : '' });
+    }
+    return segs;
+  };
+
+  /* === projection to 2D =================================================== */
+
+  /** Standardise columns (zero mean, unit variance); NaN → column mean. */
+  Atelier.dsp.standardise = function (vectors) {
+    var n = vectors.length; if (!n) return [];
+    var d = vectors[0].length, j, i;
+    var mean = new Float64Array(d), std = new Float64Array(d), cnt = new Float64Array(d);
+    for (i = 0; i < n; i++) for (j = 0; j < d; j++) {
+      var v = vectors[i][j]; if (isFinite(v)) { mean[j] += v; cnt[j]++; }
+    }
+    for (j = 0; j < d; j++) mean[j] = cnt[j] ? mean[j] / cnt[j] : 0;
+    for (i = 0; i < n; i++) for (j = 0; j < d; j++) {
+      var w = vectors[i][j]; if (isFinite(w)) std[j] += (w - mean[j]) * (w - mean[j]);
+    }
+    for (j = 0; j < d; j++) std[j] = cnt[j] > 1 ? Math.sqrt(std[j] / (cnt[j] - 1)) : 1;
+    return vectors.map(function (vec) {
+      var out = new Float64Array(d);
+      for (var k = 0; k < d; k++) {
+        var x = isFinite(vec[k]) ? vec[k] : mean[k];
+        out[k] = std[k] > 1e-12 ? (x - mean[k]) / std[k] : 0;
+      }
+      return out;
+    });
+  };
+
+  /** PCA to two axes by power iteration on the covariance matrix. */
+  Atelier.dsp.pca = function (vectors) {
+    var X = Atelier.dsp.standardise(vectors);
+    var n = X.length; if (!n) return [];
+    var d = X[0].length, i, j, k;
+    var C = [];
+    for (i = 0; i < d; i++) { C.push(new Float64Array(d)); }
+    for (k = 0; k < n; k++) for (i = 0; i < d; i++) for (j = i; j < d; j++) C[i][j] += X[k][i] * X[k][j];
+    for (i = 0; i < d; i++) for (j = i; j < d; j++) { C[i][j] /= Math.max(1, n - 1); C[j][i] = C[i][j]; }
+    var comps = [];
+    for (var c = 0; c < 2; c++) {
+      var v = new Float64Array(d);
+      for (i = 0; i < d; i++) v[i] = 1 / Math.sqrt(d) + 0.01 * i * (c + 1);
+      for (var it = 0; it < 200; it++) {
+        var w = new Float64Array(d);
+        for (i = 0; i < d; i++) for (j = 0; j < d; j++) w[i] += C[i][j] * v[j];
+        comps.forEach(function (u) {
+          var dot = 0; for (i = 0; i < d; i++) dot += w[i] * u[i];
+          for (i = 0; i < d; i++) w[i] -= dot * u[i];
+        });
+        var norm = 0; for (i = 0; i < d; i++) norm += w[i] * w[i];
+        norm = Math.sqrt(norm) || 1;
+        for (i = 0; i < d; i++) v[i] = w[i] / norm;
+      }
+      comps.push(v);
+    }
+    return X.map(function (x) {
+      var p = [0, 0];
+      for (i = 0; i < d; i++) { p[0] += x[i] * comps[0][i]; p[1] += x[i] * comps[1][i]; }
+      return p;
+    });
+  };
+
+  /**
+   * t-SNE, plain O(n²) version — fine for a few hundred segments. Yields
+   * between iterations; resolves with an array of [x, y].
+   */
+  Atelier.dsp.tsne = function (vectors, opts) {
+    opts = opts || {};
+    var X = Atelier.dsp.standardise(vectors);
+    var n = X.length;
+    if (n < 3) return Promise.resolve(X.map(function () { return [0, 0]; }));
+    var perp = Math.min(opts.perplexity || 15, Math.floor((n - 1) / 3)) || 2;
+    var iters = opts.iterations || 400;
+    var seed = opts.seed || 1;
+    function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+    var i, j, k, d = X[0].length;
+    // pairwise squared distances
+    var D = new Float64Array(n * n);
+    for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) {
+      var s = 0; for (k = 0; k < d; k++) { var t = X[i][k] - X[j][k]; s += t * t; }
+      D[i * n + j] = s; D[j * n + i] = s;
+    }
+    // conditional probabilities with binary search on beta
+    var P = new Float64Array(n * n);
+    var target = Math.log(perp);
+    for (i = 0; i < n; i++) {
+      var beta = 1, lo = -Infinity, hi = Infinity, row = new Float64Array(n);
+      for (var tries = 0; tries < 50; tries++) {
+        var sum = 0;
+        for (j = 0; j < n; j++) { row[j] = i === j ? 0 : Math.exp(-D[i * n + j] * beta); sum += row[j]; }
+        var H = 0;
+        for (j = 0; j < n; j++) if (row[j] > 0) { var pj = row[j] / sum; H -= pj * Math.log(pj); }
+        var diff = H - target;
+        if (Math.abs(diff) < 1e-4) break;
+        if (diff > 0) { lo = beta; beta = isFinite(hi) ? (beta + hi) / 2 : beta * 2; }
+        else { hi = beta; beta = isFinite(lo) ? (beta + lo) / 2 : beta / 2; }
+        if (!isFinite(sum) || sum === 0) break;
+      }
+      var tot = 0; for (j = 0; j < n; j++) tot += row[j];
+      for (j = 0; j < n; j++) P[i * n + j] = tot ? row[j] / tot : 0;
+    }
+    for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) {
+      var p = (P[i * n + j] + P[j * n + i]) / (2 * n);
+      P[i * n + j] = p; P[j * n + i] = p;
+    }
+    var Y = [], dY = [], gains = [], iY = [];
+    for (i = 0; i < n; i++) {
+      Y.push([(rnd() - 0.5) * 1e-2, (rnd() - 0.5) * 1e-2]);
+      dY.push([0, 0]); gains.push([1, 1]); iY.push([0, 0]);
+    }
+    var it = 0;
+    return new Promise(function (resolve) {
+      function step() {
+        var batchEnd = Math.min(iters, it + 20);
+        for (; it < batchEnd; it++) {
+          var exag = it < 100 ? 4 : 1, mom = it < 250 ? 0.5 : 0.8, eta = 100;
+          var Q = new Float64Array(n * n), qs = 0;
+          for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) {
+            var dx = Y[i][0] - Y[j][0], dy = Y[i][1] - Y[j][1];
+            var q = 1 / (1 + dx * dx + dy * dy);
+            Q[i * n + j] = q; Q[j * n + i] = q; qs += 2 * q;
+          }
+          for (i = 0; i < n; i++) {
+            var gx = 0, gy = 0;
+            for (j = 0; j < n; j++) {
+              if (i === j) continue;
+              var q2 = Q[i * n + j];
+              var mult = 4 * (exag * P[i * n + j] - q2 / qs) * q2;
+              gx += mult * (Y[i][0] - Y[j][0]); gy += mult * (Y[i][1] - Y[j][1]);
+            }
+            dY[i][0] = gx; dY[i][1] = gy;
+          }
+          for (i = 0; i < n; i++) for (k = 0; k < 2; k++) {
+            gains[i][k] = (Math.sign(dY[i][k]) !== Math.sign(iY[i][k])) ? gains[i][k] + 0.2 : gains[i][k] * 0.8;
+            if (gains[i][k] < 0.01) gains[i][k] = 0.01;
+            iY[i][k] = mom * iY[i][k] - eta * gains[i][k] * dY[i][k];
+            Y[i][k] += iY[i][k];
+          }
+          var mx = 0, my = 0;
+          for (i = 0; i < n; i++) { mx += Y[i][0]; my += Y[i][1]; }
+          for (i = 0; i < n; i++) { Y[i][0] -= mx / n; Y[i][1] -= my / n; }
+        }
+        if (opts.onProgress) opts.onProgress(it / iters);
+        if (it < iters) setTimeout(step, 0); else resolve(Y);
+      }
+      step();
+    });
+  };
+
+  /* === drawing: heat maps and spectrograms ================================ */
+
+  /** Sequential colour map, 0..1 → [r, g, b], chosen for the current theme:
+      light background goes white → blue → black, dark goes black → violet →
+      orange → white. Both stay monotone in lightness, which is what makes a
+      spectrogram readable. */
+  Atelier.draw.colormap = function (dark) {
+    var stops = dark
+      ? [[0, 0, 0], [40, 10, 70], [110, 30, 120], [190, 60, 90], [240, 130, 40], [252, 220, 90], [255, 255, 240]]
+      : [[255, 255, 255], [220, 230, 245], [150, 180, 225], [80, 120, 190], [30, 60, 130], [10, 20, 60], [0, 0, 0]];
+    var lut = new Uint8ClampedArray(256 * 3);
+    for (var i = 0; i < 256; i++) {
+      var x = i / 255 * (stops.length - 1), k = Math.min(stops.length - 2, Math.floor(x)), f = x - k;
+      for (var c = 0; c < 3; c++) lut[i * 3 + c] = stops[k][c] + (stops[k + 1][c] - stops[k][c]) * f;
+    }
+    return lut;
+  };
+
+  Atelier.draw.isDark = function () {
+    var bg = css('--bg').replace(/[^\d,]/g, '').split(',');
+    if (bg.length >= 3) return (+bg[0] * 0.299 + +bg[1] * 0.587 + +bg[2] * 0.114) < 128;
+    var h = css('--bg');
+    if (/^#[0-9a-f]{6}$/i.test(h)) {
+      return (parseInt(h.substr(1, 2), 16) * 0.299 + parseInt(h.substr(3, 2), 16) * 0.587 +
+              parseInt(h.substr(5, 2), 16) * 0.114) < 128;
+    }
+    return false;
+  };
+
+  /**
+   * Draw a matrix {rows, cols, data (row-major, row r at data[r*cols …])} as a
+   * heat map, row 0 at the bottom. Values are mapped through `opts.scale`
+   * ('linear' | 'db'), with opts.min/opts.max or the data's own extent.
+   */
+  Atelier.draw.heat = function (canvas, matrix, opts) {
+    opts = opts || {};
+    var f = Atelier.draw.fit(canvas, opts.height || 160);
+    var ctx = f.ctx, w = f.w, h = f.h;
+    var padL = opts.padL !== undefined ? opts.padL : 3.6 * parseFloat(getComputedStyle(doc.documentElement).fontSize);
+    var padB = opts.padB !== undefined ? opts.padB : 18, padT = opts.padT !== undefined ? opts.padT : 6;
+    var plotW = Math.max(10, Math.floor(w - padL - 8)), plotH = Math.max(10, Math.floor(h - padT - padB));
+    ctx.clearRect(0, 0, w, h);
+    var rows = matrix.rows, cols = matrix.cols, data = matrix.data;
+    if (!rows || !cols) return;
+    var dark = Atelier.draw.isDark();
+    var lut = Atelier.draw.colormap(dark);
+    var db = opts.scale === 'db';
+    var lo = opts.min, hi = opts.max;
+    if (lo === undefined || hi === undefined) {
+      var ext = Atelier.dsp.extent(data);
+      if (!ext) return;
+      if (db) { hi = 20 * Math.log10(ext.max || 1e-9); lo = hi - (opts.dbRange || 80); }
+      else { lo = lo === undefined ? ext.min : lo; hi = hi === undefined ? ext.max : hi; }
+    }
+    if (hi - lo < 1e-12) hi = lo + 1;
+
+    // Which source rows does each output pixel row cover? Log-frequency
+    // mapping when asked (rows are frequency bins from 0).
+    var outH = Math.min(plotH, opts.maxRows || 1024), outW = Math.min(plotW, cols);
+    var img = ctx.createImageData(outW, outH);
+    var px = img.data;
+    var logF = opts.logFreq, minRow = Math.max(1, opts.minRow || 1);
+    var rowAt = function (y) {                    // y: 0 (top) .. outH-1 (bottom) → source row
+      var t = 1 - y / outH;                       // 0 bottom .. 1 top
+      if (logF) return Math.exp(Math.log(minRow) + t * (Math.log(rows) - Math.log(minRow)));
+      return t * rows;
+    };
+    for (var y = 0; y < outH; y++) {
+      var r1 = rowAt(y + 1), r0 = rowAt(y);        // r1 < r0
+      var ra = Math.max(0, Math.floor(r1)), rb = Math.min(rows - 1, Math.max(ra, Math.ceil(r0) - 1));
+      for (var x = 0; x < outW; x++) {
+        var ca = Math.floor(x * cols / outW), cb = Math.min(cols - 1, Math.max(ca, Math.floor((x + 1) * cols / outW) - 1));
+        var v = -Infinity;
+        for (var r = ra; r <= rb; r++) for (var c = ca; c <= cb; c++) {
+          var d = data[r * cols + c]; if (d > v) v = d;
+        }
+        if (db) v = 20 * Math.log10(v > 1e-12 ? v : 1e-12);
+        var u = (v - lo) / (hi - lo); if (!(u >= 0)) u = 0; if (u > 1) u = 1;
+        var li = Math.round(u * 255) * 3, o = (y * outW + x) * 4;
+        px[o] = lut[li]; px[o + 1] = lut[li + 1]; px[o + 2] = lut[li + 2]; px[o + 3] = 255;
+      }
+    }
+    var off = doc.createElement('canvas'); off.width = outW; off.height = outH;
+    off.getContext('2d').putImageData(img, 0, 0);
+    ctx.imageSmoothingEnabled = !!opts.smooth;
+    ctx.drawImage(off, padL, padT, plotW, plotH);
+
+    // axes and labels
+    ctx.strokeStyle = css('--line-firm'); ctx.lineWidth = 1;
+    ctx.strokeRect(padL + 0.5, padT + 0.5, plotW - 1, plotH - 1);
+    ctx.fillStyle = css('--ink-soft'); ctx.font = '11px ' + css('--mono');
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    if (opts.yLabels) {
+      opts.yLabels.forEach(function (lab) {         // {row, text}
+        var t = logF ? (Math.log(Math.max(minRow, lab.row)) - Math.log(minRow)) / (Math.log(rows) - Math.log(minRow))
+                     : lab.row / rows;
+        var yy = padT + plotH - t * plotH;
+        if (yy < padT - 1 || yy > padT + plotH + 1) return;
+        ctx.fillText(lab.text, padL - 5, yy);
+        ctx.beginPath(); ctx.moveTo(padL - 3, yy); ctx.lineTo(padL, yy); ctx.stroke();
+      });
+    }
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(opts.x0 || '0 s', padL, h - 4);
+    ctx.textAlign = 'right';
+    if (opts.x1) ctx.fillText(opts.x1, padL + plotW, h - 4);
+    if (opts.label) {
+      ctx.textAlign = 'left'; ctx.fillStyle = dark ? '#fff' : '#000';
+      ctx.font = '12px ' + css('--sans');
+      // label on a small backing box so it reads over any colour
+      var tw = ctx.measureText(opts.label).width;
+      ctx.fillStyle = dark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.75)';
+      ctx.fillRect(padL + 4, padT + 3, tw + 8, 16);
+      ctx.fillStyle = css('--ink');
+      ctx.fillText(opts.label, padL + 8, padT + 15);
+    }
+    if (typeof opts.cursor === 'number' && opts.cursor >= 0 && opts.cursor <= 1) {
+      ctx.strokeStyle = css('--bad'); ctx.lineWidth = 1.5;
+      var cx = padL + opts.cursor * plotW;
+      ctx.beginPath(); ctx.moveTo(cx, padT); ctx.lineTo(cx, padT + plotH); ctx.stroke();
+    }
+    if (opts.marks) {                              // vertical marks, 0..1 positions
+      ctx.strokeStyle = opts.markColor || css('--warn'); ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (var mi = 0; mi < opts.marks.length; mi++) {
+        var mx = padL + opts.marks[mi] * plotW;
+        ctx.moveTo(mx, padT); ctx.lineTo(mx, padT + plotH);
+      }
+      ctx.stroke();
+    }
+    canvas.setAttribute('role', 'img');
+    if (opts.label) canvas.setAttribute('aria-label', opts.label);
+    canvas._atGeom = { padL: padL, padT: padT, plotW: plotW, plotH: plotH };
+    return canvas._atGeom;
+  };
+
+  /** Spectrogram as returned by Atelier.dsp.spectrogram(). */
+  Atelier.draw.spectrogram = function (canvas, spec, opts) {
+    opts = opts || {};
+    var sr = spec.sampleRate, bins = spec.bins;
+    var fMax = opts.fMax || sr / 2;
+    var rows = Math.max(2, Math.min(bins, Math.round(bins * fMax / (sr / 2))));
+    var hzPerBin = (sr / 2) / (bins - 1);
+    var labels = [];
+    var ticks = opts.logFreq ? [100, 200, 500, 1000, 2000, 5000, 10000, 20000] : [1000, 2000, 5000, 10000, 15000, 20000];
+    ticks.forEach(function (hz) {
+      if (hz <= fMax) labels.push({ row: hz / hzPerBin, text: hz >= 1000 ? (hz / 1000) + ' k' : hz + '' });
+    });
+    return Atelier.draw.heat(canvas, { rows: rows, cols: spec.columns, data: spec.data },
+      { height: opts.height || 220, scale: 'db', dbRange: opts.dbRange || 80,
+        max: 20 * Math.log10(spec.maxMag || 1e-9),
+        logFreq: opts.logFreq, minRow: Math.max(1, Math.round(30 / hzPerBin)),
+        yLabels: labels, label: opts.label, x1: spec.duration.toFixed(1) + ' s',
+        cursor: opts.cursor, marks: opts.marks, smooth: opts.smooth });
+  };
+
+  /* === audio: slices, WAV, recording ===================================== */
+
+  /** Play part of a buffer. start/end in seconds. */
+  Atelier.audio.playRange = function (buffer, start, end, onEnded) {
+    Atelier.audio.stop();
+    var ctx = Atelier.audio.ctx();
+    var src = ctx.createBufferSource();
+    src.buffer = buffer;
+    src.connect(Atelier.audio.master());
+    src.onended = function () {
+      if (currentSource === src) currentSource = null;
+      if (onEnded) onEnded();
+    };
+    var s = Math.max(0, start || 0);
+    var d = Math.max(0.01, Math.min(buffer.duration, end === undefined ? buffer.duration : end) - s);
+    src.start(0, s, d);
+    currentSource = src;
+    return src;
+  };
+
+  /** Fire-and-forget playback of a slice, overlapping allowed (for the map). */
+  Atelier.audio.trigger = function (buffer, start, end, gain) {
+    var ctx = Atelier.audio.ctx();
+    var src = ctx.createBufferSource();
+    src.buffer = buffer;
+    var g = ctx.createGain();
+    var s = Math.max(0, start || 0);
+    var d = Math.max(0.01, Math.min(buffer.duration, end === undefined ? buffer.duration : end) - s);
+    var now = ctx.currentTime, fade = Math.min(0.01, d / 4);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(gain === undefined ? 1 : gain, now + fade);
+    g.gain.setValueAtTime(gain === undefined ? 1 : gain, now + d - fade);
+    g.gain.linearRampToValueAtTime(0, now + d);
+    src.connect(g); g.connect(Atelier.audio.master());
+    src.start(now, s, d);
+    return src;
+  };
+
+  var masterGain = null, recorder = null;
+  /** Everything routed through here can be recorded. */
+  Atelier.audio.master = function () {
+    var ctx = Atelier.audio.ctx();
+    if (!masterGain) { masterGain = ctx.createGain(); masterGain.connect(ctx.destination); }
+    return masterGain;
+  };
+
+  /** Record what goes through master(). start() then stop() → Float32Array. */
+  Atelier.audio.record = {
+    start: function () {
+      var ctx = Atelier.audio.ctx();
+      if (recorder) return;
+      if (!ctx.createScriptProcessor) throw new Error(Atelier.t('err.noRecord'));
+      var node = ctx.createScriptProcessor(4096, 1, 1);
+      var chunks = [];
+      node.onaudioprocess = function (e) { chunks.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+      Atelier.audio.master().connect(node);
+      node.connect(ctx.destination);      // a ScriptProcessor only runs when connected
+      recorder = { node: node, chunks: chunks, t0: ctx.currentTime, sampleRate: ctx.sampleRate };
+    },
+    stop: function () {
+      if (!recorder) return null;
+      var r = recorder; recorder = null;
+      try { Atelier.audio.master().disconnect(r.node); } catch (e) { /* already gone */ }
+      try { r.node.disconnect(); } catch (e2) { /* ignore */ }
+      r.node.onaudioprocess = null;
+      var n = 0, i;
+      for (i = 0; i < r.chunks.length; i++) n += r.chunks[i].length;
+      var out = new Float32Array(n), o = 0;
+      for (i = 0; i < r.chunks.length; i++) { out.set(r.chunks[i], o); o += r.chunks[i].length; }
+      return { samples: out, sampleRate: r.sampleRate, duration: n / r.sampleRate };
+    },
+    active: function () { return !!recorder; },
+    elapsed: function () { return recorder ? Atelier.audio.ctx().currentTime - recorder.t0 : 0; }
+  };
+
+  /** 16-bit PCM WAV from one or more Float32Array channels. */
+  Atelier.io.wavBlob = function (channels, sampleRate) {
+    if (!Array.isArray(channels)) channels = [channels];
+    var nCh = channels.length, n = channels[0].length;
+    var buf = new ArrayBuffer(44 + n * nCh * 2), v = new DataView(buf);
+    function str(o, s) { for (var i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
+    str(0, 'RIFF'); v.setUint32(4, 36 + n * nCh * 2, true); str(8, 'WAVE');
+    str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, nCh, true);
+    v.setUint32(24, sampleRate, true); v.setUint32(28, sampleRate * nCh * 2, true);
+    v.setUint16(32, nCh * 2, true); v.setUint16(34, 16, true);
+    str(36, 'data'); v.setUint32(40, n * nCh * 2, true);
+    var o = 44;
+    for (var i = 0; i < n; i++) for (var c = 0; c < nCh; c++) {
+      var s = channels[c][i]; s = s > 1 ? 1 : s < -1 ? -1 : s;
+      v.setInt16(o, s < 0 ? s * 32768 : s * 32767, true); o += 2;
+    }
+    return new Blob([buf], { type: 'audio/wav' });
+  };
+
+  Atelier.io.saveWav = function (channels, sampleRate, filename) {
+    saveBlob(Atelier.io.wavBlob(channels, sampleRate), filename);
+  };
+
+  Atelier.io.saveText = function (text, filename, mime) {
+    saveBlob(new Blob(['﻿' + text], { type: (mime || 'text/plain') + ';charset=utf-8' }), filename);
+  };
+
+  Atelier.io.saveJSON = function (text, filename) {
+    saveBlob(new Blob([text], { type: 'application/json' }), filename);
+  };
+
+  /** Read a text file chosen by the user (never fetch()). */
+  Atelier.io.readText = function (file) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onerror = function () { reject(new Error(Atelier.t('err.read'))); };
+      r.onload = function () { resolve(r.result); };
+      r.readAsText(file);
+    });
+  };
+
+  /** Multi-file drop zone: onFiles(FileList-as-array). */
+  Atelier.io.dropzoneMulti = function (el, input, onFiles) {
+    Atelier.io.dropzone(el, input, function () { /* single-file path unused */ });
+    el.addEventListener('drop', function (e) {
+      if (e.dataTransfer.files && e.dataTransfer.files.length) {
+        onFiles(Array.prototype.slice.call(e.dataTransfer.files));
+      }
+    }, true);
+    input.addEventListener('change', function () {
+      if (input.files && input.files.length) onFiles(Array.prototype.slice.call(input.files));
+      input.value = '';
+    }, true);
+  };
+
+  /** Format seconds as m:ss.t */
+  Atelier.fmtTime = function (s) {
+    if (typeof s !== 'number' || !isFinite(s)) return '—';
+    var m = Math.floor(s / 60), r = s - m * 60;
+    return m + ':' + (r < 10 ? '0' : '') + r.toFixed(1);
+  };
+
+  /* === transport: play, pause, scrub, playhead ============================
+     Every tool that plays a sound file gets the same controls, so a student who
+     has learned to scrub in one page can scrub in all of them. The playhead is a
+     DOM overlay rather than a canvas redraw: a 300 000-point curve cannot be
+     repainted at 60 fps, and it does not need to be — only the line moves.
+     ======================================================================= */
+
+  Atelier.transport = {};
+
+  /** Wrap a canvas in a positioned stack so an overlay can sit on top of it and
+      still scroll with the canvas inside `.at-canvas-wrap`. */
+  function ensureStack(canvas) {
+    var parent = canvas.parentNode;
+    if (parent && parent.className === 'at-canvas-stack') return parent;
+    var stack = doc.createElement('div');
+    stack.className = 'at-canvas-stack';
+    parent.insertBefore(stack, canvas);
+    stack.appendChild(canvas);
+    return stack;
+  }
+
+  /** Plot geometry in CSS pixels, as recorded by Atelier.draw.*; whole-canvas
+      fallback for anything drawn by hand. */
+  function geomOf(canvas) {
+    return canvas._atGeom || { padL: 0, padT: 0,
+                               plotW: canvas.clientWidth || 1,
+                               plotH: canvas.clientHeight || 1 };
+  }
+
+  /**
+   * A transport bound to one AudioBuffer.
+   *
+   *   var tp = Atelier.transport.create({ mount: el, buffer: buf, canvases: [cv] });
+   *   tp.setBuffer(buf);        tp.attach(cv);        tp.detachAll();
+   *   tp.play(); tp.pause(); tp.stop(); tp.seek(seconds); tp.time();
+   *   tp.setRange(start, end);  // play only part of the buffer (a segment)
+   *   tp.onSeek(fn);            // fn(seconds) whenever the position changes
+   *
+   * Attached canvases get a playhead and click-to-seek. Playback is routed through
+   * Atelier.audio.master(), so a recording picks it up.
+   */
+  Atelier.transport.create = function (opts) {
+    opts = opts || {};
+    var buffer = opts.buffer || null;
+    var rangeStart = 0, rangeEnd = null;   // null = end of buffer
+    var position = 0;                      // seconds from the start of the buffer
+    var playing = false, src = null, startedAt = 0, raf = null;
+    var heads = [];                        // {canvas, el, onClick}
+    var seekListeners = [];
+    var api = {};
+
+    var box = doc.createElement('div');
+    box.className = 'at-transport';
+    var playBtn = doc.createElement('button');
+    playBtn.type = 'button';
+    playBtn.className = 'at-primary';
+    var stopBtn = doc.createElement('button');
+    stopBtn.type = 'button';
+    var slider = doc.createElement('input');
+    slider.type = 'range';
+    slider.min = 0; slider.max = 10000; slider.step = 1; slider.value = 0;
+    var readout = doc.createElement('span');
+    readout.className = 'at-time';
+    box.appendChild(playBtn);
+    box.appendChild(stopBtn);
+    box.appendChild(slider);
+    box.appendChild(readout);
+    if (opts.mount) opts.mount.appendChild(box);
+
+    function lo() { return rangeStart; }
+    function hi() { return rangeEnd !== null ? rangeEnd : (buffer ? buffer.duration : 0); }
+    function span() { return Math.max(0.0001, hi() - lo()); }
+
+    function labels() {
+      playBtn.textContent = playing ? Atelier.t('tp.pause') : Atelier.t('tp.play');
+      playBtn.setAttribute('aria-label', playing ? Atelier.t('tp.pause') : Atelier.t('tp.play'));
+      stopBtn.textContent = Atelier.t('tp.stop');
+      slider.setAttribute('aria-label', Atelier.t('tp.scrub'));
+      var dis = !buffer;
+      playBtn.disabled = dis; stopBtn.disabled = dis; slider.disabled = dis;
+    }
+
+    function paint() {
+      var t = api.time();
+      readout.textContent = buffer
+        ? Atelier.fmtTime(t) + ' / ' + Atelier.fmtTime(hi())
+        : '';
+      if (doc.activeElement !== slider) {
+        slider.value = Math.round((t - lo()) / span() * 10000);
+      }
+      for (var i = 0; i < heads.length; i++) {
+        var g = geomOf(heads[i].canvas);
+        var u = (t - lo()) / span();
+        heads[i].el.style.display = 'block';
+        heads[i].el.style.left = (g.padL + u * g.plotW) + 'px';
+        heads[i].el.style.top = g.padT + 'px';
+        heads[i].el.style.height = g.plotH + 'px';
+      }
+    }
+
+    function tick() {
+      if (!playing) return;
+      if (api.time() >= hi() - 0.001) { api.stop(); return; }
+      paint();
+      raf = global.requestAnimationFrame(tick);
+    }
+
+    api.time = function () {
+      if (!buffer) return 0;
+      if (!playing) return Math.min(Math.max(position, lo()), hi());
+      var t = Atelier.audio.ctx().currentTime - startedAt;
+      return Math.min(Math.max(t, lo()), hi());
+    };
+
+    api.play = function () {
+      if (!buffer || playing) return api;
+      var ctx = Atelier.audio.ctx();
+      Atelier.audio.stop();
+      if (position >= hi() - 0.001 || position < lo()) position = lo();
+      src = ctx.createBufferSource();
+      src.buffer = buffer;
+      src.connect(Atelier.audio.master());
+      src.onended = function () {
+        if (currentSource === src) currentSource = null;
+        if (playing && api.time() >= hi() - 0.01) api.stop();
+      };
+      startedAt = ctx.currentTime - position;
+      src.start(0, position, Math.max(0.01, hi() - position));
+      currentSource = src;
+      playing = true;
+      labels();
+      raf = global.requestAnimationFrame(tick);
+      return api;
+    };
+
+    api.pause = function () {
+      if (!playing) return api;
+      position = api.time();
+      playing = false;
+      if (raf) global.cancelAnimationFrame(raf);
+      raf = null;
+      try { if (src) src.stop(); } catch (e) { /* already stopped */ }
+      src = null;
+      labels(); paint();
+      return api;
+    };
+
+    api.stop = function () {
+      api.pause();
+      position = lo();
+      paint();
+      return api;
+    };
+
+    api.toggle = function () { return playing ? api.pause() : api.play(); };
+
+    api.seek = function (seconds, quiet) {
+      if (!buffer) return api;
+      position = Math.min(Math.max(seconds, lo()), hi());
+      if (playing) { var was = true; api.pause(); if (was) api.play(); }
+      paint();
+      if (!quiet) {
+        for (var i = 0; i < seekListeners.length; i++) seekListeners[i](position);
+      }
+      return api;
+    };
+
+    api.onSeek = function (fn) { seekListeners.push(fn); return api; };
+
+    api.setBuffer = function (buf) {
+      api.stop();
+      buffer = buf;
+      rangeStart = 0; rangeEnd = null;
+      position = 0;
+      labels(); paint();
+      return api;
+    };
+
+    api.setRange = function (start, end) {
+      rangeStart = start || 0;
+      rangeEnd = (end === undefined || end === null) ? null : end;
+      position = lo();
+      paint();
+      return api;
+    };
+
+    api.playing = function () { return playing; };
+    api.element = function () { return box; };
+
+    /** Give a canvas a playhead and click-to-seek. */
+    api.attach = function (canvas) {
+      if (!canvas) return api;
+      for (var i = 0; i < heads.length; i++) if (heads[i].canvas === canvas) return api;
+      var stack = ensureStack(canvas);
+      var el = doc.createElement('div');
+      el.className = 'at-playhead';
+      el.setAttribute('aria-hidden', 'true');
+      stack.appendChild(el);
+      canvas.classList.add('at-scrubbable');
+
+      var dragging = false;
+      function seekFromEvent(e) {
+        var r = canvas.getBoundingClientRect();
+        var g = geomOf(canvas);
+        var u = (e.clientX - r.left - g.padL) / Math.max(1, g.plotW);
+        api.seek(lo() + Math.min(1, Math.max(0, u)) * span());
+      }
+      var onDown = function (e) {
+        dragging = true;
+        if (canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
+        seekFromEvent(e);
+      };
+      var onMove = function (e) { if (dragging) seekFromEvent(e); };
+      var onUp = function () { dragging = false; };
+      canvas.addEventListener('pointerdown', onDown);
+      canvas.addEventListener('pointermove', onMove);
+      canvas.addEventListener('pointerup', onUp);
+      canvas.addEventListener('pointercancel', onUp);
+
+      heads.push({ canvas: canvas, el: el,
+                   off: function () {
+                     canvas.removeEventListener('pointerdown', onDown);
+                     canvas.removeEventListener('pointermove', onMove);
+                     canvas.removeEventListener('pointerup', onUp);
+                     canvas.removeEventListener('pointercancel', onUp);
+                     canvas.classList.remove('at-scrubbable');
+                     if (el.parentNode) el.parentNode.removeChild(el);
+                   } });
+      paint();
+      return api;
+    };
+
+    api.detachAll = function () {
+      for (var i = 0; i < heads.length; i++) heads[i].off();
+      heads = [];
+      return api;
+    };
+
+    /** Re-place the playhead after a redraw changed the canvas geometry. */
+    api.refresh = function () { paint(); return api; };
+
+    playBtn.addEventListener('click', function () { api.toggle(); });
+    stopBtn.addEventListener('click', function () { api.stop(); });
+    slider.addEventListener('input', function () {
+      api.seek(lo() + (slider.value / 10000) * span());
+    });
+    slider.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); api.toggle(); }
+    });
+
+    Atelier.onLanguageChange(labels);
+    labels();
+    paint();
+    return api;
+  };
+
+  global.Atelier = Atelier;
+})(window);
+</script>
+<script>
+(function () {
+  'use strict';
+
+  /* --- strings ---------------------------------------------------------- */
+
+  Atelier.i18n.add({
+    fr: {
+      'lede': "Un descripteur audio est une mesure : une seule valeur, calculée sur une courte tranche de son, et suivie dans le temps. Importez un fichier, choisissez une taille de fenêtre et quelques descripteurs, et regardez ce que la machine entend — puis demandez-vous où sa mesure et votre oreille ne sont pas d'accord. Tout est calculé dans votre navigateur ; rien n'est envoyé nulle part.",
+      's1.title': '1. Le son',
+      's1.hint': "Aucun fichier n'est envoyé nulle part : tout est calculé dans votre navigateur. Si vous n'avez pas de fichier sous la main, prenez un son de démonstration — ils sont synthétisés à la volée.",
+      'drop.main': 'Glissez un fichier audio ici, ou appuyez sur Entrée pour en choisir un',
+      'drop.formats': 'WAV, MP3, FLAC, M4A, OGG',
+      'drop.aria': 'Choisir un fichier audio',
+      'demo.label': 'Son de démonstration',
+      'demo.none': '—',
+      'demo.sine': 'Sinusoïde 440 Hz', 'demo.sweep': 'Balayage 80 Hz → 8 kHz',
+      'demo.noise': 'Bruit blanc', 'demo.bell': 'Cloche (FM)',
+      'demo.pluck': 'Corde pincée', 'demo.texture': 'Texture filtrée mouvante',
+      'btn.play': '▶ Écouter', 'btn.stop': '■ Arrêter',
+      'btn.run': 'Analyser', 'btn.csv': 'Exporter le tableau (CSV)',
+      'btn.png': 'Exporter les courbes (PNG)',
+      'caption.none': 'Aucun son chargé.',
+      'caption.loaded': '{name} — {dur} s · {sr} Hz · {ch} canal(aux)',
+      's2.title': "3. L'analyse",
+      's2.hint': "La taille de fenêtre est le compromis vu en cours : grande fenêtre = fréquences nettes, temps flou ; petite fenêtre = l'inverse. Changez-la et regardez ce que les courbes gagnent et perdent.",
+      'opt.frame': 'Taille de fenêtre', 'opt.overlap': 'Recouvrement', 'opt.none': 'aucun',
+      'opt.features': 'Descripteurs',
+      'prog.aria': "Progression de l'analyse",
+      's3.title': '4. Les courbes',
+      's4.title': '5. Le tableau',
+      's4.hint': "Une ligne par fenêtre d'analyse. Cliquez sur un en-tête pour trier — trier un corpus par descripteur, c'est déjà une manière d'écouter.",
+      'st.decoding': 'Décodage de « {name} »…',
+      'st.loaded': 'Son chargé : {n} échantillons en mémoire.',
+      'st.running': 'Analyse en cours…',
+      'st.done': '{n} fenêtres analysées.',
+      'st.nofeat': 'Choisissez au moins un descripteur.',
+      'st.tooshort': "Le son est plus court qu'une fenêtre d'analyse.",
+      'st.failed': 'Échec : {msg}',
+      'st.big': 'Fichier long ({min} min) : {n} fenêtres. Le calcul peut prendre un moment.',
+      'res.hint': 'Fenêtre de {size} échantillons, pas de {hop} ({ms} ms par fenêtre, résolution fréquentielle ≈ {hz} Hz).',
+      'tbl.more': '… {n} lignes supplémentaires — exportez le CSV pour tout voir.',
+      'tbl.caption': '{n} fenêtres, {shown} affichées.',
+      'tbl.sortBy': 'Trier par {col}',
+      'col.time': 'temps (s)',
+      'f.rms': 'rms — intensité',
+      'f.spectralCentroid': 'centroïde spectral',
+      'f.spectralFlatness': 'planéité spectrale',
+      'f.zcr': 'passages par zéro',
+      'f.spectralRolloff': 'rolloff spectral',
+      'f.spectralSpread': 'étalement spectral',
+      'f.perceptualSharpness': 'acuité perçue',
+      'f.loudness': 'sonie totale',
+      'f.pitch': 'hauteur (f0)',
+      'f.mfcc': 'MFCC — empreinte du timbre (13 coefficients)',
+      'u.hz': 'Hz', 'u.norm': '0–1', 'u.perframe': 'par fenêtre',
+      'sp.title': '2. Votre prédiction',
+      'sp.hint': 'Avant de lancer le calcul : écoutez le son, puis dessinez à la souris (ou au doigt) la courbe que vous attendez pour un descripteur — de gauche à droite, haut = valeur forte. La machine dessinera la sienne par-dessus. L’écart entre les deux est le sujet de la séance.',
+      'sp.for': 'Descripteur prédit', 'sp.clear': 'Effacer le dessin',
+      'sp.legend': 'Votre trait apparaîtra <b>en orange</b> sur la courbe calculée.',
+      'sp.aria': 'Zone de dessin de la prédiction',
+      'mfcc.aria': 'MFCC : 12 coefficients dans le temps',
+      'mfcc.view': 'Affichage des MFCC',
+      'mfcc.viewHeat': 'Bande colorée (les 12 empilés)',
+      'mfcc.viewCurves': 'Une courbe par coefficient',
+      'mfcc.explain': 'Les MFCC résument la forme du spectre en 12 nombres par fenêtre (le 13ᵉ, qui ne mesure que le volume, est écarté). Ce ne sont pas des fréquences : le coefficient 1 décrit la pente générale du spectre — grave contre aigu —, et plus le numéro monte, plus le détail décrit est fin. En bande colorée, chaque ligne horizontale est un coefficient et la couleur est sa valeur ; une colonne est donc l’empreinte d’un instant. Aucun coefficient ne se lit isolément : ce qui compte, c’est que deux sons de timbre proche donnent des colonnes proches. C’est ce qui permettra, en S7 et S8, de comparer et de cartographier un corpus.',
+      'mfcc.curve': 'coefficient {k}'
+    },
+    en: {
+      'lede': 'An audio descriptor is a measurement: one value, computed over a short slice of sound, followed through time. Load a file, choose a frame size and a few descriptors, and look at what the machine hears — then ask where its measurement and your ear disagree. Everything is computed in your browser; nothing is sent anywhere.',
+      's1.title': '1. The sound',
+      's1.hint': 'Nothing is uploaded anywhere: everything is computed in your browser. If you have no file to hand, pick a demo sound — they are synthesised on the fly.',
+      'drop.main': 'Drop an audio file here, or press Enter to choose one',
+      'drop.formats': 'WAV, MP3, FLAC, M4A, OGG',
+      'drop.aria': 'Choose an audio file',
+      'demo.label': 'Demo sound',
+      'demo.none': '—',
+      'demo.sine': '440 Hz sine', 'demo.sweep': 'Sweep 80 Hz → 8 kHz',
+      'demo.noise': 'White noise', 'demo.bell': 'Bell (FM)',
+      'demo.pluck': 'Plucked string', 'demo.texture': 'Drifting filtered texture',
+      'btn.play': '▶ Play', 'btn.stop': '■ Stop',
+      'btn.run': 'Analyse', 'btn.csv': 'Export table (CSV)',
+      'btn.png': 'Export curves (PNG)',
+      'caption.none': 'No sound loaded.',
+      'caption.loaded': '{name} — {dur} s · {sr} Hz · {ch} channel(s)',
+      's2.title': '3. The analysis',
+      's2.hint': 'Frame size is the trade-off from class: a long window gives sharp frequencies and blurred time; a short one does the opposite. Change it and watch what the curves gain and lose.',
+      'opt.frame': 'Frame size', 'opt.overlap': 'Overlap', 'opt.none': 'none',
+      'opt.features': 'Descriptors',
+      'prog.aria': 'Analysis progress',
+      's3.title': '4. The curves',
+      's4.title': '5. The table',
+      's4.hint': 'One row per analysis frame. Click a header to sort — sorting a corpus by descriptor is already a way of listening.',
+      'st.decoding': 'Decoding “{name}”…',
+      'st.loaded': 'Sound loaded: {n} samples in memory.',
+      'st.running': 'Analysing…',
+      'st.done': '{n} frames analysed.',
+      'st.nofeat': 'Choose at least one descriptor.',
+      'st.tooshort': 'The sound is shorter than one analysis frame.',
+      'st.failed': 'Failed: {msg}',
+      'st.big': 'Long file ({min} min): {n} frames. This may take a moment.',
+      'res.hint': 'Frame of {size} samples, hop of {hop} ({ms} ms per frame, frequency resolution ≈ {hz} Hz).',
+      'tbl.more': '… {n} more rows — export the CSV to see them all.',
+      'tbl.caption': '{n} frames, {shown} shown.',
+      'tbl.sortBy': 'Sort by {col}',
+      'col.time': 'time (s)',
+      'f.rms': 'rms — intensity',
+      'f.spectralCentroid': 'spectral centroid',
+      'f.spectralFlatness': 'spectral flatness',
+      'f.zcr': 'zero crossings',
+      'f.spectralRolloff': 'spectral rolloff',
+      'f.spectralSpread': 'spectral spread',
+      'f.perceptualSharpness': 'perceptual sharpness',
+      'f.loudness': 'total loudness',
+      'f.pitch': 'pitch (f0)',
+      'f.mfcc': 'MFCC — timbre fingerprint (13 coefficients)',
+      'u.hz': 'Hz', 'u.norm': '0–1', 'u.perframe': 'per frame',
+      'sp.title': '2. Your prediction',
+      'sp.hint': 'Before computing anything: listen to the sound, then draw with the mouse (or a finger) the curve you expect for one descriptor — left to right, high = large value. The machine will draw its own on top. The gap between the two is what the session is about.',
+      'sp.for': 'Predicted descriptor', 'sp.clear': 'Clear the sketch',
+      'sp.legend': 'Your line will appear <b>in orange</b> over the computed curve.',
+      'sp.aria': 'Prediction sketch area',
+      'mfcc.aria': 'MFCC: 12 coefficients over time',
+      'mfcc.view': 'MFCC display',
+      'mfcc.viewHeat': 'Colour band (all 12 stacked)',
+      'mfcc.viewCurves': 'One curve per coefficient',
+      'mfcc.explain': 'MFCCs summarise the shape of the spectrum in 12 numbers per frame (the 13th, which measures only level, is dropped). They are not frequencies: coefficient 1 describes the overall tilt of the spectrum — dark against bright — and the higher the number, the finer the detail it describes. In the colour band each horizontal line is one coefficient and the colour is its value, so a column is the fingerprint of one instant. No single coefficient means anything on its own: what matters is that two sounds of similar timbre give similar columns. That is what makes it possible, in S7 and S8, to compare and map a corpus.',
+      'mfcc.curve': 'coefficient {k}'
+    }
+  });
+
+  var FEATURES = [
+    { id: 'rms', unit: '', on: true },
+    { id: 'pitch', unit: 'u.hz', on: true },
+    { id: 'spectralCentroid', unit: 'u.hz', on: true },
+    { id: 'spectralFlatness', unit: 'u.norm', on: true },
+    { id: 'zcr', unit: 'u.perframe', on: false },
+    { id: 'spectralRolloff', unit: 'u.hz', on: false },
+    { id: 'spectralSpread', unit: '', on: false },
+    { id: 'perceptualSharpness', unit: '', on: false },
+    { id: 'loudness', unit: '', on: false },
+    { id: 'mfcc', unit: '', on: false }
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var buffer = null, signal = null, result = null, srcName = '';
+  var tp = Atelier.transport.create({ mount: $('transport') });
+  var sortState = { col: 0, dir: 1 };
+  var MAX_ROWS = 500;
+
+  /* --- build the descriptor checkboxes ----------------------------------- */
+
+  FEATURES.forEach(function (f) {
+    var lab = document.createElement('label');
+    lab.className = 'at-check';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = f.id;
+    cb.checked = f.on;
+    cb.id = 'f-' + f.id;
+    var span = document.createElement('span');
+    span.setAttribute('data-i18n', 'f.' + f.id);
+    var code = document.createElement('code');
+    code.textContent = f.id;
+    lab.appendChild(cb); lab.appendChild(span); lab.appendChild(code);
+    $('features').appendChild(lab);
+  });
+
+  Atelier.init();
+
+  function unitFor(id) {
+    var f = FEATURES.filter(function (x) { return x.id === id; })[0];
+    return f && f.unit ? Atelier.t(f.unit) : '';
+  }
+
+  /* --- loading ----------------------------------------------------------- */
+
+  function adopt(buf, name) {
+    buffer = buf;
+    srcName = name;
+    signal = Atelier.dsp.mono(buf);
+    updateCaption();
+    Atelier.draw.waveform($('wave'), signal, { label: name });
+    $('run').disabled = false;
+    tp.setBuffer(buf);
+    tp.detachAll();
+    tp.attach($('wave'));
+    drawSketch();
+    Atelier.status($('load-status'),
+      Atelier.t('st.loaded', { n: signal.length.toLocaleString(Atelier.lang()) }), 'ok');
+    Atelier.log.ok(name + ' — ' + buf.duration.toFixed(2) + ' s, ' + buf.sampleRate + ' Hz, ' +
+                   buf.numberOfChannels + ' ch');
+  }
+
+  function updateCaption() {
+    if (!buffer) { $('wave-caption').textContent = Atelier.t('caption.none'); return; }
+    $('wave-caption').textContent = Atelier.t('caption.loaded', {
+      name: srcName, dur: buffer.duration.toFixed(2),
+      sr: buffer.sampleRate, ch: buffer.numberOfChannels
+    });
+  }
+
+  Atelier.io.dropzone($('drop'), $('file'), function (file) {
+    Atelier.status($('load-status'), Atelier.t('st.decoding', { name: file.name }));
+    Atelier.audio.decodeFile(file).then(function (buf) {
+      $('demo').value = '';
+      adopt(buf, file.name);
+    }).catch(function (err) {
+      Atelier.status($('load-status'), err.message, 'bad');
+    });
+  });
+
+  $('demo').addEventListener('change', function () {
+    if (!this.value) return;
+    try {
+      adopt(Atelier.audio.generate(this.value, { duration: 4 }),
+            this.options[this.selectedIndex].textContent);
+    } catch (err) {
+      Atelier.status($('load-status'), err.message, 'bad');
+    }
+  });
+
+  /* --- prediction sketch -------------------------------------------------- */
+  /* One value per pixel column, 0..1 (NaN where nothing was drawn). Kept per
+     descriptor so a pair can predict several before running the analysis. */
+
+  var sketches = {};
+  var drawing = false, lastX = -1;
+
+  function sketchFor(name) {
+    var w = Math.max(1, Math.floor($('sketch').clientWidth || 800));
+    if (!sketches[name] || sketches[name].length !== w) {
+      var a = new Float32Array(w);
+      for (var i = 0; i < w; i++) a[i] = NaN;
+      sketches[name] = a;
+    }
+    return sketches[name];
+  }
+
+  function drawSketch() {
+    var cv = $('sketch'), f = Atelier.draw.fit(cv, 130), ctx = f.ctx, w = f.w, h = f.h;
+    var cssv = function (n) { return getComputedStyle(document.body).getPropertyValue(n).trim(); };
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = cssv('--line'); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, h / 2 + 0.5); ctx.lineTo(w, h / 2 + 0.5); ctx.stroke();
+    ctx.fillStyle = cssv('--ink-soft'); ctx.font = '11px ' + cssv('--mono');
+    ctx.textAlign = 'left'; ctx.fillText('0 s', 4, h - 4);
+    ctx.textAlign = 'right'; ctx.fillText(buffer ? buffer.duration.toFixed(1) + ' s' : '', w - 4, h - 4);
+    ctx.fillText(Atelier.t('f.' + $('predict-for').value), w - 4, 14);
+    var a = sketchFor($('predict-for').value);
+    ctx.strokeStyle = cssv('--warn'); ctx.lineWidth = 2.5;
+    ctx.beginPath(); var started = false;
+    for (var x = 0; x < a.length && x < w; x++) {
+      if (isNaN(a[x])) { started = false; continue; }
+      var y = (1 - a[x]) * (h - 8) + 4;
+      if (!started) { ctx.moveTo(x, y); started = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  function sketchPoint(e) {
+    var cv = $('sketch'), r = cv.getBoundingClientRect();
+    var x = Math.round(e.clientX - r.left), h = cv.clientHeight;
+    var v = 1 - Math.max(0, Math.min(1, (e.clientY - r.top - 4) / (h - 8)));
+    var a = sketchFor($('predict-for').value);
+    if (x < 0 || x >= a.length) return;
+    if (lastX >= 0 && Math.abs(x - lastX) > 1) {       // fill the gap between events
+      var from = Math.min(lastX, x), to = Math.max(lastX, x), v0 = a[lastX];
+      for (var i = from; i <= to; i++) a[i] = isNaN(v0) ? v : v0 + (v - v0) * (i - lastX) / (x - lastX);
+    } else a[x] = v;
+    lastX = x;
+    drawSketch();
+  }
+  $('sketch').addEventListener('pointerdown', function (e) { drawing = true; lastX = -1; this.setPointerCapture(e.pointerId); sketchPoint(e); });
+  $('sketch').addEventListener('pointermove', function (e) { if (drawing) sketchPoint(e); });
+  ['pointerup', 'pointercancel'].forEach(function (ev) { $('sketch').addEventListener(ev, function () { drawing = false; lastX = -1; }); });
+  $('predict-clear').addEventListener('click', function () { delete sketches[$('predict-for').value]; drawSketch(); });
+  $('predict-for').addEventListener('change', drawSketch);
+
+  /* Overlay the sketch, if any, on a computed curve: same width, shape only
+     (the sketch is 0..1, the curve keeps its own scale). */
+  function overlaySketch(canvas, name) {
+    var a = sketches[name]; if (!a) return;
+    var ctx = canvas.getContext('2d'), w = canvas.clientWidth, h = canvas.clientHeight;
+    var padL = 3.6 * parseFloat(getComputedStyle(document.documentElement).fontSize), padB = 18, padT = 10;
+    var plotW = Math.max(10, w - padL - 8), plotH = Math.max(10, h - padT - padB);
+    ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--warn').trim();
+    ctx.lineWidth = 2.2; ctx.setLineDash([5, 3]);
+    ctx.beginPath(); var started = false;
+    for (var x = 0; x < a.length; x++) {
+      if (isNaN(a[x])) { started = false; continue; }
+      var px = padL + x / a.length * plotW, py = padT + (1 - a[x]) * plotH;
+      if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  /* --- analysis ---------------------------------------------------------- */
+
+  $('run').addEventListener('click', function () {
+    if (!signal) return;
+    var size = parseInt($('fftsize').value, 10);
+    var hop = Math.max(1, Math.round(size * (1 - parseFloat($('overlap').value))));
+    var feats = Array.prototype.slice.call($('features').querySelectorAll('input:checked'))
+                  .map(function (c) { return c.value; });
+
+    if (!feats.length) { Atelier.status($('run-status'), Atelier.t('st.nofeat'), 'bad'); return; }
+    if (signal.length < size) { Atelier.status($('run-status'), Atelier.t('st.tooshort'), 'bad'); return; }
+
+    var nFrames = Math.floor((signal.length - size) / hop) + 1;
+    if (nFrames > 60000) {
+      Atelier.log.warn(Atelier.t('st.big', {
+        min: (buffer.duration / 60).toFixed(0),
+        n: nFrames.toLocaleString(Atelier.lang())
+      }));
+    }
+
+    $('run').disabled = true;
+    $('prog').hidden = false;
+    $('prog').value = 0;
+    Atelier.status($('run-status'), Atelier.t('st.running'));
+
+    var t0 = performance.now();
+    Atelier.dsp.describe(signal, buffer.sampleRate, feats, {
+      frameSize: size, hopSize: hop,
+      onProgress: function (p) { $('prog').value = p; }
+    }).then(function (res) {
+      result = res;
+      $('prog').hidden = true;
+      $('run').disabled = false;
+      Atelier.status($('run-status'),
+        Atelier.t('st.done', { n: res.nFrames.toLocaleString(Atelier.lang()) }), 'ok');
+      Atelier.log.ok(res.nFrames + ' frames · ' + feats.length + ' descriptors · ' +
+                     ((performance.now() - t0) / 1000).toFixed(1) + ' s');
+      render();
+    }).catch(function (err) {
+      $('prog').hidden = true;
+      $('run').disabled = false;
+      Atelier.status($('run-status'), Atelier.t('st.failed', { msg: err.message }), 'bad');
+    });
+  });
+
+  /* --- rendering ---------------------------------------------------------- */
+
+  function render() {
+    if (!result) return;
+    $('results').hidden = false;
+    $('results-hint').textContent = Atelier.t('res.hint', {
+      size: result.frameSize, hop: result.hopSize,
+      ms: (result.frameSize / result.sampleRate * 1000).toFixed(1),
+      hz: (result.sampleRate / result.frameSize).toFixed(1)
+    });
+
+    var host = $('curves');
+    host.innerHTML = '';
+    Object.keys(result.features).forEach(function (name) {
+      var wrap = document.createElement('div');
+      wrap.className = 'at-canvas-wrap';
+      var cv = document.createElement('canvas');
+      cv.className = 'at-canvas';
+      cv.setAttribute('data-feature', name);
+      wrap.appendChild(cv);
+      host.appendChild(wrap);
+      Atelier.draw.curve(cv, result.times, result.features[name], {
+        label: Atelier.t('f.' + name), unit: unitFor(name), height: 130
+      });
+      overlaySketch(cv, name);
+    });
+    var hasMfcc = !!(result.matrices && result.matrices.mfcc);
+    $('mfcc-controls').hidden = !hasMfcc;
+    $('mfcc-explain').hidden = !hasMfcc;
+    if (hasMfcc) {
+      var m = result.matrices.mfcc;
+      // Coefficient 0 is overall level, not timbre; dropping it lets the remaining
+      // twelve use the whole colour range instead of hiding under it.
+      var rows = m.rows - 1;
+      var tEnd = result.times[result.nFrames - 1];
+      if ($('mfcc-view').value === 'curves') {
+        // One small curve per coefficient, stacked and sharing the time axis. Slower
+        // to read than the band, but it answers "what is this thing actually made of".
+        for (var r = 0; r < rows; r++) {
+          var wr = document.createElement('div'); wr.className = 'at-canvas-wrap';
+          var cvr = document.createElement('canvas'); cvr.className = 'at-canvas';
+          wr.appendChild(cvr); host.appendChild(wr);
+          Atelier.draw.curve(cvr, result.times, m.data.subarray((r + 1) * m.cols, (r + 2) * m.cols),
+                             { label: Atelier.t('mfcc.curve', { k: r + 1 }), height: 64 });
+        }
+      } else {
+        var wrap2 = document.createElement('div'); wrap2.className = 'at-canvas-wrap';
+        var cv2 = document.createElement('canvas'); cv2.className = 'at-canvas';
+        wrap2.appendChild(cv2); host.appendChild(wrap2);
+        var sub = { rows: rows, cols: m.cols, data: m.data.subarray(m.cols) };
+        var yl = [];
+        for (var k = 1; k <= rows; k += (rows > 8 ? 2 : 1)) yl.push({ row: k - 0.5, text: String(k) });
+        Atelier.draw.heat(cv2, sub, { height: 170, label: Atelier.t('f.mfcc'),
+                                      x1: tEnd.toFixed(1) + ' s', yLabels: yl });
+        cv2.setAttribute('aria-label', Atelier.t('mfcc.aria'));
+      }
+    }
+    // the curves share the sound's time axis, so they all carry the playhead
+    tp.detachAll();
+    tp.attach($('wave'));
+    Array.prototype.forEach.call(host.querySelectorAll('canvas'), function (c) { tp.attach(c); });
+    tp.refresh();
+    renderTable();
+  }
+
+  function featureNames() { return Object.keys(result.features); }
+
+  function rowAt(i) {
+    var r = [result.times[i]];
+    featureNames().forEach(function (n) { r.push(result.features[n][i]); });
+    return r;
+  }
+
+  function renderTable() {
+    var names = featureNames();
+    var header = [Atelier.t('col.time')].concat(names.map(function (n) { return Atelier.t('f.' + n); }));
+
+    // Sort indices, not copies of the rows — 300 000 arrays is not a thing to build.
+    var order = new Int32Array(result.nFrames);
+    for (var i = 0; i < result.nFrames; i++) order[i] = i;
+    var col = sortState.col, dir = sortState.dir;
+    var series = col === 0 ? result.times : result.features[names[col - 1]];
+    var idx = Array.prototype.slice.call(order);
+    idx.sort(function (a, b) {
+      var x = series[a], y = series[b];
+      if (!isFinite(x)) return 1;
+      if (!isFinite(y)) return -1;
+      return (x - y) * dir;
+    });
+
+    var shown = Math.min(MAX_ROWS, result.nFrames);
+    var table = $('table');
+    table.innerHTML = '';
+
+    var caption = document.createElement('caption');
+    caption.textContent = Atelier.t('tbl.caption', {
+      n: result.nFrames.toLocaleString(Atelier.lang()),
+      shown: shown.toLocaleString(Atelier.lang())
+    });
+    table.appendChild(caption);
+
+    var thead = document.createElement('thead');
+    var trh = document.createElement('tr');
+    header.forEach(function (h, ci) {
+      var th = document.createElement('th');
+      th.scope = 'col';
+      th.setAttribute('aria-sort', ci === col ? (dir > 0 ? 'ascending' : 'descending') : 'none');
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = h + (ci === col ? (dir > 0 ? ' ▲' : ' ▼') : '');
+      b.title = Atelier.t('tbl.sortBy', { col: h });
+      b.addEventListener('click', function () {
+        sortState = { col: ci, dir: (sortState.col === ci ? -sortState.dir : 1) };
+        renderTable();
+      });
+      th.appendChild(b);
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh);
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    for (var r = 0; r < shown; r++) {
+      var tr = document.createElement('tr');
+      rowAt(idx[r]).forEach(function (v) {
+        var td = document.createElement('td');
+        td.textContent = Atelier.fmt(v);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+
+    if (result.nFrames > shown) {
+      var tfoot = document.createElement('tfoot');
+      var tr2 = document.createElement('tr');
+      var td2 = document.createElement('td');
+      td2.colSpan = header.length;
+      td2.textContent = Atelier.t('tbl.more', {
+        n: (result.nFrames - shown).toLocaleString(Atelier.lang())
+      });
+      tr2.appendChild(td2); tfoot.appendChild(tr2); table.appendChild(tfoot);
+    }
+  }
+
+  $('mfcc-view').addEventListener('change', function () { if (result) render(); });
+
+  /* --- export ------------------------------------------------------------- */
+
+  $('csv').addEventListener('click', function () {
+    if (!result) return;
+    var names = featureNames();
+    Atelier.io.csvRows(['time_s'].concat(names), result.nFrames, rowAt, 'descripteurs.csv');
+    Atelier.log.ok('CSV — ' + result.nFrames + ' rows');
+  });
+
+  $('png').addEventListener('click', function () {
+    var canvases = $('curves').querySelectorAll('canvas');
+    if (!canvases.length) return;
+    var w = canvases[0].width, h = 0, i;
+    for (i = 0; i < canvases.length; i++) h += canvases[i].height;
+    var out = document.createElement('canvas');
+    out.width = w; out.height = h;
+    var ctx = out.getContext('2d');
+    ctx.fillStyle = getComputedStyle(document.body).backgroundColor;
+    ctx.fillRect(0, 0, w, h);
+    var y = 0;
+    for (i = 0; i < canvases.length; i++) { ctx.drawImage(canvases[i], 0, y); y += canvases[i].height; }
+    Atelier.io.png(out, 'courbes.png');
+  });
+
+  /* --- redraw on language, theme, accessible mode, resize ----------------- */
+
+  function redraw() {
+    updateCaption();
+    if (signal) Atelier.draw.waveform($('wave'), signal, { label: srcName });
+    drawSketch();
+    if (result) render();
+    tp.refresh();
+  }
+  Atelier.onRedraw(redraw);
+  Atelier.onLanguageChange(function () { redraw(); });
+
+  var t = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(t);
+    t = setTimeout(redraw, 180);
+  });
+  drawSketch();
+})();
+</script>
+</body>
+</html>
