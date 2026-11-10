@@ -589,6 +589,11 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
       <h3 data-i18n="s2t0-t"></h3>
       <p data-i18n="s2t0-c"></p>
     </a>
+    <a class="at-card" href="general-guide-descripteurs.html">
+      <span class="at-tag" data-i18n="s2t1-g"></span>
+      <h3 data-i18n="s2t1-t"></h3>
+      <p data-i18n="s2t1-c"></p>
+    </a>
   </div>
 </section>
 
@@ -1483,7 +1488,8 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
 
     var plotW = Math.max(10, w - padL - 8), plotH = Math.max(10, h - padT - padB);
     var n = values.length;
-    var tMax = n ? times[n - 1] : 1;
+    // opts.tMax: the time at the right edge (default: the last frame's centre).
+    var tMax = opts.tMax || (n ? times[n - 1] : 1);
 
     ctx.strokeStyle = css('--line-firm');
     ctx.fillStyle = css('--ink-soft');
@@ -1892,22 +1898,30 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
   };
 
   /* --- describe(): pitch and MFCC ---------------------------------------- */
-  /* `describe` understands two extra names on top of Meyda's scalar features:
-       'pitch' — YIN, in hertz (NaN where nothing periodic is found);
-       'mfcc'  — 13 coefficients per frame, returned in result.matrices.mfcc
-                 as {rows: 13, data: Float32Array(rows * nFrames)}.            */
+  /* `describe` understands four extra names on top of Meyda's scalar features:
+       'pitch'        — YIN, in hertz (NaN where nothing periodic is found);
+       'mfcc'         — 13 coefficients per frame, returned in result.matrices.mfcc
+                        as {rows: 13, data: Float32Array(rows * nFrames)};
+       'chroma'       — 12 pitch classes per frame (C first), each frame normalised
+                        to its maximum, in result.matrices.chroma;
+       'spectralFlux' — sum of the increases in the magnitude spectrum since the
+                        previous frame (NaN on the first frame).                 */
 
   var describeMeyda = Atelier.dsp.describe;
   Atelier.dsp.describe = function (signal, sampleRate, features, opts) {
     opts = opts || {};
     var wantPitch = features.indexOf('pitch') >= 0;
     var wantMfcc = features.indexOf('mfcc') >= 0;
-    var scalar = features.filter(function (f) { return f !== 'pitch' && f !== 'mfcc'; });
+    var wantChroma = features.indexOf('chroma') >= 0;
+    var wantFlux = features.indexOf('spectralFlux') >= 0;
+    var scalar = features.filter(function (f) {
+      return f !== 'pitch' && f !== 'mfcc' && f !== 'chroma' && f !== 'spectralFlux';
+    });
     var size = opts.frameSize || 1024;
     var hop = opts.hopSize || Math.floor(size / 2);
     var nFrames = Math.max(0, Math.floor((signal.length - size) / hop) + 1);
     var progress = opts.onProgress;
-    var extra = (wantPitch ? 1 : 0) + (wantMfcc ? 1 : 0);
+    var extra = (wantPitch ? 1 : 0) + (wantMfcc ? 1 : 0) + (wantChroma ? 1 : 0) + (wantFlux ? 1 : 0);
     var steps = (scalar.length ? 1 : 0) + extra;
     var done = 0;
     function sub(p) { if (progress) progress((done + p) / Math.max(1, steps)); }
@@ -1946,6 +1960,37 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
         done++;
         return res;
       });
+    }).then(function (res) {
+      if (!wantChroma) return res;
+      if (!global.Meyda) throw new Error(Atelier.t('err.noMeyda'));
+      var M = global.Meyda, rows = 12;
+      M.sampleRate = sampleRate; M.bufferSize = size; M.windowingFunction = 'hanning';
+      // Meyda 5.6.3 rebuilds its chroma filter bank only when the number of bands
+      // changes, not when the frame size or sample rate does: a second analysis at
+      // another frame size would silently reuse the first one's filters. Drop it.
+      M.chromaFilterBank = undefined;
+      var data = new Float32Array(rows * nFrames);
+      return Atelier.dsp.eachFrame(signal, size, hop, function (frame, i) {
+        var c = M.extract('chroma', frame);
+        if (c) for (var r = 0; r < rows; r++) data[r * nFrames + i] = c[r];
+      }, sub).then(function () {
+        res.matrices.chroma = { rows: rows, cols: nFrames, data: data };
+        done++;
+        return res;
+      });
+    }).then(function (res) {
+      if (!wantFlux) return res;
+      // Computed here rather than by Meyda: the sum of the *increases* in the
+      // magnitude spectrum from one frame to the next (half-wave rectified), the
+      // same measure as the novelty curve of Atelier.dsp.spectrogram().
+      var win = Atelier.dsp.window(size, 'hann'), scratch = {};
+      var bins = (size >> 1) + 1, prev = new Float32Array(bins);
+      var fl = new Float64Array(nFrames);
+      return Atelier.dsp.eachFrame(signal, size, hop, function (frame, i) {
+        var mag = Atelier.dsp.magnitude(frame, win, scratch), s = 0, d;
+        for (var k = 0; k < bins; k++) { d = mag[k] - prev[k]; if (d > 0) s += d; prev[k] = mag[k]; }
+        fl[i] = i === 0 ? NaN : s;
+      }, sub).then(function () { res.features.spectralFlux = fl; done++; return res; });
     });
   };
 
@@ -2809,7 +2854,10 @@ Atelier.i18n.add({ fr: {
   "s2-b": "",
   "s2t0-t": "Descripteurs audio",
   "s2t0-c": "Importer un son, dessiner la courbe que vous attendez, puis calculer ce que la machine mesure vraiment — intensité, hauteur, centroïde, planéité, MFCC.",
-  "s2t0-g": "Écoute et analyse"
+  "s2t0-g": "Écoute et analyse",
+  "s2t1-t": "Guide des descripteurs",
+  "s2t1-c": "Un onglet par descripteur (RMS, sonie, hauteur, centroïde, étalement, planéité, rolloff, passages par zéro, flux, MFCC, chroma), avec son fonctionnement, ses pièges, des sons d’exemple et votre propre son.",
+  "s2t1-g": "Écoute et analyse"
 }, en: {
   "lede": "Listening and sound-analysis tools accompanying the musicology courses. Every page opens in the browser, with nothing to install and no account; the sounds you load stay on your machine and are never sent anywhere.",
   "soon": "Tools in preparation.",
@@ -2843,7 +2891,10 @@ Atelier.i18n.add({ fr: {
   "s2-b": "",
   "s2t0-t": "Audio descriptors",
   "s2t0-c": "Load a sound, sketch the curve you expect, then compute what the machine really measures — intensity, pitch, centroid, flatness, MFCC.",
-  "s2t0-g": "Listening and analysis"
+  "s2t0-g": "Listening and analysis",
+  "s2t1-t": "Descriptor guide",
+  "s2t1-c": "One tab per descriptor (RMS, loudness, pitch, centroid, spread, flatness, rolloff, zero crossings, flux, MFCC, chroma), with how it works, its pitfalls, example sounds and your own sound.",
+  "s2t1-g": "Listening and analysis"
 } });
 Atelier.init();
 document.querySelector('.at-home').style.visibility = 'hidden';
