@@ -526,41 +526,51 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
 .at-console.at-min .at-console-bar h2 { font-size: 0.72rem; }
 </style>
 <style>
-  .gd-tabs { display: flex; flex-wrap: wrap; gap: 0.25rem; border-bottom: 1px solid var(--line-firm);
-             margin: 0 0 0; padding: 0; }
+  .gd-tabs { display: flex; flex-wrap: wrap; gap: 0.25rem; border-bottom: 1px solid var(--line-firm); }
   .gd-tab { font: inherit; font-size: 0.92rem; cursor: pointer; color: var(--ink);
             background: var(--sunken); border: 1px solid var(--line); border-bottom: none;
-            border-radius: var(--radius) var(--radius) 0 0; padding: 0.45rem 0.75rem;
-            margin-bottom: -1px; }
+            border-radius: var(--radius) var(--radius) 0 0; padding: 0.45rem 0.75rem; margin-bottom: -1px; }
   .gd-tab:hover { color: var(--accent); }
   .gd-tab[aria-selected="true"] { background: var(--panel); color: var(--accent); font-weight: 600;
             border-color: var(--line-firm); box-shadow: inset 0 3px 0 var(--accent); }
-  .gd-tabpanel { border-top-left-radius: 0; margin-top: 0; }
-  .gd-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem; margin-bottom: 0.4rem; }
+  .gd-tabpanel { margin-top: 0; border-top-left-radius: 0; }
+  .gd-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem; margin-bottom: 0.6rem; }
   .gd-head h2 { margin: 0; }
   .gd-head code { color: var(--ink-soft); font-size: 0.85rem; }
-  .gd-cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1.4rem; }
-  @media (max-width: 860px) { .gd-cols { grid-template-columns: minmax(0, 1fr); } }
-  .gd-cols h3 { font-size: 0.95rem; margin: 0.9rem 0 0.3rem; }
-  .gd-cols h3:first-child { margin-top: 0.2rem; }
-  .gd-cols p { margin: 0 0 0.4rem; line-height: 1.5; }
+  .gd-use { margin: 0 0 1rem; padding: 0.7rem 0.9rem; border-radius: var(--radius); background: var(--sunken);
+            border-left: 3px solid var(--accent); }
+  .gd-use h3 { font-size: 0.95rem; margin: 0 0 0.3rem; }
+  .gd-use p { margin: 0; line-height: 1.5; max-width: 62rem; }
+  .gd-how { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2rem;
+            padding-bottom: 1rem; border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+  @media (max-width: 900px) { .gd-how { grid-template-columns: minmax(0, 1fr); gap: 0.4rem; } }
+  .gd-how h3, .gd-notes h3 { font-size: 0.95rem; margin: 0.2rem 0 0.3rem; }
+  .gd-how p { margin: 0; line-height: 1.5; }
+  .gd-drop.at-drop { padding: 0.7rem; }
+  .gd-row { display: flex; flex-wrap: wrap; gap: 0.8rem 1.2rem; align-items: end; margin: 0.8rem 0 0.2rem; }
+  .gd-row .at-field { margin: 0; }
+  #ex-select { max-width: 100%; min-width: min(34rem, 100%); }
+  .gd-notes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.4rem; margin: 0.6rem 0 1rem; align-items: start; }
+  @media (max-width: 900px) { .gd-notes { grid-template-columns: minmax(0, 1fr); } }
+  .gd-notes details > summary { cursor: pointer; list-style-position: inside; }
+  .gd-notes details > summary h3 { display: inline; margin: 0; }
+  .gd-notes details > summary::marker { color: var(--ink-soft); }
+  .gd-notes details:not([open]) { padding-bottom: 0.7rem; }
+  .gd-notes details[open] > summary { margin-bottom: 0.4rem; }
+  .gd-example { align-self: start; background: var(--accent-bg); border-radius: var(--radius); padding: 0.7rem 0.9rem; }
+  .gd-example p { margin: 0 0 0.5rem; line-height: 1.5; }
+  .gd-meas { font: 0.84rem var(--mono); white-space: pre-wrap; color: var(--ink); }
   .gd-traps { border-left: 3px solid var(--warn); padding: 0.1rem 0 0.1rem 0.9rem; }
   .gd-traps h3 { color: var(--warn); }
   .gd-traps ul { margin: 0.2rem 0 0; padding-left: 1.1rem; }
   .gd-traps li { margin: 0 0 0.45rem; line-height: 1.45; }
-  .gd-ex { list-style: none; margin: 0.5rem 0 0; padding: 0; }
-  .gd-ex li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.2rem 0.8rem;
-              padding: 0.55rem 0; border-top: 1px solid var(--line); }
-  .gd-ex li[data-current="true"] { background: var(--accent-bg); }
-  .gd-ex button { align-self: start; white-space: nowrap; }
-  .gd-ex .gd-lab { font-weight: 600; }
-  .gd-ex .gd-shows { color: var(--ink-soft); }
-  .gd-ex .gd-meas { grid-column: 2; font: 0.84rem var(--mono); color: var(--ink); }
-  .gd-ex .gd-meas:empty { display: none; }
+  .gd-others { margin-top: 0.5rem; font-size: 0.92rem; color: var(--ink-soft); }
+  .gd-others > summary { cursor: pointer; }
   .gd-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; font-size: 0.8rem;
                color: var(--ink-soft); margin: 0.3rem 0 0.2rem; }
   .gd-legend span::before { content: ""; display: inline-block; width: 0.9rem; height: 0.22rem;
                margin-right: 0.35rem; vertical-align: middle; background: var(--sw, var(--accent)); }
+  .gd-legend .gd-band::before { height: 0.7rem; opacity: 0.6; }
   .gd-readout { font: 0.86rem var(--mono); margin: 0.3rem 0; }
   details.gd-common { margin: 0 0 1rem; }
   details.gd-common summary { cursor: pointer; font-weight: 600; }
@@ -572,60 +582,56 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
       data-title-en="Descriptor guide"
       data-subtitle="Onze descripteurs, un par onglet"
       data-subtitle-en="Eleven descriptors, one per tab"
-      data-card="Un onglet par descripteur (RMS, sonie, hauteur, centroïde, étalement, planéité, rolloff, passages par zéro, flux, MFCC, chroma), avec son fonctionnement, ses pièges, des sons d’exemple et votre propre son."
-      data-card-en="One tab per descriptor (RMS, loudness, pitch, centroid, spread, flatness, rolloff, zero crossings, flux, MFCC, chroma), with how it works, its pitfalls, example sounds and your own sound."
+      data-card="Un onglet par descripteur (RMS, loudness, hauteur, centroïde, étalement, planéité, rolloff, passages par zéro, flux, MFCC, chroma) : son fonctionnement, des exemples à écouter avec leurs pièges, et votre propre son."
+      data-card-en="One tab per descriptor (RMS, loudness, pitch, centroid, spread, flatness, rolloff, zero crossings, flux, MFCC, chroma): how it works, examples to listen to with their pitfalls, and your own sound."
       data-tag="Écoute et analyse"
       data-tag-en="Listening and analysis"
       data-home="index.html">
 
 <main>
 
-<p class="at-lede" data-i18n="lede"></p>
+<p class="at-lede" data-gd="lede"></p>
 
 <details class="gd-common">
-  <summary data-i18n="common.title"></summary>
+  <summary data-gd="common.title"></summary>
   <ul>
-    <li data-i18n="common.1"></li>
-    <li data-i18n="common.2"></li>
-    <li data-i18n="common.3"></li>
-    <li data-i18n="common.4"></li>
+    <li data-gd="common.1"></li>
+    <li data-gd="common.2"></li>
+    <li data-gd="common.3"></li>
+    <li data-gd="common.4"></li>
   </ul>
 </details>
 
 <div class="gd-tabs" role="tablist" id="tabs" data-i18n-attr="aria-label:tabs.aria"></div>
 
-<section class="at-panel gd-tabpanel" id="panel" role="tabpanel" tabindex="0">
+<section class="at-panel gd-tabpanel" id="panel" role="tabpanel">
   <div class="gd-head"><h2 id="d-name"></h2><code id="d-code"></code></div>
-  <div class="gd-cols">
-    <div>
-      <h3 data-i18n="h.what"></h3><p id="d-what"></p>
-      <h3 data-i18n="h.how"></h3><p id="d-how"></p>
-      <h3 data-i18n="h.tool"></h3><p id="d-tool"></p>
-    </div>
-    <div class="gd-traps">
-      <h3 data-i18n="h.traps"></h3>
-      <ul id="d-traps"></ul>
-    </div>
+
+  <div class="gd-use">
+    <h3 data-gd="h.use"></h3>
+    <p id="d-use"></p>
   </div>
-  <h3 style="margin-top:1.2rem" data-i18n="h.examples"></h3>
-  <p class="at-hint" data-i18n="ex.hint"></p>
-  <ul class="gd-ex" id="d-ex"></ul>
-</section>
 
-<section class="at-panel" aria-labelledby="h-work">
-  <h2 id="h-work" data-i18n="w.title"></h2>
-  <p class="at-hint" data-i18n="w.hint"></p>
+  <div class="gd-how">
+    <div><h3 data-gd="h.what"></h3><p id="d-what"></p></div>
+    <div><h3 data-gd="h.how"></h3><p id="d-how"></p></div>
+    <div><h3 data-gd="h.tool"></h3><p id="d-tool"></p></div>
+  </div>
 
-  <div class="at-drop" id="drop" data-i18n-attr="aria-label:drop.aria">
-    <span data-i18n="drop.main"></span>
-    <small data-i18n="drop.formats"></small>
+  <div class="at-drop gd-drop" id="drop" data-i18n-attr="aria-label:drop.aria">
+    <span data-gd="drop.main"></span>
+    <small data-gd="drop.formats"></small>
   </div>
   <input type="file" id="file" accept="audio/*" class="at-visually-hidden"
          data-i18n-attr="aria-label:drop.aria">
 
-  <div class="at-controls" style="margin-top:0.9rem">
+  <div class="gd-row">
     <div class="at-field">
-      <label for="fftsize" data-i18n="opt.frame"></label>
+      <label for="ex-select" data-gd="ex.label"></label>
+      <select id="ex-select"></select>
+    </div>
+    <div class="at-field">
+      <label for="fftsize" data-gd="opt.frame"></label>
       <select id="fftsize">
         <option value="512">512</option>
         <option value="1024" selected>1024</option>
@@ -635,19 +641,39 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
     </div>
   </div>
   <p class="at-hint" id="frame-hint"></p>
+  <div class="gd-notes">
+    <details class="gd-example" id="ex-box" open>
+      <summary><h3 data-gd="h.example"></h3></summary>
+      <p id="ex-shows"></p>
+      <div class="gd-meas" id="ex-meas"></div>
+    </details>
+    <details class="gd-traps" id="traps-box" open>
+      <summary><h3 id="traps-title"></h3></summary>
+      <p id="traps-none" hidden data-gd="traps.none"></p>
+      <ul id="d-traps"></ul>
+      <details class="gd-others" id="traps-others">
+        <summary id="others-title"></summary>
+        <ul id="d-others"></ul>
+      </details>
+    </details>
+  </div>
 
   <div id="transport"></div>
   <p class="at-caption" id="wave-caption"></p>
   <div class="at-canvas-wrap"><canvas class="at-canvas" id="wave" role="img"></canvas></div>
   <div class="at-canvas-wrap"><canvas class="at-canvas" id="curve" role="img"></canvas></div>
+  <div class="gd-legend" id="curve-legend"></div>
   <progress id="prog" max="1" value="0" hidden data-i18n-attr="aria-label:prog.aria"></progress>
   <p class="at-status" id="status"></p>
   <p class="gd-readout" id="stats"></p>
+  <div class="at-controls" style="margin-top:0.4rem">
+    <button type="button" id="save-png" disabled data-gd="btn.png"></button>
+  </div>
 
-  <h3 style="margin-top:1.2rem" data-i18n="loupe.title"></h3>
-  <p class="at-hint" data-i18n="loupe.hint"></p>
+  <h3 style="margin-top:1.2rem" data-gd="loupe.title"></h3>
+  <p class="at-hint" data-gd="loupe.hint"></p>
   <div class="at-controls" id="loupe-opts" style="display:none">
-    <label class="at-check"><input type="checkbox" id="logf"> <span data-i18n="loupe.log"></span></label>
+    <label class="at-check"><input type="checkbox" id="logf"> <span data-gd="loupe.log"></span></label>
   </div>
   <p class="gd-readout" id="loupe-read"></p>
   <div class="at-canvas-wrap"><canvas class="at-canvas" id="loupe" role="img"></canvas></div>
@@ -2880,103 +2906,121 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
   'use strict';
 
   /* === strings ============================================================
+     *word* marks a technical term kept in English, in italics — only where
+     French has no clean equivalent (loudness, rolloff, bin, offset).
      French is written with ordinary spaces before : ; ! ? » and after «;
-     frTypo() turns them into narrow no-break spaces when the strings are
-     registered, so the source stays readable. */
+     frTypo() turns them into narrow no-break spaces on registration. */
 
   function frTypo(s) {
-    return s.replace(/ ([:;!?»])/g, ' $1').replace(/« /g, '« ');
+    return s.replace(/ ([:;!?»])/g, '\u202f$1').replace(/« /g, '«\u202f')
+            .replace(/(\d) (\d{3})(?!\d)/g, '$1\u202f$2');   // 2 048, 1 031: never split
   }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function rich(s) { return esc(s).replace(/\*([^*]+)\*/g, '<em>$1</em>'); }
+  function plain(s) { return String(s).replace(/\*/g, ''); }
+  function setRich(el, key, vars) { el.innerHTML = rich(Atelier.t(key, vars)); }
 
   var UI = {
     fr: {
-      'lede': "Onze descripteurs, un par onglet. Pour chacun : ce qu’il mesure, comment il le calcule, et où il se trompe. Chargez votre propre son ou l’un des exemples, écoutez, déplacez-vous dans le son : la loupe montre ce que la machine voit dans la trame sous le curseur. Tout est calculé dans votre navigateur ; rien n’est envoyé nulle part.",
+      'lede': "Un onglet par descripteur. Pour chacun : ce qu’il mesure et comment, puis des exemples à écouter, chacun avec le piège qu’il met en évidence. Vous pouvez aussi déposer votre propre son. Tout est calculé dans votre navigateur ; aucun fichier n’est envoyé.",
       'common.title': 'Ce que toutes ces mesures ont en commun',
-      'common.1': "Une trame, un nombre. La taille de trame est un choix qui change le résultat : trame longue pour les sons graves (hauteur, chroma), trame courte pour suivre les attaques.",
-      'common.2': "La moyenne efface le geste. Le centroïde moyen d’un son jette sa trajectoire, et c’est la trajectoire qui intéresse la spectromorphologie.",
-      'common.3': "Le silence et le bruit de fond mentent. Plusieurs descripteurs n’ont pas de valeur sur le silence, d’autres en inventent une.",
-      'common.4': "Deux logiciels, deux nombres. Seuils, unités et normalisations diffèrent. Comparer des sons dans le même outil, jamais des valeurs entre outils : ce sont les écarts entre sons qui comptent.",
+      'common.1': "Une trame, une valeur. La taille de trame change le résultat : une trame longue pour les sons graves (hauteur, chroma), une trame courte pour suivre les attaques.",
+      'common.2': "La moyenne efface le geste. Le centroïde moyen d’un son ne dit rien de sa trajectoire, et c’est la trajectoire qui intéresse la spectromorphologie.",
+      'common.3': "Le silence et le bruit de fond trompent. Certains descripteurs n’ont pas de valeur sur le silence, d’autres en inventent une.",
+      'common.4': "Deux logiciels, deux résultats. Seuils, unités et normalisations varient. On compare des sons dans un même outil, jamais des valeurs d’un outil à l’autre : ce sont les écarts entre les sons qui comptent.",
       'tabs.aria': 'Descripteurs',
-      'h.what': 'Ce que c’est', 'h.how': 'Comment ça marche', 'h.tool': 'Dans cette page',
-      'h.traps': 'Pièges', 'h.examples': 'Sons d’exemple',
-      'ex.hint': "Synthétisés à la volée, sans droits. Une fois le calcul fait, la valeur médiane de chaque son (A, B…) s’affiche sous l’exemple : ce sont des mesures, refaites à chaque chargement, pas des valeurs recopiées.",
-      'ex.load': '▶ Charger',
-      'w.title': 'Écouter et mesurer',
-      'w.hint': "Votre son ou un exemple. Cliquez ou glissez sur la forme d’onde ou la courbe pour vous déplacer : la loupe suit le curseur. Changer d’onglet recalcule le descripteur sur le même son.",
-      'drop.main': 'Glissez un fichier audio ici, ou appuyez sur Entrée pour en choisir un',
+      'h.use': 'À quoi ça sert', 'h.what': 'Ce qu’il mesure', 'h.how': 'Comment ça marche', 'h.tool': 'Dans cet outil',
+      'h.example': 'Cet exemple', 'h.traps': 'Pièges de cet exemple', 'h.trapsAll': 'Pièges', 'h.trapsOther': 'Autres pièges de ce descripteur ({n})',
+      'traps.none': "Ici le descripteur fait ce qu’on attend de lui. Les autres exemples montrent où il se trompe.",
+      'ex.label': 'Son',
+      'ex.pick': 'Choisir un exemple…',
+      'ex.own': 'Votre fichier : {name}',
+      'ex.ownNote': "Votre propre son : pas de commentaire, à vous d’écouter. Tous les pièges du descripteur sont listés ci-contre.",
+      'drop.main': 'Déposez un fichier audio ici, ou appuyez sur Entrée pour en choisir un',
       'drop.formats': 'WAV, MP3, FLAC, M4A, OGG',
       'drop.aria': 'Choisir un fichier audio',
       'opt.frame': 'Taille de trame',
-      'frame.hint': "Trame de {size} échantillons ({ms} ms), pas de {hop} ; une case de FFT ≈ {hz} Hz.",
-      'frame.pitch': " Hauteur la plus grave détectable avec cette trame : ≈ {f} Hz.",
-      'frame.chroma': " Deux notes voisines ne se séparent plus sous ≈ {f} Hz.",
+      'frame.hint': "Trame de {size} échantillons ({ms} ms), pas de {hop} ; un *bin* couvre ≈ {hz} Hz.",
+      'frame.pitch': " Hauteur la plus grave détectable : ≈ {f} Hz.",
+      'frame.chroma': " Deux notes voisines ne se distinguent plus sous ≈ {f} Hz.",
       'caption.none': 'Aucun son chargé.',
-      'caption.loaded': '{name} — {dur} s · {sr} Hz · {ch} canal(aux)',
+      'caption.loaded': '{name} — {dur} s, {sr} Hz, {ch} canal(aux)',
       'prog.aria': 'Progression du calcul',
       'st.decoding': 'Décodage de « {name} »…',
-      'st.running': 'Calcul : {name}…',
+      'st.running': 'Calcul en cours : {name}…',
       'st.done': '{name} : {n} trames.',
       'st.failed': 'Échec : {msg}',
       'st.tooshort': "Le son est plus court qu’une trame.",
-      'stats': 'Sur tout le son : médiane {med} · min {min} · max {max}',
-      'stats.nan': ' · {p} % des trames sans valeur',
-      'stats.none': 'Sur tout le son : aucune valeur.',
-      'seg.none': 'aucune valeur', 'seg.nan': '{p} % sans valeur', 'seg.medmax': 'médiane {med}, max {max}',
+      'stats': 'Sur l’ensemble du son : médiane {med}, min. {min}, max. {max}',
+      'stats.nan': ', {p} % des trames sans valeur',
+      'stats.none': 'Sur l’ensemble du son : aucune valeur.',
+      'curve.none': 'Aucune valeur sur ce son',
+      'curve.band': 'zones grisées : trames sans valeur',
+      'seg.none': 'aucune valeur', 'seg.nan': '{p} % sans valeur', 'seg.medmax': 'médiane {med}, max. {max}',
+      'meas.title': 'Mesuré, médiane par son :',
       'mfcc.dist': 'distance c1–c12',
       'loupe.title': 'La loupe : une trame',
-      'loupe.hint': "Ce que le calcul voit à l’instant du curseur. La valeur affichée est celle de la courbe.",
+      'loupe.hint': "Ce que le calcul voit à la position du curseur. La valeur affichée est celle de la courbe.",
       'loupe.read': 'Trame {i} · {t} s · {v}',
       'loupe.log': 'Fréquences en échelle logarithmique',
       'loupe.empty': 'Chargez un son pour voir une trame.',
-      'lg.raw': 'trame brute', 'lg.win': 'trame fenêtrée (ce qui est mesuré)', 'lg.rms': '± RMS',
+      'lg.raw': 'trame brute', 'lg.win': 'trame après fenêtrage (ce qui est mesuré)', 'lg.rms': '± RMS',
       'lg.cross': 'passages par zéro', 'lg.period': 'périodes trouvées',
       'lg.nopitch': 'aucune périodicité trouvée dans cette trame',
-      'lg.bark': 'sonie par bande critique (Bark)',
-      'lg.spec': 'spectre (dB relatifs au pic de la trame)',
+      'lg.bark': '*loudness* par bande critique (échelle de Bark)',
+      'lg.spec': 'spectre (dB par rapport au pic de la trame)',
       'lg.centroid': 'centroïde', 'lg.spread': 'centroïde ± étalement',
-      'lg.cum': 'amplitude cumulée (0 → 100 %)', 'lg.rolloff': 'rolloff : 99 % atteints',
+      'lg.cum': 'amplitude cumulée (0 → 100 %)', 'lg.rolloff': '*rolloff* : 99 % atteints',
       'lg.gm': 'moyenne géométrique', 'lg.am': 'moyenne arithmétique',
-      'lg.prev': 'trame précédente', 'lg.cur': 'trame courante',
-      'lg.up': 'augmentations : ce qui est additionné',
-      'lg.mfcc0': 'c0 (niveau)', 'lg.mfcc': 'c1 … c12',
+      'lg.prev': 'trame précédente', 'lg.cur': 'trame actuelle',
+      'lg.up': 'augmentations (ce qui est additionné)',
+      'lg.mfcc0': 'c0 (niveau)', 'lg.mfcc': 'c1 à c12',
       'lg.chroma': 'classes de hauteur, normalisées au maximum de la trame',
       'lg.silent': 'trame silencieuse',
       'pc': 'do,do♯,ré,ré♯,mi,fa,fa♯,sol,sol♯,la,la♯,si',
-      'u.hz': 'Hz', 'u.perframe': 'par trame', 'u.norm': '0–1'
+      'u.hz': 'Hz', 'u.perframe': 'par trame',
+      'btn.png': 'Enregistrer l’analyse en image (PNG)',
+      'png.frame': 'Trame de {size} échantillons, pas de {hop}, {sr} Hz',
+      'png.cursor': 'Loupe à {t} s',
+      'png.saved': 'Image enregistrée : {name}'
     },
     en: {
-      'lede': 'Eleven descriptors, one per tab. For each: what it measures, how it computes it, and where it goes wrong. Load your own sound or one of the examples, listen, move around in the sound: the magnifier shows what the machine sees in the frame under the cursor. Everything is computed in your browser; nothing is sent anywhere.',
+      'lede': 'One tab per descriptor. For each: what it measures and how, then examples to listen to, each with the pitfall it brings out. You can also drop in your own sound. Everything is computed in your browser; no file is sent anywhere.',
       'common.title': 'What all these measurements have in common',
-      'common.1': 'One frame, one number. Frame size is a choice that changes the result: a long frame for low sounds (pitch, chroma), a short one to follow attacks.',
-      'common.2': 'The average erases the gesture. The mean centroid of a sound throws away its trajectory, and the trajectory is what spectromorphology cares about.',
-      'common.3': 'Silence and background noise lie. Several descriptors have no value on silence; others invent one.',
-      'common.4': 'Two programs, two numbers. Thresholds, units and normalisations differ. Compare sounds within one tool, never values across tools: what counts is the difference between sounds.',
+      'common.1': 'One frame, one value. Frame size changes the result: a long frame for low sounds (pitch, chroma), a short one to follow attacks.',
+      'common.2': 'The average erases the gesture. The mean centroid of a sound says nothing about its trajectory, and the trajectory is what spectromorphology cares about.',
+      'common.3': 'Silence and background noise mislead. Some descriptors have no value on silence; others invent one.',
+      'common.4': 'Two programs, two results. Thresholds, units and normalisations vary. Compare sounds within one tool, never values across tools: what counts is the difference between sounds.',
       'tabs.aria': 'Descriptors',
-      'h.what': 'What it is', 'h.how': 'How it works', 'h.tool': 'On this page',
-      'h.traps': 'Pitfalls', 'h.examples': 'Example sounds',
-      'ex.hint': 'Synthesised on the fly, rights-free. Once computed, the median value of each sound (A, B…) appears under the example: these are measurements, redone on every load, not copied figures.',
-      'ex.load': '▶ Load',
-      'w.title': 'Listen and measure',
-      'w.hint': 'Your sound or an example. Click or drag on the waveform or the curve to move around: the magnifier follows the cursor. Switching tabs recomputes the descriptor on the same sound.',
+      'h.use': 'What it is useful for', 'h.what': 'What it measures', 'h.how': 'How it works', 'h.tool': 'In this tool',
+      'h.example': 'This example', 'h.traps': 'Pitfalls in this example', 'h.trapsAll': 'Pitfalls', 'h.trapsOther': 'Other pitfalls of this descriptor ({n})',
+      'traps.none': 'Here the descriptor does what we expect of it. The other examples show where it goes wrong.',
+      'ex.label': 'Sound',
+      'ex.pick': 'Choose an example…',
+      'ex.own': 'Your file: {name}',
+      'ex.ownNote': 'Your own sound: no commentary, the listening is yours. All of the descriptor’s pitfalls are listed alongside.',
       'drop.main': 'Drop an audio file here, or press Enter to choose one',
       'drop.formats': 'WAV, MP3, FLAC, M4A, OGG',
       'drop.aria': 'Choose an audio file',
       'opt.frame': 'Frame size',
-      'frame.hint': 'Frame of {size} samples ({ms} ms), hop of {hop}; one FFT bin ≈ {hz} Hz.',
-      'frame.pitch': ' Lowest pitch detectable with this frame: ≈ {f} Hz.',
-      'frame.chroma': ' Two neighbouring notes stop being separated below ≈ {f} Hz.',
+      'frame.hint': 'Frame of {size} samples ({ms} ms), hop of {hop}; one bin covers ≈ {hz} Hz.',
+      'frame.pitch': ' Lowest detectable pitch: ≈ {f} Hz.',
+      'frame.chroma': ' Neighbouring notes stop being separated below ≈ {f} Hz.',
       'caption.none': 'No sound loaded.',
-      'caption.loaded': '{name} — {dur} s · {sr} Hz · {ch} channel(s)',
+      'caption.loaded': '{name} — {dur} s, {sr} Hz, {ch} channel(s)',
       'prog.aria': 'Computation progress',
       'st.decoding': 'Decoding “{name}”…',
       'st.running': 'Computing: {name}…',
       'st.done': '{name}: {n} frames.',
       'st.failed': 'Failed: {msg}',
       'st.tooshort': 'The sound is shorter than one frame.',
-      'stats': 'Over the whole sound: median {med} · min {min} · max {max}',
-      'stats.nan': ' · {p} % of frames without a value',
+      'stats': 'Over the whole sound: median {med}, min {min}, max {max}',
+      'stats.nan': ', {p} % of frames without a value',
       'stats.none': 'Over the whole sound: no value.',
+      'curve.none': 'No value on this sound',
+      'curve.band': 'grey areas: frames without a value',
       'seg.none': 'no value', 'seg.nan': '{p} % without a value', 'seg.medmax': 'median {med}, max {max}',
+      'meas.title': 'Measured, median per sound:',
       'mfcc.dist': 'distance c1–c12',
       'loupe.title': 'The magnifier: one frame',
       'loupe.hint': 'What the computation sees at the cursor. The value shown is the one on the curve.',
@@ -2986,389 +3030,455 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
       'lg.raw': 'raw frame', 'lg.win': 'windowed frame (what is measured)', 'lg.rms': '± RMS',
       'lg.cross': 'zero crossings', 'lg.period': 'periods found',
       'lg.nopitch': 'no periodicity found in this frame',
-      'lg.bark': 'loudness per critical band (Bark)',
+      'lg.bark': 'loudness per critical band (Bark scale)',
       'lg.spec': 'spectrum (dB relative to the frame’s peak)',
       'lg.centroid': 'centroid', 'lg.spread': 'centroid ± spread',
       'lg.cum': 'cumulative amplitude (0 → 100 %)', 'lg.rolloff': 'rolloff: 99 % reached',
       'lg.gm': 'geometric mean', 'lg.am': 'arithmetic mean',
       'lg.prev': 'previous frame', 'lg.cur': 'current frame',
-      'lg.up': 'increases: what gets summed',
-      'lg.mfcc0': 'c0 (level)', 'lg.mfcc': 'c1 … c12',
+      'lg.up': 'increases (what gets summed)',
+      'lg.mfcc0': 'c0 (level)', 'lg.mfcc': 'c1 to c12',
       'lg.chroma': 'pitch classes, normalised to the frame’s maximum',
       'lg.silent': 'silent frame',
       'pc': 'C,C♯,D,D♯,E,F,F♯,G,G♯,A,A♯,B',
-      'u.hz': 'Hz', 'u.perframe': 'per frame', 'u.norm': '0–1'
+      'u.hz': 'Hz', 'u.perframe': 'per frame',
+      'btn.png': 'Save the analysis as an image (PNG)',
+      'png.frame': 'Frame of {size} samples, hop of {hop}, {sr} Hz',
+      'png.cursor': 'Magnifier at {t} s',
+      'png.saved': 'Image saved: {name}'
     }
   };
 
   /* === the eleven descriptors ============================================= */
-  /* feat: the name Atelier.dsp.describe() understands. loupe: what the frame
-     view draws. unit: an i18n key or ''. ex: example sounds, each a list of
-     segments made by the synth below. */
+  /* tab: short tab label. feat: the name Atelier.dsp.describe() understands.
+     loupe: what the frame view draws. ex: [label, what it shows] per language,
+     segs: segment specs for the synth below, frame: the frame size it needs. */
 
   var DESC = [
     { id: 'rms', feat: 'rms', loupe: 'rms', unit: '',
-      fr: { name: 'RMS — énergie', short: 'RMS',
-        what: "Le niveau moyen du signal dans la trame : la racine de la moyenne des carrés des échantillons.",
-        how: "On élève chaque échantillon au carré, on fait la moyenne, on prend la racine. Aucun spectre, aucune oreille : de l’arithmétique sur la forme d’onde.",
-        tool: "Calculé après fenêtrage (Hann), comme le montre la loupe : une sinusoïde lit environ 0,61 × sa vraie valeur RMS. Facteur constant, sans effet sur les comparaisons ; ne pas le présenter comme un niveau absolu.",
-        traps: ["L’oreille ne pondère pas les fréquences également : à RMS égal, 60 Hz paraît bien plus faible que 1 kHz.",
-                "Une salve très brève paraît plus faible que son énergie ne le dit.",
-                "Le niveau mesuré n’est pas le niveau d’écoute : volume, enceintes et distance n’existent pas pour lui."] },
-      en: { name: 'RMS — energy', short: 'RMS',
-        what: 'The average level of the signal in the frame: the square root of the mean of the squared samples.',
-        how: 'Square each sample, average, take the root. No spectrum, no ear: arithmetic on the waveform.',
-        tool: 'Computed after windowing (Hann), as the magnifier shows: a sine reads about 0.61 × its true RMS. A constant factor with no effect on comparisons; do not present it as an absolute level.',
-        traps: ['The ear does not weight frequencies equally: at equal RMS, 60 Hz sounds far quieter than 1 kHz.',
-                'A very short burst sounds quieter than its energy says.',
-                'Measured level is not listening level: volume, speakers and distance do not exist for it.'] },
+      fr: { tab: 'RMS', name: 'RMS (énergie)',
+        what: "Le niveau moyen du signal dans une trame : la racine carrée de la moyenne des carrés des échantillons.",
+        how: "On élève chaque échantillon au carré, on fait la moyenne, puis on prend la racine. Pas de spectre, pas de modèle de l’oreille : un simple calcul sur la forme d’onde.",
+        tool: "La valeur est calculée après fenêtrage (fenêtre de Hann) : une sinusoïde donne environ 0,61 fois sa vraie valeur RMS. Le facteur est constant et ne fausse pas les comparaisons, mais ce n’est pas un niveau absolu.",
+        traps: ["L’oreille n’entend pas toutes les fréquences avec la même sensibilité : à RMS égal, 60 Hz paraît beaucoup plus faible que 1 kHz.",
+                "Un son très bref paraît moins fort que son énergie ne le laisse penser.",
+                "C’est le niveau du fichier, pas le niveau d’écoute : volume, enceintes et distance n’entrent pas en compte."] },
+      en: { tab: 'RMS', name: 'RMS (energy)',
+        what: 'The average level of the signal in a frame: the square root of the mean of the squared samples.',
+        how: 'Square each sample, average, take the root. No spectrum, no model of the ear: plain arithmetic on the waveform.',
+        tool: 'Computed after windowing (Hann window): a sine reads about 0.61 × its true RMS. The factor is constant and does not distort comparisons, but it is not an absolute level.',
+        traps: ['The ear does not hear all frequencies equally: at equal RMS, 60 Hz sounds far quieter than 1 kHz.',
+                'A very short sound seems quieter than its energy suggests.',
+                'It is the level of the file, not the listening level: volume, speakers and distance do not come into it.'] },
       ex: [
-        { fr: ['Sinusoïdes 60 Hz | 1 kHz, même amplitude', 'Égales pour la machine ; l’oreille entend la grave beaucoup plus faible.'],
-          en: ['Sines 60 Hz | 1 kHz, same amplitude', 'Equal for the machine; the ear hears the low one as much quieter.'],
+        { fr: ['Sinusoïdes à 60 Hz puis 1 kHz, même amplitude', 'Valeurs identiques pour la machine, alors que l’oreille entend la sinusoïde grave bien plus faible.'],
+          en: ['Sines at 60 Hz then 1 kHz, same amplitude', 'Identical for the machine, yet the ear hears the low sine as much quieter.'],
           segs: [['A', 'sine', 60, 0.5], ['B', 'sine', 1000, 0.5]] },
-        { fr: ['Corde pincée', 'Une décroissance exponentielle : la courbe d’enveloppe la plus lisible qui soit.'],
-          en: ['Plucked string', 'An exponential decay: the most legible envelope curve there is.'],
+        { fr: ['Corde pincée', 'Une décroissance exponentielle : l’enveloppe se lit directement sur la courbe.'],
+          en: ['Plucked string', 'An exponential decay: the envelope reads straight off the curve.'],
           segs: [['', 'pluck', 196, 0.8, 3]] },
-        { fr: ['Balayage 80 Hz → 8 kHz', 'Le niveau ne bouge pas, alors qu’on entend le son devenir plus présent vers 2–4 kHz.'],
-          en: ['Sweep 80 Hz → 8 kHz', 'The level does not move, yet the sound becomes more present around 2–4 kHz.'],
+        { fr: ['Balayage de 80 Hz à 8 kHz', 'Le niveau reste constant, alors qu’on entend le son devenir plus présent vers 2–4 kHz.'],
+          en: ['Sweep from 80 Hz to 8 kHz', 'The level stays constant, yet the sound becomes more present around 2–4 kHz.'],
           segs: [['', 'demo', 'sweep', 4]] },
-        { fr: ['Sinusoïde | silence numérique', 'Zéro sur le silence : correct. Centroïde, planéité et rolloff n’en sont pas capables.'],
-          en: ['Sine | digital silence', 'Zero on silence: correct. Centroid, flatness and rolloff cannot manage that.'],
+        { fr: ['Sinusoïde puis silence numérique', 'Zéro sur le silence, ce qui est juste. Le centroïde, la planéité et le *rolloff* n’en sont pas capables.'],
+          en: ['Sine then digital silence', 'Zero on silence, which is right. Centroid, flatness and rolloff cannot manage that.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'silence']] }
       ] },
 
     { id: 'loudness', feat: 'loudness', loupe: 'bark', unit: '',
-      fr: { name: 'Sonie', short: 'Sonie',
-        what: "Une estimation de la force perçue, et non de l’énergie.",
-        how: "Le spectre est découpé en 24 bandes critiques (échelle de Bark) ; l’amplitude cumulée de chaque bande est comprimée (puissance 0,23), puis on additionne les bandes. Un son large bande « remplit » plus de bandes et paraît donc plus fort à énergie égale.",
-        tool: "« Sonie totale » de Meyda 5.6.3, sans unité. La loupe montre les 24 bandes de la trame. Comparer des sons entre eux, pas à des sones.",
-        traps: ["C’est le modèle d’un auditeur moyen en laboratoire, pas de vous.",
-                "Cette implémentation n’applique pas les courbes d’égale sonie : elle ne sait pas que 60 Hz s’entend mal.",
-                "Pas d’intégration temporelle : une salve brève compte autant qu’un son tenu.",
-                "La compression : dix fois moins d’amplitude ne donne pas dix fois moins de sonie."] },
-      en: { name: 'Loudness', short: 'Loudness',
-        what: 'An estimate of perceived strength, not of energy.',
-        how: 'The spectrum is cut into 24 critical bands (Bark scale); the summed amplitude of each band is compressed (power 0.23), then the bands are added. A broadband sound “fills” more bands and so seems louder at equal energy.',
-        tool: 'Meyda 5.6.3 “total loudness”, unitless. The magnifier shows the frame’s 24 bands. Compare sounds with each other, not with sones.',
-        traps: ['It models an average listener in a lab, not you.',
-                'This implementation applies no equal-loudness contours: it does not know that 60 Hz is hard to hear.',
-                'No temporal integration: a short burst counts as much as a held sound.',
-                'Compression: ten times less amplitude does not give ten times less loudness.'] },
+      fr: { tab: '*Loudness*', name: '*Loudness*',
+        what: "Une estimation de l’intensité perçue, et non de l’énergie physique. (« Sonie » existe en français, mais désigne surtout une unité de mesure précise ; ce n’est pas ce que calcule cet outil.)",
+        how: "Le spectre est découpé en 24 bandes critiques (échelle de Bark). L’amplitude de chaque bande est comprimée (puissance 0,23), puis les bandes sont additionnées. Un son à large bande occupe plus de bandes : à énergie égale, il paraît donc plus fort.",
+        tool: "*Loudness* totale calculée par Meyda 5.6.3, sans unité. Elle sert à comparer des sons entre eux, pas à donner une valeur en sones.",
+        traps: ["C’est le modèle d’un auditeur moyen en laboratoire, pas votre propre écoute.",
+                "Cette implémentation n’applique pas les courbes d’isosonie : elle ignore que les graves s’entendent mal.",
+                "Aucune intégration temporelle : un son bref compte autant qu’un son tenu.",
+                "La compression est forte : diviser l’amplitude par dix ne divise pas la *loudness* par dix."] },
+      en: { tab: 'Loudness', name: 'Loudness',
+        what: 'An estimate of perceived intensity, not of physical energy.',
+        how: 'The spectrum is cut into 24 critical bands (Bark scale). The amplitude of each band is compressed (power 0.23), then the bands are added. A broadband sound occupies more bands, so at equal energy it seems louder.',
+        tool: 'Total loudness as computed by Meyda 5.6.3, unitless. It is for comparing sounds with each other, not for a value in sones.',
+        traps: ['It models an average listener in a lab, not your own listening.',
+                'This implementation applies no equal-loudness contours: it ignores that low frequencies are hard to hear.',
+                'No temporal integration: a short sound counts as much as a held one.',
+                'Strong compression: dividing the amplitude by ten does not divide the loudness by ten.'] },
       ex: [
-        { fr: ['Sinusoïdes 60 Hz | 1 kHz, même RMS', 'Presque égales : le modèle rate ce que l’oreille entend tout de suite. Un échec instructif.'],
-          en: ['Sines 60 Hz | 1 kHz, same RMS', 'Almost equal: the model misses what the ear hears at once. An instructive failure.'],
+        { fr: ['Sinusoïdes à 60 Hz puis 1 kHz, même RMS', 'Valeurs presque égales : le modèle ne perçoit pas ce que l’oreille entend immédiatement. Un échec instructif.'],
+          en: ['Sines at 60 Hz then 1 kHz, same RMS', 'Almost equal: the model misses what the ear hears at once. An instructive failure.'],
           segs: [['A', 'sine', 60, 0.354], ['B', 'sine', 1000, 0.354]] },
-        { fr: ['Sinusoïde 1 kHz | bruit blanc, même RMS', 'Le bruit remplit toutes les bandes : bien plus fort pour le modèle. Ce que le RMS ne voit pas.'],
-          en: ['1 kHz sine | white noise, same RMS', 'Noise fills every band: far louder for the model. What RMS cannot see.'],
+        { fr: ['Sinusoïde à 1 kHz puis bruit blanc, même RMS', 'Le bruit occupe toutes les bandes et paraît beaucoup plus fort au modèle. Le RMS ne voit pas cette différence.'],
+          en: ['1 kHz sine then white noise, same RMS', 'The noise fills every band and seems far louder to the model. RMS cannot see that difference.'],
           segs: [['A', 'sine', 1000, 0.354], ['B', 'white', 0.25]] },
-        { fr: ['Sinusoïde 1 kHz | la même 20 dB plus bas', 'Dix fois moins d’amplitude, à peine deux fois moins de sonie.'],
-          en: ['1 kHz sine | the same 20 dB lower', 'Ten times less amplitude, barely half the loudness.'],
+        { fr: ['Sinusoïde à 1 kHz, puis la même 20 dB plus bas', 'Amplitude divisée par dix, *loudness* divisée par moins de deux.'],
+          en: ['1 kHz sine, then the same 20 dB lower', 'Amplitude divided by ten, loudness by less than two.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'sine', 1000, 0.05]] }
       ] },
 
     { id: 'pitch', feat: 'pitch', loupe: 'pitch', unit: 'u.hz',
-      fr: { name: 'Hauteur (f0)', short: 'Hauteur',
-        what: "La fréquence fondamentale : combien de fois par seconde la forme d’onde se répète.",
-        how: "Méthode YIN : on décale la trame sur elle-même et on cherche le plus petit décalage pour lequel elle se superpose le mieux. Si rien ne se superpose assez bien, pas de réponse. La loupe marque les périodes trouvées.",
-        tool: "Plage 50–2 000 Hz, mais la trame limite le grave : avec 1 024 échantillons, rien sous ≈ 86 Hz. Passer à 2 048 ou 4 096 pour les sons graves — c’est à cela que sert le sélecteur de trame. Un trou dans la courbe = « pas de périodicité trouvée ».",
-        traps: ["Pas de réponse sur le bruit, les partiels inharmoniques, les mélanges : un trou dans la courbe est une information, pas une panne.",
+      fr: { tab: 'Hauteur', name: 'Hauteur (f0)',
+        what: "La fréquence fondamentale : le nombre de fois par seconde où la forme d’onde se répète.",
+        how: "Algorithme YIN : on compare la trame à une copie d’elle-même décalée dans le temps, et on cherche le plus petit décalage pour lequel les deux coïncident. Si aucun décalage ne convient, l’algorithme ne renvoie rien.",
+        tool: "Plage de 50 à 2 000 Hz, mais la taille de trame limite le grave : avec 1 024 échantillons, rien en dessous de 86 Hz environ. Pour les sons graves, passer à 2 048 ou 4 096. Les zones grisées de la courbe sont les trames sans valeur.",
+        traps: ["Aucune valeur sur le bruit, les sons inharmoniques ou les mélanges : une zone grisée est une information, pas une panne.",
                 "Erreurs d’octave, surtout dans l’aigu.",
-                "Hors de sa plage, l’estimateur donne une fausse valeur au lieu de se taire.",
-                "Une seule hauteur par trame, au mieux : la polyphonie lui échappe."] },
-      en: { name: 'Pitch (f0)', short: 'Pitch',
+                "Hors de sa plage, l’algorithme renvoie une valeur fausse au lieu de ne rien renvoyer.",
+                "Une seule hauteur par trame : la polyphonie lui échappe."] },
+      en: { tab: 'Pitch', name: 'Pitch (f0)',
         what: 'The fundamental frequency: how many times per second the waveform repeats.',
-        how: 'The YIN method: shift the frame against itself and look for the smallest shift at which it lines up best. If nothing lines up well enough, no answer. The magnifier marks the periods found.',
-        tool: 'Range 50–2,000 Hz, but the frame limits the low end: with 1,024 samples, nothing below ≈ 86 Hz. Switch to 2,048 or 4,096 for low sounds — that is what the frame selector is for. A gap in the curve = “no periodicity found”.',
-        traps: ['No answer on noise, inharmonic partials, mixtures: a gap in the curve is information, not a fault.',
+        how: 'The YIN algorithm: compare the frame with a time-shifted copy of itself and look for the smallest shift at which the two line up. If no shift fits, it returns nothing.',
+        tool: 'Range 50 to 2,000 Hz, but frame size limits the low end: with 1,024 samples, nothing below about 86 Hz. For low sounds, switch to 2,048 or 4,096. Grey areas on the curve are frames without a value.',
+        traps: ['No value on noise, inharmonic sounds or mixtures: a grey area is information, not a fault.',
                 'Octave errors, especially high up.',
-                'Outside its range, the estimator gives a wrong value instead of keeping quiet.',
-                'One pitch per frame at best: polyphony escapes it.'] },
+                'Outside its range, the algorithm returns a wrong value instead of nothing.',
+                'One pitch per frame: polyphony escapes it.'] },
       ex: [
-        { fr: ['Sinusoïde 440 Hz', 'Le cas facile.'], en: ['440 Hz sine', 'The easy case.'],
+        { fr: ['Sinusoïde à 440 Hz', 'Le cas simple.'], en: ['440 Hz sine', 'The easy case.'],
           segs: [['', 'sine', 440, 0.5, 2]] },
-        { fr: ['Partiels 400 + 600 + 800 Hz, sans 200 Hz', 'La fondamentale absente, que l’oreille entend aussi : un vrai succès.'],
-          en: ['Partials 400 + 600 + 800 Hz, no 200 Hz', 'The missing fundamental, which the ear hears too: a real success.'],
+        { fr: ['Partiels à 400, 600 et 800 Hz, sans le 200 Hz', 'La fondamentale absente (200 Hz) est retrouvée, comme le fait l’oreille.'],
+          en: ['Partials at 400, 600 and 800 Hz, without 200 Hz', 'The missing fundamental (200 Hz) is found, as the ear finds it.'],
           segs: [['', 'partials', [[400, 0.2], [600, 0.2], [800, 0.2]], 0, 2]] },
-        { fr: ['Partiels inharmoniques 200, 547, 1 031 Hz', 'Refus de répondre : c’est une information, pas une panne.'],
-          en: ['Inharmonic partials 200, 547, 1,031 Hz', 'It refuses to answer: that is information, not a fault.'],
+        { fr: ['Partiels inharmoniques à 200, 547 et 1 031 Hz', 'Toute la courbe est grisée : l’algorithme ne trouve aucune période. C’est une information, pas une panne.'],
+          en: ['Inharmonic partials at 200, 547 and 1,031 Hz', 'The whole curve is grey: the algorithm finds no period. That is information, not a fault.'],
           segs: [['', 'partials', [[200, 0.2], [547, 0.2], [1031, 0.2]], 0, 2]] },
-        { fr: ['Bruit blanc', 'Pas de valeur non plus.'], en: ['White noise', 'No value either.'],
+        { fr: ['Bruit blanc', 'Aucune valeur non plus.'], en: ['White noise', 'No value either.'],
           segs: [['', 'white', 0.25, 0, 2]] },
-        { fr: ['Sinusoïde 80 Hz (voix grave, bourdon)', 'Avec la trame de 1 024 : faux, et sans avertissement. Refaire le calcul avec 2 048.'],
-          en: ['80 Hz sine (low voice, drone)', 'With the 1,024 frame: wrong, with no warning. Redo it with 2,048.'],
+        { fr: ['Sinusoïde à 80 Hz (voix grave, bourdon)', 'Avec une trame de 1 024, la valeur est fausse et rien ne le signale. Refaire le calcul avec 2 048.'],
+          en: ['80 Hz sine (low voice, drone)', 'With a 1,024 frame the value is wrong and nothing says so. Redo it with 2,048.'],
           segs: [['', 'sine', 80, 0.5, 2]] },
-        { fr: ['Sinusoïde 2 500 Hz', 'Au-dessus de 2 kHz, une sous-harmonique au lieu de la vraie hauteur.'],
-          en: ['2,500 Hz sine', 'Above 2 kHz, a subharmonic instead of the true pitch.'],
+        { fr: ['Sinusoïde à 2 500 Hz', 'Au-dessus de 2 kHz, l’algorithme renvoie une sous-harmonique au lieu de la vraie hauteur.'],
+          en: ['2,500 Hz sine', 'Above 2 kHz the algorithm returns a subharmonic instead of the true pitch.'],
           segs: [['', 'sine', 2500, 0.5, 2]] },
-        { fr: ['Balayage 80 Hz → 8 kHz', 'Suit le son jusqu’à ≈ 2 kHz, puis décroche : il rend la moitié de la vraie fréquence, puis le tiers, puis le quart. La courbe remonte en dents de scie sans jamais dépasser 2 kHz, pendant que le son monte jusqu’à 8 kHz.'],
-          en: ['Sweep 80 Hz → 8 kHz', 'Follows the sound up to ≈ 2 kHz, then lets go: it returns half the true frequency, then a third, then a quarter. The curve climbs in a sawtooth that never passes 2 kHz while the sound rises to 8 kHz.'],
+        { fr: ['Balayage de 80 Hz à 8 kHz', 'La courbe suit le son jusqu’à 2 kHz environ, puis décroche : elle donne la moitié de la vraie fréquence, puis le tiers, puis le quart. Elle remonte en dents de scie sans dépasser 2 kHz, alors que le son monte jusqu’à 8 kHz.'],
+          en: ['Sweep from 80 Hz to 8 kHz', 'The curve follows the sound up to about 2 kHz, then lets go: it gives half the true frequency, then a third, then a quarter. It climbs in a sawtooth that never passes 2 kHz while the sound rises to 8 kHz.'],
           segs: [['', 'demo', 'sweep', 4]] },
-        { fr: ['Cloche (FM)', 'Valeurs fausses tant que la modulation est forte ; juste quand la cloche devient presque sinusoïdale.'],
-          en: ['Bell (FM)', 'Wrong values while the modulation is strong; right once the bell becomes nearly sinusoidal.'],
+        { fr: ['Cloche (synthèse FM)', 'Valeurs fausses tant que la modulation est forte, justes quand la cloche devient presque sinusoïdale.'],
+          en: ['Bell (FM synthesis)', 'Wrong values while the modulation is strong, right once the bell becomes nearly sinusoidal.'],
           segs: [['', 'demo', 'bell', 3]] },
-        { fr: ['Bande de bruit étroite 900–1 100 Hz', 'Un bruit étroit a une hauteur, pour la machine comme pour l’oreille.'],
-          en: ['Narrow noise band 900–1,100 Hz', 'A narrow noise has a pitch, for the machine as for the ear.'],
+        { fr: ['Bande de bruit étroite, 900–1 100 Hz', 'Un bruit étroit a une hauteur, pour la machine comme pour l’oreille.'],
+          en: ['Narrow noise band, 900–1,100 Hz', 'A narrow noise has a pitch, for the machine as for the ear.'],
           segs: [['', 'band', 900, 1100, 0.25, 2]] }
       ] },
 
     { id: 'centroid', feat: 'spectralCentroid', loupe: 'centroid', unit: 'u.hz',
-      fr: { name: 'Centroïde spectral', short: 'Centroïde',
-        what: "La fréquence « moyenne » du spectre, pondérée par l’amplitude de chaque fréquence, en hertz.",
-        how: "Chaque case du spectre pèse selon son amplitude ; on cherche le point d’équilibre. Plus il y a d’énergie dans l’aigu, plus il monte. La loupe le place sur le spectre de la trame.",
-        tool: "En Hz. Calculé sur une échelle de fréquence linéaire, où l’aigu occupe presque toute la place : passer la loupe en échelle logarithmique montre à quel point il est tiré vers le haut.",
-        traps: ["Souvent traduit par « brillance » : corrélé, pas identique.",
-                "Il ignore le niveau : un souffle très faible mais aigu a un centroïde bien plus haut qu’un bourdon fort.",
-                "Trois sons très différents peuvent avoir le même centroïde.",
-                "Dans les trames presque silencieuses, il décrit le bruit de fond ; dans le silence numérique, il n’existe pas."] },
-      en: { name: 'Spectral centroid', short: 'Centroid',
-        what: 'The “average” frequency of the spectrum, weighted by the amplitude of each frequency, in hertz.',
-        how: 'Each spectral bin weighs according to its amplitude; find the balance point. The more energy up high, the higher it goes. The magnifier places it on the frame’s spectrum.',
-        tool: 'In Hz. Computed on a linear frequency scale, where the treble takes up almost all the room: switch the magnifier to a log scale to see how far up it is pulled.',
-        traps: ['Often glossed as “brightness”: correlated, not identical.',
-                'It ignores level: a very faint but high hiss has a far higher centroid than a loud drone.',
-                'Three very different sounds can share the same centroid.',
-                'In near-silent frames it describes the background noise; in digital silence it does not exist.'] },
+      fr: { tab: 'Centroïde', name: 'Centroïde spectral',
+        what: "La fréquence moyenne du spectre, pondérée par l’amplitude de chaque fréquence. En hertz.",
+        how: "Chaque *bin* du spectre pèse selon son amplitude ; le centroïde est le point d’équilibre. Plus il y a d’énergie dans l’aigu, plus il monte.",
+        tool: "En Hz, calculé sur une échelle de fréquences linéaire, où l’aigu occupe presque toute la place. La loupe en échelle logarithmique montre à quel point il est tiré vers le haut.",
+        traps: ["On l’assimile souvent à la « brillance » : les deux sont corrélés, pas identiques.",
+                "Il ignore le niveau : un souffle aigu très faible a un centroïde bien plus haut qu’un bourdon grave et fort.",
+                "Des sons très différents peuvent avoir le même centroïde.",
+                "Dans les passages presque silencieux, il décrit le bruit de fond ; sur un silence numérique, il n’a pas de valeur."] },
+      en: { tab: 'Centroid', name: 'Spectral centroid',
+        what: 'The average frequency of the spectrum, weighted by the amplitude of each frequency. In hertz.',
+        how: 'Each spectral bin weighs according to its amplitude; the centroid is the balance point. The more energy up high, the higher it goes.',
+        tool: 'In Hz, computed on a linear frequency scale, where the treble takes up almost all the room. The magnifier on a log scale shows how far up it is pulled.',
+        traps: ['Often equated with “brightness”: the two are correlated, not identical.',
+                'It ignores level: a very faint high hiss has a far higher centroid than a loud low drone.',
+                'Very different sounds can share the same centroid.',
+                'In near-silent passages it describes the background noise; on digital silence it has no value.'] },
       ex: [
-        { fr: ['Sinusoïde 1 kHz | bande de bruit 900–1 100 Hz | sinusoïdes 500 + 1 500 Hz', 'Trois sons distincts, un seul nombre. C’est l’étalement qui les sépare.'],
-          en: ['1 kHz sine | noise band 900–1,100 Hz | sines 500 + 1,500 Hz', 'Three distinct sounds, one number. Spread is what tells them apart.'],
+        { fr: ['Sinusoïde à 1 kHz, bande de bruit 900–1 100 Hz, sinusoïdes 500 + 1 500 Hz', 'Trois sons différents, une seule valeur. C’est l’étalement qui les distingue.'],
+          en: ['1 kHz sine, noise band 900–1,100 Hz, sines 500 + 1,500 Hz', 'Three different sounds, one value. Spread is what tells them apart.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'band', 900, 1100, 0.25], ['C', 'partials', [[500, 0.3], [1500, 0.3]]]] },
-        { fr: ['Bourdon grave fort | souffle aigu 30 dB plus faible', 'Personne n’appellera le souffle « le son le plus brillant ».'],
-          en: ['Loud low drone | high hiss 30 dB quieter', 'Nobody will call the hiss “the brightest sound”.'],
+        { fr: ['Bourdon grave fort, puis souffle aigu 30 dB plus faible', 'Personne ne dirait que le souffle est le son le plus brillant.'],
+          en: ['Loud low drone, then high hiss 30 dB quieter', 'Nobody would call the hiss the brightest sound.'],
           segs: [['A', 'drone'], ['B', 'hiss', -30]] },
-        { fr: ['Sinusoïde 1 kHz | la même + souffle à −40 dB', 'Un souffle à peine audible double le centroïde.'],
-          en: ['1 kHz sine | the same + hiss at −40 dB', 'A barely audible hiss doubles the centroid.'],
+        { fr: ['Sinusoïde à 1 kHz, puis la même avec un souffle à −40 dB', 'Un souffle à peine audible double le centroïde.'],
+          en: ['1 kHz sine, then the same with hiss at −40 dB', 'A barely audible hiss doubles the centroid.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'sinehiss', -40]] },
-        { fr: ['Cloche (FM)', 'Il descend pendant la résonance : les partiels aigus meurent en premier. Une observation musicale, offerte par le nombre.'],
-          en: ['Bell (FM)', 'It falls during the resonance: the high partials die first. A musical observation, handed over by the number.'],
+        { fr: ['Cloche (synthèse FM)', 'Il descend pendant la résonance, parce que les partiels aigus s’éteignent en premier. La mesure confirme ici une observation musicale.'],
+          en: ['Bell (FM synthesis)', 'It falls during the resonance, because the high partials die first. Here the measurement confirms a musical observation.'],
           segs: [['', 'demo', 'bell', 3]] },
-        { fr: ['Corde pincée', 'Idem.'], en: ['Plucked string', 'Same.'],
+        { fr: ['Corde pincée', 'Même phénomène que pour la cloche.'], en: ['Plucked string', 'The same as the bell.'],
           segs: [['', 'pluck', 196, 0.8, 3]] },
-        { fr: ['Bruit blanc | bruit rose', 'Le rose sonne plus sombre, et le nombre suit.'],
-          en: ['White noise | pink noise', 'Pink sounds darker, and the number follows.'],
+        { fr: ['Bruit blanc, puis bruit rose', 'Le bruit rose sonne plus sombre, et la valeur baisse en conséquence.'],
+          en: ['White noise, then pink noise', 'Pink noise sounds darker, and the value drops accordingly.'],
           segs: [['A', 'white', 0.25], ['B', 'pink', 0.25]] },
-        { fr: ['Sinusoïde | silence numérique', '0 divisé par 0 : pas de valeur sur le silence.'],
-          en: ['Sine | digital silence', '0 divided by 0: no value on silence.'],
+        { fr: ['Sinusoïde puis silence numérique', 'Pas de valeur sur le silence : le calcul revient à diviser zéro par zéro.'],
+          en: ['Sine then digital silence', 'No value on silence: the computation comes down to zero divided by zero.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'silence']] }
       ] },
 
     { id: 'spread', feat: 'spectralSpread', loupe: 'spread', unit: 'u.hz',
-      fr: { name: 'Étalement spectral', short: 'Étalement',
-        what: "La largeur du spectre : à quelle distance du centroïde se trouve l’énergie, en moyenne.",
-        how: "L’écart-type du spectre autour de son centroïde, comme l’écart-type d’une série de notes. La loupe le dessine comme une bande autour du centroïde.",
-        tool: "Meyda le rend en cases de FFT ; il est converti ici en Hz pour se lire à côté du centroïde. L’outil « Descripteurs audio » l’affiche encore en cases (1 case ≈ 43 Hz avec la trame de 1 024) : ne pas comparer les deux nombres.",
-        traps: ["Seul, il dit peu de chose ; il sert là où le centroïde est ambigu.",
-                "Deux sinusoïdes très écartées sont « étalées » sans être un bruit.",
-                "Comme le centroïde : pas de valeur dans le silence, et le bruit de fond dans les trames presque silencieuses."] },
-      en: { name: 'Spectral spread', short: 'Spread',
-        what: 'The width of the spectrum: how far from the centroid the energy lies, on average.',
-        how: 'The standard deviation of the spectrum around its centroid, like the standard deviation of a set of notes. The magnifier draws it as a band around the centroid.',
-        tool: 'Meyda returns it in FFT bins; it is converted to Hz here so it reads alongside the centroid. The “Audio descriptors” tool still shows it in bins (1 bin ≈ 43 Hz with the 1,024 frame): do not compare the two numbers.',
-        traps: ['On its own it says little; it earns its place where the centroid is ambiguous.',
-                'Two widely spaced sines are “spread” without being noise.',
-                'Like the centroid: no value on silence, and background noise in near-silent frames.'] },
+      fr: { tab: 'Étalement', name: 'Étalement spectral',
+        what: "La largeur du spectre : la distance moyenne entre l’énergie et le centroïde.",
+        how: "L’écart-type du spectre autour de son centroïde, comme l’écart-type d’une série de valeurs. La loupe le représente comme une bande autour du centroïde.",
+        tool: "Meyda le renvoie en *bins* ; il est converti ici en Hz pour être comparable au centroïde. L’outil « Descripteurs audio » l’affiche encore en *bins* (1 *bin* ≈ 43 Hz avec une trame de 1 024) : ne pas comparer les deux valeurs.",
+        traps: ["Seul, il dit peu de chose ; il est utile quand le centroïde est ambigu.",
+                "Deux sinusoïdes très éloignées donnent un étalement élevé sans être un bruit.",
+                "Comme le centroïde : pas de valeur sur le silence, et dans les passages presque silencieux il décrit le bruit de fond."] },
+      en: { tab: 'Spread', name: 'Spectral spread',
+        what: 'The width of the spectrum: the average distance between the energy and the centroid.',
+        how: 'The standard deviation of the spectrum around its centroid, like the standard deviation of a set of values. The magnifier draws it as a band around the centroid.',
+        tool: 'Meyda returns it in bins; it is converted to Hz here to sit beside the centroid. The “Audio descriptors” tool still shows it in bins (1 bin ≈ 43 Hz with a 1,024 frame): do not compare the two values.',
+        traps: ['On its own it says little; it helps where the centroid is ambiguous.',
+                'Two widely spaced sines give a large spread without being noise.',
+                'Like the centroid: no value on silence, and background noise in near-silent passages.'] },
       ex: [
-        { fr: ['Sinusoïde 1 kHz | bande 900–1 100 Hz | 500 + 1 500 Hz | bruit blanc', 'Même centroïde pour les trois premiers, pas la même largeur ; le bruit blanc met l’énergie partout.'],
-          en: ['1 kHz sine | band 900–1,100 Hz | 500 + 1,500 Hz | white noise', 'Same centroid for the first three, not the same width; white noise puts energy everywhere.'],
+        { fr: ['Sinusoïde à 1 kHz, bande 900–1 100 Hz, sinusoïdes 500 + 1 500 Hz, bruit blanc', 'Les trois premiers ont le même centroïde mais pas la même largeur. Le bruit blanc répartit l’énergie sur tout le spectre.'],
+          en: ['1 kHz sine, band 900–1,100 Hz, sines 500 + 1,500 Hz, white noise', 'The first three share a centroid but not a width. White noise spreads energy over the whole spectrum.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'band', 900, 1100, 0.25], ['C', 'partials', [[500, 0.3], [1500, 0.3]]], ['D', 'white', 0.25]] }
       ] },
 
     { id: 'flatness', feat: 'spectralFlatness', loupe: 'flatness', unit: '',
-      fr: { name: 'Planéité spectrale', short: 'Planéité',
-        what: "Un nombre entre 0 et 1 : proche de 0 quand l’énergie est concentrée dans quelques pics (son tonique), plus haut quand toutes les fréquences se valent (bruit).",
-        how: "On compare deux moyennes du spectre, géométrique et arithmétique. Elles ne sont égales que si le spectre est parfaitement plat. La loupe trace les deux : plus elles sont proches, plus la planéité est grande.",
-        tool: "Sans unité. Valeurs minuscules pour les sons toniques (0,00001) : regarder l’ordre de grandeur, pas les décimales.",
-        traps: ["Calculée sur tout le spectre, de 0 à 22 kHz : un bruit filtré dans une bande étroite est aussi « tonique » qu’une sinusoïde.",
+      fr: { tab: 'Planéité', name: 'Planéité spectrale',
+        what: "Une valeur entre 0 et 1 : proche de 0 quand l’énergie est concentrée sur quelques pics (son tonique), plus élevée quand toutes les fréquences ont un poids comparable (bruit).",
+        how: "On compare deux moyennes du spectre, géométrique et arithmétique. Elles ne sont égales que si le spectre est parfaitement plat. La loupe trace les deux : plus elles sont proches, plus la planéité est élevée.",
+        tool: "Sans unité. Les sons toniques donnent des valeurs minuscules (0,00001) : c’est l’ordre de grandeur qui compte, pas les décimales.",
+        traps: ["Elle est calculée sur tout le spectre, de 0 à 22 kHz : un bruit filtré dans une bande étroite paraît aussi tonique qu’une sinusoïde.",
                 "Le bruit blanc n’atteint pas 1.",
-                "Un souffle presque inaudible suffit à la multiplier par des milliers.",
+                "Un souffle presque inaudible suffit à la multiplier par plusieurs milliers.",
                 "Aucun terme de Schaeffer ou de Smalley ne lui correspond exactement.",
                 "Pas de valeur sur le silence."] },
-      en: { name: 'Spectral flatness', short: 'Flatness',
-        what: 'A number between 0 and 1: near 0 when energy is concentrated in a few peaks (tonal sound), higher when all frequencies are alike (noise).',
+      en: { tab: 'Flatness', name: 'Spectral flatness',
+        what: 'A value between 0 and 1: near 0 when energy is concentrated in a few peaks (tonal sound), higher when all frequencies weigh about the same (noise).',
         how: 'Compare two averages of the spectrum, geometric and arithmetic. They are equal only if the spectrum is perfectly flat. The magnifier draws both: the closer they are, the higher the flatness.',
-        tool: 'Unitless. Tiny values for tonal sounds (0.00001): read the order of magnitude, not the decimals.',
-        traps: ['Computed over the whole spectrum, 0 to 22 kHz: noise filtered into a narrow band is as “tonal” as a sine.',
+        tool: 'Unitless. Tonal sounds give tiny values (0.00001): read the order of magnitude, not the decimals.',
+        traps: ['Computed over the whole spectrum, 0 to 22 kHz: noise filtered into a narrow band looks as tonal as a sine.',
                 'White noise does not reach 1.',
                 'A nearly inaudible hiss is enough to multiply it by thousands.',
                 'No term of Schaeffer’s or Smalley’s corresponds to it exactly.',
                 'No value on silence.'] },
       ex: [
-        { fr: ['Bruit blanc | bruit rose', 'Le maximum en pratique n’est pas 1 ; le rose, au spectre penché, est moins plat.'],
-          en: ['White noise | pink noise', 'The practical maximum is not 1; pink, with its tilted spectrum, is less flat.'],
+        { fr: ['Bruit blanc, puis bruit rose', 'En pratique, le maximum n’est pas 1. Le bruit rose, dont le spectre est incliné, est moins plat.'],
+          en: ['White noise, then pink noise', 'In practice the maximum is not 1. Pink noise, with its tilted spectrum, is less flat.'],
           segs: [['A', 'white', 0.25], ['B', 'pink', 0.25]] },
-        { fr: ['Texture filtrée mouvante', 'Elle descend quand le filtre se referme vers le grave.'],
-          en: ['Drifting filtered texture', 'It falls as the filter closes towards the low end.'],
+        { fr: ['Texture de bruit filtré, filtre mouvant', 'La valeur baisse quand le filtre se referme vers le grave.'],
+          en: ['Filtered-noise texture, moving filter', 'The value drops as the filter closes towards the low end.'],
           segs: [['', 'demo', 'texture', 4]] },
-        { fr: ['Sinusoïde 440 Hz | bande de bruit 900–1 100 Hz', 'Un bruit, mais aussi « tonique » qu’une sinusoïde : le piège principal.'],
-          en: ['440 Hz sine | noise band 900–1,100 Hz', 'A noise, yet as “tonal” as a sine: the main trap.'],
+        { fr: ['Sinusoïde à 440 Hz, puis bande de bruit 900–1 100 Hz', 'C’est un bruit, mais il est aussi tonique qu’une sinusoïde pour la mesure : le piège principal.'],
+          en: ['440 Hz sine, then noise band 900–1,100 Hz', 'It is noise, yet as tonal as a sine for the measurement: the main trap.'],
           segs: [['A', 'sine', 440, 0.5], ['B', 'band', 900, 1100, 0.25]] },
-        { fr: ['Sinusoïde 1 kHz | la même + souffle à −40 dB', 'Un souffle presque inaudible change l’ordre de grandeur.'],
-          en: ['1 kHz sine | the same + hiss at −40 dB', 'A nearly inaudible hiss changes the order of magnitude.'],
+        { fr: ['Sinusoïde à 1 kHz, puis la même avec un souffle à −40 dB', 'Un souffle presque inaudible change l’ordre de grandeur.'],
+          en: ['1 kHz sine, then the same with hiss at −40 dB', 'A nearly inaudible hiss changes the order of magnitude.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'sinehiss', -40]] },
-        { fr: ['Sinusoïde | silence numérique', 'Pas de valeur sur le silence.'],
-          en: ['Sine | digital silence', 'No value on silence.'],
+        { fr: ['Sinusoïde puis silence numérique', 'Pas de valeur sur le silence.'],
+          en: ['Sine then digital silence', 'No value on silence.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'silence']] }
       ] },
 
     { id: 'rolloff', feat: 'spectralRolloff', loupe: 'rolloff', unit: 'u.hz',
-      fr: { name: 'Rolloff spectral', short: 'Rolloff',
-        what: "La fréquence sous laquelle se trouve une proportion fixée du spectre.",
-        how: "On additionne les amplitudes du spectre en partant du grave et on s’arrête au seuil. Le seuil est un choix : 85 %, 95 %, 99 % selon les logiciels. La loupe trace le cumul et le point où il franchit le seuil.",
-        tool: "Seuil de 99 %, en Hz. Meyda cumule les amplitudes, pas l’énergie (leur carré) : un autre logiciel, même au même seuil, donnera un autre nombre.",
-        traps: ["On le dit plus robuste que le centroïde : cela dépend du seuil. À 99 %, c’est l’inverse — un souffle inaudible le propulse en haut du spectre.",
-                "Sur le silence, il renvoie une valeur absurde (le haut du spectre) au lieu de rien.",
-                "Deux logiciels, deux seuils, deux nombres."] },
-      en: { name: 'Spectral rolloff', short: 'Rolloff',
+      fr: { tab: '*Rolloff*', name: '*Rolloff* spectral',
+        what: "La fréquence en dessous de laquelle se trouve une proportion fixée du spectre.",
+        how: "On additionne les amplitudes du spectre en partant du grave et on s’arrête au seuil. Le seuil varie selon les logiciels : 85 %, 95 % ou 99 %. La loupe trace la somme cumulée et le point où elle franchit le seuil.",
+        tool: "Seuil de 99 %, en Hz. Meyda additionne les amplitudes, pas l’énergie (leur carré) : un autre logiciel, même avec le même seuil, donnera une autre valeur.",
+        traps: ["On le dit plus robuste que le centroïde, mais cela dépend du seuil. À 99 %, c’est l’inverse : un souffle inaudible le fait monter en haut du spectre.",
+                "Sur le silence, il renvoie une valeur absurde (le haut du spectre) au lieu de ne rien renvoyer.",
+                "Deux logiciels, deux seuils, deux résultats."] },
+      en: { tab: 'Rolloff', name: 'Spectral rolloff',
         what: 'The frequency below which a fixed proportion of the spectrum lies.',
-        how: 'Add up the spectrum’s amplitudes from the bottom and stop at the threshold. The threshold is a choice: 85 %, 95 %, 99 % depending on the software. The magnifier draws the running total and where it crosses the threshold.',
-        tool: '99 % threshold, in Hz. Meyda sums amplitudes, not energy (their square): another program, even at the same threshold, will give another number.',
-        traps: ['It is said to be more robust than the centroid: that depends on the threshold. At 99 % it is the reverse — an inaudible hiss sends it to the top of the spectrum.',
+        how: 'Add up the spectrum’s amplitudes from the bottom and stop at the threshold. The threshold varies between programs: 85 %, 95 % or 99 %. The magnifier draws the running total and where it crosses the threshold.',
+        tool: '99 % threshold, in Hz. Meyda sums amplitudes, not energy (their square): another program, even at the same threshold, will give another value.',
+        traps: ['It is said to be more robust than the centroid, but that depends on the threshold. At 99 % it is the reverse: an inaudible hiss sends it to the top of the spectrum.',
                 'On silence it returns an absurd value (the top of the spectrum) instead of nothing.',
-                'Two programs, two thresholds, two numbers.'] },
+                'Two programs, two thresholds, two results.'] },
       ex: [
-        { fr: ['Sinusoïde 1 kHz | la même + souffle à −40 dB', 'Le centroïde double ; le rolloff saute en haut du spectre.'],
-          en: ['1 kHz sine | the same + hiss at −40 dB', 'The centroid doubles; the rolloff jumps to the top of the spectrum.'],
+        { fr: ['Sinusoïde à 1 kHz, puis la même avec un souffle à −40 dB', 'Le centroïde double, le *rolloff* saute en haut du spectre.'],
+          en: ['1 kHz sine, then the same with hiss at −40 dB', 'The centroid doubles; the rolloff jumps to the top of the spectrum.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'sinehiss', -40]] },
-        { fr: ['Bruit blanc | bruit rose', 'À 99 %, les deux touchent presque le plafond : il ne les distingue plus, le centroïde si.'],
-          en: ['White noise | pink noise', 'At 99 %, both nearly hit the ceiling: it no longer tells them apart; the centroid does.'],
+        { fr: ['Bruit blanc, puis bruit rose', 'À 99 %, les deux sont presque au maximum : le *rolloff* ne les distingue plus, le centroïde si.'],
+          en: ['White noise, then pink noise', 'At 99 % both are nearly at the maximum: the rolloff no longer tells them apart; the centroid does.'],
           segs: [['A', 'white', 0.25], ['B', 'pink', 0.25]] },
-        { fr: ['Sinusoïde | silence numérique', 'Un nombre là où il ne devrait rien y avoir.'],
-          en: ['Sine | digital silence', 'A number where there should be nothing.'],
+        { fr: ['Sinusoïde puis silence numérique', 'Une valeur là où il ne devrait rien y avoir.'],
+          en: ['Sine then digital silence', 'A value where there should be nothing.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'silence']] }
       ] },
 
     { id: 'zcr', feat: 'zcr', loupe: 'zcr', unit: 'u.perframe',
-      fr: { name: 'Taux de passage par zéro', short: 'Passages par 0',
-        what: "Le nombre de fois où la forme d’onde change de signe dans la trame.",
-        how: "On compte. Aucun spectre. Historiquement l’un des premiers descripteurs, parce qu’il ne coûte presque rien à calculer. La loupe marque chaque passage.",
-        tool: "En passages par trame : il double si la trame double. Une sinusoïde de fréquence f en donne environ 2 × f × durée de la trame (≈ f / 21,5 avec 1 024 échantillons à 44,1 kHz).",
-        traps: ["Élevé pour le bruit et pour un son aigu propre : seul, il ne peut pas les distinguer.",
-                "Un décalage continu (offset) ou un ronflement grave ajouté le fait chuter sans que l’aigu change.",
-                "Un descripteur mesure ce qu’il mesure, pas ce qu’on voudrait qu’il signifie."] },
-      en: { name: 'Zero-crossing rate', short: 'Zero crossings',
-        what: 'The number of times the waveform changes sign within the frame.',
-        how: 'Count them. No spectrum. Historically one of the first descriptors, because it costs almost nothing to compute. The magnifier marks every crossing.',
-        tool: 'In crossings per frame: it doubles if the frame doubles. A sine at frequency f gives about 2 × f × frame duration (≈ f / 21.5 with 1,024 samples at 44.1 kHz).',
-        traps: ['High for noise and for a clean high sound: on its own it cannot tell them apart.',
-                'A DC offset or an added low hum makes it drop with no change in the treble.',
-                'A descriptor measures what it measures, not what we would like it to mean.'] },
+      fr: { tab: 'Passages par zéro', name: 'Taux de passage par zéro',
+        what: "Le nombre de fois où la forme d’onde change de signe dans une trame.",
+        how: "On compte, sans calculer de spectre. C’est l’un des plus anciens descripteurs, parce qu’il ne coûte presque rien à calculer. La loupe marque chaque passage.",
+        tool: "En passages par trame : la valeur double si la trame double. Une sinusoïde de fréquence f donne environ 2 × f × la durée de la trame, soit f / 21,5 avec 1 024 échantillons à 44,1 kHz.",
+        traps: ["Il est élevé pour un bruit comme pour un son aigu pur : seul, il ne peut pas les distinguer.",
+                "Un décalage continu (*DC offset*) ou un ronflement grave le fait chuter, même si l’aigu ne change pas.",
+                "Un descripteur mesure ce qu’il mesure, pas ce qu’on voudrait lui faire dire."] },
+      en: { tab: 'Zero crossings', name: 'Zero-crossing rate',
+        what: 'The number of times the waveform changes sign within a frame.',
+        how: 'Count them, no spectrum needed. One of the oldest descriptors, because it costs almost nothing to compute. The magnifier marks every crossing.',
+        tool: 'In crossings per frame: the value doubles if the frame doubles. A sine at frequency f gives about 2 × f × frame duration, i.e. f / 21.5 with 1,024 samples at 44.1 kHz.',
+        traps: ['High for noise and for a clean high sound alike: on its own it cannot tell them apart.',
+                'A DC offset or a low hum makes it drop even when the treble does not change.',
+                'A descriptor measures what it measures, not what we would like it to say.'] },
       ex: [
-        { fr: ['Sinusoïde 1 kHz | bruit blanc | sinusoïde 11 kHz | bruit rose', 'Le bruit blanc et la sinusoïde à 11 kHz donnent presque le même nombre. Le meilleur exemple de la fiche.'],
-          en: ['1 kHz sine | white noise | 11 kHz sine | pink noise', 'White noise and the 11 kHz sine give almost the same number. The best example on the sheet.'],
+        { fr: ['Sinusoïde à 1 kHz, bruit blanc, sinusoïde à 11 kHz, bruit rose', 'Le bruit blanc et la sinusoïde à 11 kHz donnent presque la même valeur.'],
+          en: ['1 kHz sine, white noise, 11 kHz sine, pink noise', 'White noise and the 11 kHz sine give almost the same value.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'white', 0.25], ['C', 'sine', 11000, 0.5], ['D', 'pink', 0.25]] },
-        { fr: ['Balayage 80 Hz → 8 kHz', 'Il suit la fréquence, comme une hauteur grossière.'],
-          en: ['Sweep 80 Hz → 8 kHz', 'It follows the frequency, like a crude pitch.'],
+        { fr: ['Balayage de 80 Hz à 8 kHz', 'La valeur suit la fréquence, comme une estimation grossière de la hauteur.'],
+          en: ['Sweep from 80 Hz to 8 kHz', 'The value follows the frequency, like a crude pitch estimate.'],
           segs: [['', 'demo', 'sweep', 4]] }
       ] },
 
     { id: 'flux', feat: 'spectralFlux', loupe: 'flux', unit: '',
-      fr: { name: 'Flux spectral', short: 'Flux',
-        what: "La quantité de changement du spectre d’une trame à la suivante.",
-        how: "On soustrait le spectre précédent du spectre courant, case par case, et on additionne les augmentations seulement. Une attaque fait apparaître de l’énergie d’un coup : pic. La loupe superpose les deux spectres et colore ce qui est additionné.",
-        tool: "Calculé ici, pas par Meyda : même principe que la courbe de nouveauté de l’outil « Segmentation », au pas de cette page (une demi-trame). Pas de valeur sur la première trame : il n’y a rien avant.",
+      fr: { tab: 'Flux', name: 'Flux spectral',
+        what: "L’ampleur du changement du spectre d’une trame à la suivante.",
+        how: "On soustrait le spectre précédent du spectre actuel, *bin* par *bin*, et on n’additionne que les augmentations. Une attaque fait apparaître de l’énergie d’un coup, d’où un pic. La loupe superpose les deux spectres et colore ce qui est additionné.",
+        tool: "Calculé ici et non par Meyda, selon le même principe que la courbe de nouveauté de l’outil « Segmentation », avec un pas d’une demi-trame. Pas de valeur sur la première trame, puisqu’il n’y a rien avant.",
         traps: ["Le bruit change à chaque trame : un bruit stationnaire a un flux élevé en permanence.",
-                "Le vibrato aussi est un changement permanent.",
-                "Sans unité, et il dépend du niveau : un son deux fois plus fort a un flux deux fois plus grand.",
-                "C’est la base de la segmentation automatique, et la cause de ses sur-segmentations."] },
-      en: { name: 'Spectral flux', short: 'Flux',
+                "Le vibrato est lui aussi un changement permanent.",
+                "Sans unité, et dépendant du niveau : un son deux fois plus fort a un flux deux fois plus grand.",
+                "C’est la base de la segmentation automatique, et la cause de ses découpages en trop."] },
+      en: { tab: 'Flux', name: 'Spectral flux',
         what: 'How much the spectrum changes from one frame to the next.',
-        how: 'Subtract the previous spectrum from the current one, bin by bin, and add up the increases only. An attack makes energy appear all at once: a peak. The magnifier overlays both spectra and colours what gets summed.',
-        tool: 'Computed here, not by Meyda: the same principle as the novelty curve in the “Segmentation” tool, at this page’s hop (half a frame). No value on the first frame: there is nothing before it.',
+        how: 'Subtract the previous spectrum from the current one, bin by bin, and add up only the increases. An attack makes energy appear all at once, hence a peak. The magnifier overlays both spectra and colours what gets summed.',
+        tool: 'Computed here, not by Meyda, on the same principle as the novelty curve in the “Segmentation” tool, with a hop of half a frame. No value on the first frame, since there is nothing before it.',
         traps: ['Noise changes every frame: a stationary noise has a permanently high flux.',
-                'So does vibrato: a permanent change.',
-                'Unitless, and level-dependent: a sound twice as loud has twice the flux.',
-                'It is the basis of automatic segmentation, and the cause of its over-segmentation.'] },
+                'Vibrato is also a permanent change.',
+                'Unitless and level-dependent: a sound twice as loud has twice the flux.',
+                'It is the basis of automatic segmentation, and the cause of its extra cuts.'] },
       ex: [
-        { fr: ['Sinusoïde 440 Hz tenue | la même avec vibrato', 'Rien ne change, puis un changement permanent.'],
-          en: ['Held 440 Hz sine | the same with vibrato', 'Nothing changes, then a permanent change.'],
+        { fr: ['Sinusoïde à 440 Hz tenue, puis la même avec vibrato', 'Aucun changement, puis un changement permanent.'],
+          en: ['Held 440 Hz sine, then the same with vibrato', 'No change, then a permanent change.'],
           segs: [['A', 'sine', 440, 0.5, 2], ['B', 'vibrato', 2]] },
-        { fr: ['Notes brèves répétées | les mêmes + bruit blanc tenu, plus faible', 'Des pics nets sur les attaques, rien entre elles : le cas pour lequel il a été conçu. Avec le bruit, le flux ne redescend plus jamais, même entre les notes.'],
-          en: ['Short repeated notes | the same + held white noise, quieter', 'Sharp peaks on the attacks, nothing between them: the case it was designed for. With the noise, the flux never comes back down, even between the notes.'],
+        { fr: ['Notes brèves répétées, puis les mêmes avec un bruit blanc tenu plus faible', 'Des pics nets sur les attaques et rien entre elles : le cas pour lequel le flux a été conçu. Avec le bruit, la valeur ne redescend plus, même entre les notes.'],
+          en: ['Short repeated notes, then the same with a quieter held white noise', 'Sharp peaks on the attacks and nothing between them: the case flux was designed for. With the noise, the value never comes back down, even between the notes.'],
           segs: [['A', 'notes', 0, 2], ['B', 'notes', 0.05, 2]] },
-        { fr: ['Cloche (FM)', 'Une attaque, puis presque rien.'], en: ['Bell (FM)', 'One attack, then almost nothing.'],
+        { fr: ['Cloche (synthèse FM)', 'Une attaque, puis presque plus rien.'], en: ['Bell (FM synthesis)', 'One attack, then almost nothing.'],
           segs: [['', 'demo', 'bell', 3]] }
       ] },
 
     { id: 'mfcc', feat: 'mfcc', loupe: 'mfcc', unit: '', matrix: true,
-      fr: { name: 'MFCC — l’enveloppe spectrale', short: 'MFCC',
-        what: "Treize nombres par trame qui résument la forme générale du spectre (son « profil »), pas une fréquence en particulier.",
-        how: "Le spectre est regroupé en 26 bandes espacées comme l’oreille espace les hauteurs (échelle mel), passé au logarithme, puis décomposé en formes de base, de la plus lisse à la plus détaillée. Chaque coefficient dit combien il y a de chaque forme.",
-        tool: "13 coefficients. La bande colorée montre c1 à c12 (c0, qui suit le niveau, écraserait l’échelle des couleurs) ; la loupe montre les treize. Sous un exemple à plusieurs sons : c0 et c1 de chacun, et la distance entre leurs profils c1–c12 — plus elle est petite, plus les timbres sont proches pour la machine.",
-        traps: ["Conçus pour reconnaître la parole (Davis et Mermelstein, 1980), empruntés ensuite pour le timbre.",
-                "Seuls les deux premiers se lisent à peu près : c0 suit le niveau, c1 l’inclinaison grave/aigu. Les autres n’ont pas de sens nommable.",
-                "Le niveau déplace tous les coefficients : normaliser avant de comparer.",
+      fr: { tab: 'MFCC', name: 'MFCC (coefficients cepstraux sur l’échelle mel)',
+        what: "Treize valeurs par trame qui résument la forme générale du spectre (son enveloppe), et non une fréquence particulière.",
+        how: "Le spectre est regroupé en 26 bandes espacées comme l’oreille espace les hauteurs (échelle mel), passé au logarithme, puis décomposé en formes de base, de la plus lisse à la plus détaillée. Chaque coefficient indique la part de chacune de ces formes.",
+        tool: "13 coefficients. La bande colorée montre c1 à c12 ; c0, qui suit surtout le niveau, écraserait l’échelle des couleurs. La loupe montre les treize. Pour un exemple à plusieurs sons : c0 et c1 de chacun, et la distance entre leurs profils c1–c12. Plus elle est petite, plus les timbres sont proches pour la machine.",
+        traps: ["Conçus pour la reconnaissance de la parole (Davis et Mermelstein, 1980), puis repris pour le timbre.",
+                "Seuls les deux premiers s’interprètent à peu près : c0 suit le niveau, c1 l’équilibre entre grave et aigu. Les autres n’ont pas de signification simple.",
+                "Le niveau modifie tous les coefficients : normaliser avant de comparer.",
                 "Ils servent à comparer des sons, pas à les décrire."] },
-      en: { name: 'MFCC — the spectral envelope', short: 'MFCC',
-        what: 'Thirteen numbers per frame summarising the general shape of the spectrum (its “profile”), not any particular frequency.',
-        how: 'The spectrum is grouped into 26 bands spaced the way the ear spaces pitch (mel scale), taken to the logarithm, then decomposed into basic shapes, from smoothest to most detailed. Each coefficient says how much of each shape there is.',
-        tool: '13 coefficients. The colour band shows c1 to c12 (c0, which follows level, would swamp the colour scale); the magnifier shows all thirteen. Under a multi-sound example: c0 and c1 of each, and the distance between their c1–c12 profiles — the smaller, the closer the timbres are for the machine.',
+      en: { tab: 'MFCC', name: 'MFCC (mel-frequency cepstral coefficients)',
+        what: 'Thirteen values per frame summarising the general shape of the spectrum (its envelope), not any particular frequency.',
+        how: 'The spectrum is grouped into 26 bands spaced the way the ear spaces pitch (mel scale), taken to the logarithm, then decomposed into basic shapes, from smoothest to most detailed. Each coefficient gives the share of one of those shapes.',
+        tool: '13 coefficients. The colour band shows c1 to c12; c0, which mostly follows level, would swamp the colour scale. The magnifier shows all thirteen. For a multi-sound example: c0 and c1 of each, and the distance between their c1–c12 profiles. The smaller it is, the closer the timbres are for the machine.',
         traps: ['Designed for speech recognition (Davis and Mermelstein, 1980), later borrowed for timbre.',
-                'Only the first two are roughly readable: c0 follows level, c1 the low/high tilt. The others have no nameable meaning.',
-                'Level shifts every coefficient: normalise before comparing.',
+                'Only the first two are roughly readable: c0 follows level, c1 the balance between low and high. The others have no simple meaning.',
+                'Level changes every coefficient: normalise before comparing.',
                 'They are for comparing sounds, not describing them.'] },
       ex: [
-        { fr: ['Sinusoïde 1 kHz | la même 20 dB plus bas', 'Le niveau déplace tous les coefficients, pas seulement c0.'],
-          en: ['1 kHz sine | the same 20 dB lower', 'Level shifts every coefficient, not only c0.'],
+        { fr: ['Sinusoïde à 1 kHz, puis la même 20 dB plus bas', 'Le niveau modifie tous les coefficients, pas seulement c0.'],
+          en: ['1 kHz sine, then the same 20 dB lower', 'Level changes every coefficient, not only c0.'],
           segs: [['A', 'sine', 1000, 0.5], ['B', 'sine', 1000, 0.05]] },
-        { fr: ['Bruit blanc | bruit rose', 'c1 est négatif quand l’aigu domine, positif quand le grave domine.'],
-          en: ['White noise | pink noise', 'c1 is negative when the treble dominates, positive when the bass does.'],
+        { fr: ['Bruit blanc, puis bruit rose', 'c1 est négatif quand l’aigu domine, positif quand le grave domine.'],
+          en: ['White noise, then pink noise', 'c1 is negative when the treble dominates, positive when the bass does.'],
           segs: [['A', 'white', 0.25], ['B', 'pink', 0.25]] },
-        { fr: ['Bourdon grave | souffle aigu', 'Idem, plus nettement.'],
-          en: ['Low drone | high hiss', 'Same, more clearly.'],
+        { fr: ['Bourdon grave, puis souffle aigu', 'Même chose, plus nettement.'],
+          en: ['Low drone, then high hiss', 'The same, more clearly.'],
           segs: [['A', 'drone'], ['B', 'hiss', -30]] },
-        { fr: ['Corde pincée sol | corde pincée do | bruit blanc', 'Deux cordes à des hauteurs différentes sont plus proches entre elles que du bruit : ce dont une carte de corpus a besoin.'],
-          en: ['Plucked G | plucked C | white noise', 'Two strings at different pitches are closer to each other than to noise: what a corpus map needs.'],
+        { fr: ['Corde pincée en sol, corde pincée en do, bruit blanc', 'Les deux cordes, à des hauteurs différentes, sont plus proches l’une de l’autre que du bruit. C’est ce dont une carte de corpus a besoin.'],
+          en: ['Plucked G, plucked C, white noise', 'The two strings, at different pitches, are closer to each other than to the noise. That is what a corpus map needs.'],
           segs: [['A', 'pluck', 196, 0.8], ['B', 'pluck', 261.63, 0.8], ['C', 'white', 0.25]] }
       ] },
 
     { id: 'chroma', feat: 'chroma', loupe: 'chroma', unit: '', matrix: true,
-      fr: { name: 'Chroma — classes de hauteur', short: 'Chroma',
-        what: "Douze nombres par trame, un par classe de hauteur (do, do♯, ré … si) : combien du spectre tombe sur chaque note, toutes octaves confondues.",
-        how: "Chaque case du spectre est rattachée aux notes tempérées les plus proches (la = 440 Hz), et toutes les octaves sont repliées sur une seule. Une pondération favorise le médium. On divise enfin par la plus grande des douze valeurs : la classe dominante vaut toujours 1.",
-        tool: "12 classes, do en bas de la bande colorée. Les exemples règlent la trame à 4 096 sauf mention contraire. Sous un exemple : les classes dont la médiane dépasse 0,5, pour chaque son. Ce n’est pas une transcription : aucune note n’est « détectée », on lit des proportions.",
-        traps: ["Il ignore l’octave : un la 440 et un la 880 donnent le même profil.",
-                "Les harmoniques d’une note allument d’autres classes, la quinte (3e harmonique) en tête : un do joué seul n’est pas un do pur.",
-                "Normalisé trame par trame : le maximum vaut 1 même pour un son presque inaudible, et un bruit allume les douze classes. Il dit « quelle proportion », jamais « combien fort ».",
-                "Dans le grave, une case de FFT est plus large qu’un demi-ton : deux notes voisines ne se séparent plus sous ≈ 700 Hz avec 1 024 échantillons, sous ≈ 180 Hz avec 4 096. La basse reste floue quoi qu’on fasse.",
+      fr: { tab: 'Chroma', name: 'Chroma (classes de hauteur)',
+        what: "Douze valeurs par trame, une par classe de hauteur (do, do♯, ré… si) : la part du spectre qui tombe sur chaque note, toutes octaves confondues.",
+        how: "Chaque *bin* du spectre est rattaché aux notes tempérées les plus proches (la = 440 Hz), et toutes les octaves sont ramenées à une seule. Une pondération favorise le médium. Enfin, tout est divisé par la plus grande des douze valeurs : la classe dominante vaut toujours 1.",
+        tool: "12 classes, do en bas de la bande colorée. Sauf indication contraire, les exemples règlent la trame sur 4 096. Pour chaque exemple : les classes dont la médiane dépasse 0,5. Ce n’est pas une transcription : aucune note n’est détectée, on lit des proportions.",
+        traps: ["Il ignore l’octave : un la à 440 Hz et un la à 880 Hz donnent le même profil.",
+                "Les harmoniques d’une note allument d’autres classes, à commencer par la quinte (3e harmonique) : un do joué seul n’est pas un do pur.",
+                "La normalisation se fait trame par trame : le maximum vaut 1 même pour un son presque inaudible, et un bruit allume les douze classes. Le chroma indique des proportions, jamais une intensité.",
+                "Dans le grave, un *bin* est plus large qu’un demi-ton : deux notes voisines ne se distinguent plus sous 700 Hz environ avec une trame de 1 024, sous 180 Hz avec 4 096. La basse reste floue quel que soit le réglage.",
                 "La pondération favorise le médium (autour de 880 Hz) : dans un mélange, la basse compte moins que la mélodie.",
-                "Accordé sur le tempérament égal à la 440 : un diapason à 415 ou une musique non tempérée tombent entre deux classes."] },
-      en: { name: 'Chroma — pitch classes', short: 'Chroma',
-        what: 'Twelve numbers per frame, one per pitch class (C, C♯, D … B): how much of the spectrum falls on each note, all octaves folded together.',
+                "Le calcul suppose le tempérament égal avec la = 440 Hz : un diapason à 415 Hz ou une musique non tempérée tombe entre deux classes."] },
+      en: { tab: 'Chroma', name: 'Chroma (pitch classes)',
+        what: 'Twelve values per frame, one per pitch class (C, C♯, D… B): the share of the spectrum that falls on each note, all octaves folded together.',
         how: 'Each spectral bin is assigned to the nearest equal-tempered notes (A = 440 Hz), and all octaves are folded onto one. A weighting favours the middle register. Finally everything is divided by the largest of the twelve: the dominant class is always 1.',
-        tool: '12 classes, C at the bottom of the colour band. The examples set the frame to 4,096 unless stated. Under an example: the classes whose median exceeds 0.5, for each sound. This is not a transcription: no note is “detected”; you are reading proportions.',
-        traps: ['It ignores octave: an A 440 and an A 880 give the same profile.',
+        tool: '12 classes, C at the bottom of the colour band. Unless stated, the examples set the frame to 4,096. For each example: the classes whose median exceeds 0.5. This is not a transcription: no note is detected; you are reading proportions.',
+        traps: ['It ignores octave: an A at 440 Hz and an A at 880 Hz give the same profile.',
                 'A note’s harmonics light up other classes, the fifth (3rd harmonic) first: a C played alone is not a pure C.',
-                'Normalised frame by frame: the maximum is 1 even for a nearly inaudible sound, and noise lights all twelve classes. It says “what proportion”, never “how loud”.',
-                'Low down, an FFT bin is wider than a semitone: neighbouring notes stop being separated below ≈ 700 Hz with 1,024 samples, below ≈ 180 Hz with 4,096. The bass stays blurred whatever you do.',
+                'Normalised frame by frame: the maximum is 1 even for a nearly inaudible sound, and noise lights all twelve classes. Chroma gives proportions, never intensity.',
+                'Low down, a bin is wider than a semitone: neighbouring notes stop being separated below about 700 Hz with a 1,024 frame, below 180 Hz with 4,096. The bass stays blurred whatever the setting.',
                 'The weighting favours the middle register (around 880 Hz): in a mixture the bass counts for less than the melody.',
-                'Tuned to equal temperament at A 440: a 415 pitch standard or untempered music falls between two classes.'] },
+                'It assumes equal temperament at A = 440 Hz: a 415 Hz pitch standard or untempered music falls between two classes.'] },
       ex: [
-        { frame: 4096, fr: ['La 440 Hz | la 880 Hz', 'Même profil : l’octave a disparu.'],
-          en: ['A 440 Hz | A 880 Hz', 'Same profile: the octave has vanished.'],
+        { frame: 4096, fr: ['La à 440 Hz, puis la à 880 Hz', 'Même profil : l’octave a disparu.'],
+          en: ['A at 440 Hz, then A at 880 Hz', 'Same profile: the octave has vanished.'],
           segs: [['A', 'sine', 440, 0.5], ['B', 'sine', 880, 0.5]] },
-        { frame: 1024, fr: ['Les mêmes, avec une trame de 1 024', 'Le la 440 bave sur la♯ et sol♯ : à 440 Hz, une case de FFT (≈ 43 Hz) est plus large qu’un demi-ton (≈ 26 Hz). Le la 880 reste net.'],
-          en: ['The same, with a 1,024 frame', 'A 440 smears onto A♯ and G♯: at 440 Hz an FFT bin (≈ 43 Hz) is wider than a semitone (≈ 26 Hz). A 880 stays clean.'],
+        { frame: 1024, fr: ['Les mêmes, avec une trame de 1 024', 'Le la 440 déborde sur la♯ et sol♯ : à 440 Hz, un *bin* (≈ 43 Hz) est plus large qu’un demi-ton (≈ 26 Hz). Le la 880 reste net.'],
+          en: ['The same, with a 1,024 frame', 'A 440 spills onto A♯ and G♯: at 440 Hz a bin (≈ 43 Hz) is wider than a semitone (≈ 26 Hz). A 880 stays clean.'],
           segs: [['A', 'sine', 440, 0.5], ['B', 'sine', 880, 0.5]] },
-        { frame: 4096, fr: ['Accord de do majeur (do4, mi4, sol4, sinusoïdes)', 'Trois classes allumées, les autres éteintes. Les trois notes ont la même amplitude, mais le sol domine et le do vient en dernier : la pondération favorise l’aigu.'],
+        { frame: 4096, fr: ['Accord de do majeur (do4, mi4, sol4, sinusoïdes)', 'Trois classes allumées, les autres éteintes. Les trois notes ont la même amplitude, mais le sol domine et le do arrive en dernier : la pondération favorise l’aigu.'],
           en: ['C major chord (C4, E4, G4, sines)', 'Three classes lit, the others dark. The three notes have equal amplitude, yet G dominates and C comes last: the weighting favours the higher notes.'],
           segs: [['', 'partials', [[261.63, 0.2], [329.63, 0.2], [392.0, 0.2]], 0, 2]] },
-        { frame: 4096, fr: ['Do3 avec ses harmoniques', 'Le do domine, mais le sol s’allume aussi : c’est le 3e harmonique (une quinte plus une octave), pas une autre note.'],
-          en: ['C3 with its harmonics', 'C dominates, but G lights up too: that is the 3rd harmonic (a twelfth above), not another note.'],
+        { frame: 4096, fr: ['Do3 avec ses harmoniques', 'Le do domine, mais le sol s’allume aussi : c’est le 3e harmonique, pas une autre note.'],
+          en: ['C3 with its harmonics', 'C dominates, but G lights up too: that is the 3rd harmonic, not another note.'],
           segs: [['', 'harm', 130.81, 10, 0.3, 2]] },
-        { frame: 4096, fr: ['Gamme de do majeur', 'La classe allumée monte d’une case à chaque note.'],
-          en: ['C major scale', 'The lit class moves up at each note.'],
+        { frame: 4096, fr: ['Gamme de do majeur', 'La classe allumée monte d’un degré à chaque note.'],
+          en: ['C major scale', 'The lit class moves up one step at each note.'],
           segs: [['1', 'harm', 261.63, 5, 0.3, 0.4], ['2', 'harm', 293.66, 5, 0.3, 0.4], ['3', 'harm', 329.63, 5, 0.3, 0.4], ['4', 'harm', 349.23, 5, 0.3, 0.4],
                  ['5', 'harm', 392.0, 5, 0.3, 0.4], ['6', 'harm', 440.0, 5, 0.3, 0.4], ['7', 'harm', 493.88, 5, 0.3, 0.4], ['8', 'harm', 523.25, 5, 0.3, 0.4]] },
-        { frame: 4096, fr: ['Do2, sinusoïde 65 Hz', 'Même avec la trame de 4 096, une seule sinusoïde se répand sur cinq ou six classes voisines : sous ≈ 180 Hz, une case est encore plus large qu’un demi-ton. Le chroma n’est pas fait pour la basse.'],
-          en: ['C2, 65 Hz sine', 'Even with the 4,096 frame, a single sine spreads over five or six neighbouring classes: below ≈ 180 Hz a bin is still wider than a semitone. Chroma is not made for the bass.'],
+        { frame: 4096, fr: ['Do2, sinusoïde à 65 Hz', 'Même avec une trame de 4 096, une seule sinusoïde se répartit sur cinq ou six classes voisines : sous 180 Hz environ, un *bin* reste plus large qu’un demi-ton. Le chroma n’est pas adapté à la basse.'],
+          en: ['C2, 65 Hz sine', 'Even with a 4,096 frame, a single sine spreads over five or six neighbouring classes: below about 180 Hz a bin is still wider than a semitone. Chroma is not suited to the bass.'],
           segs: [['', 'sine', 65.41, 0.5, 2]] },
-        { frame: 4096, fr: ['La 440 | la un quart de ton plus haut', 'Le quart de ton tombe entre deux classes : la et la♯ se le partagent.'],
-          en: ['A 440 | A a quarter-tone higher', 'The quarter-tone falls between two classes: A and A♯ share it.'],
+        { frame: 4096, fr: ['La à 440 Hz, puis un quart de ton plus haut', 'Le quart de ton tombe entre deux classes : la et la♯ se le partagent.'],
+          en: ['A at 440 Hz, then a quarter-tone higher', 'The quarter-tone falls between two classes: A and A♯ share it.'],
           segs: [['A', 'sine', 440, 0.5], ['B', 'sine', 452.89, 0.5]] },
-        { frame: 4096, fr: ['Bruit blanc', 'Les douze classes s’allument : un bruit a un profil de chroma, pas une hauteur.'],
-          en: ['White noise', 'All twelve classes light up: noise has a chroma profile, not a pitch.'],
+        { frame: 4096, fr: ['Bruit blanc', 'Les douze classes s’allument : un bruit a un profil de chroma, mais pas de hauteur.'],
+          en: ['White noise', 'All twelve classes light up: noise has a chroma profile, but no pitch.'],
           segs: [['', 'white', 0.25, 0, 2]] }
       ] }
   ];
+
+  /* Which of the descriptor's pitfalls each example brings out, by index into
+     its traps list — the text stays in one place. [] = the example shows the
+     descriptor working; the box says so. */
+  var EX_TRAPS = {
+    rms:      [[0], [], [0], []],
+    loudness: [[1, 0], [], [3]],
+    pitch:    [[], [], [0], [0], [2], [1, 2], [1, 2], [2], []],
+    centroid: [[2], [1, 0], [3], [], [], [], [3]],
+    spread:   [[0, 1]],
+    flatness: [[1], [3], [0], [2], [4]],
+    rolloff:  [[0], [0, 2], [1]],
+    zcr:      [[0, 2], []],
+    flux:     [[1, 3], [0, 3], []],
+    mfcc:     [[2], [1], [1], [3]],
+    chroma:   [[0], [3], [4], [1], [1], [3], [5], [2]]
+  };
+  DESC.forEach(function (d) {      // a mismatch here would silently drop a pitfall
+    if (!EX_TRAPS[d.id] || EX_TRAPS[d.id].length !== d.ex.length) throw new Error('EX_TRAPS ' + d.id);
+  });
+
+  /* What each descriptor is good for: the musical question it can help with,
+     before how it works. */
+  var USE = {
+    rms: {
+      fr: "Suivre l’enveloppe dynamique d’un son ou d’une pièce : attaques, crescendos, decrescendos, silences. Repérer les passages forts et faibles dans un long enregistrement, comparer la dynamique de deux interprétations, trouver les silences pour découper un fichier.",
+      en: 'Following the dynamic envelope of a sound or a piece: attacks, crescendos, decrescendos, silences. Finding the loud and soft passages in a long recording, comparing the dynamics of two performances, locating silences to cut a file up.' },
+    loudness: {
+      fr: "Comparer l’intensité perçue de sons de timbres différents, là où le RMS trompe (un bruit et une sinusoïde au même niveau ne sonnent pas aussi fort). Suivre la dynamique d’une pièce un peu plus près de l’écoute que le RMS.",
+      en: 'Comparing the perceived intensity of sounds with different timbres, where RMS misleads (a noise and a sine at the same level do not sound equally loud). Following the dynamics of a piece a little closer to listening than RMS does.' },
+    pitch: {
+      fr: "Tracer une ligne mélodique à partir d’un enregistrement monophonique (voix, instrument seul) : intonation, vibrato, glissandos, micro-intervalles, ornements que la partition ne note pas. Précieux pour les musiques de tradition orale et pour l’étude de l’interprétation. Pas pour la polyphonie.",
+      en: 'Tracing a melodic line from a monophonic recording (voice, solo instrument): intonation, vibrato, glissandi, microtones, ornaments the score does not notate. Valuable for orally transmitted music and for performance studies. Not for polyphony.' },
+    centroid: {
+      fr: "Suivre l’évolution du timbre, en particulier son éclat : un filtre qui s’ouvre, une attaque brillante qui s’assombrit, un changement de mode de jeu (sul ponticello, sul tasto), une sourdine. Trier les sons d’un corpus du plus sombre au plus clair. Dans les études sur le timbre, il est souvent associé à la dimension de brillance.",
+      en: 'Following how timbre changes, especially its brightness: a filter opening, a bright attack that darkens, a change of playing technique (sul ponticello, sul tasto), a mute. Sorting the sounds of a corpus from darkest to brightest. In timbre studies it is often associated with the brightness dimension.' },
+    spread: {
+      fr: "Distinguer des sons que le centroïde confond : un son concentré (note tenue, bande étroite) contre un son diffus (bruit, accord large, texture). Un complément du centroïde pour décrire l’épaisseur, la « masse » d’un son.",
+      en: 'Telling apart sounds the centroid confuses: a concentrated sound (held note, narrow band) against a diffuse one (noise, wide chord, texture). A companion to the centroid for describing the thickness, the “mass” of a sound.' },
+    flatness: {
+      fr: "Séparer les sons toniques des sons bruités, et suivre le passage de l’un à l’autre : souffle dans une note de flûte, attaque bruitée qui se stabilise, texture électroacoustique qui se densifie. Une première approche mesurable de la distinction entre son tonique et son complexe.",
+      en: 'Separating tonal sounds from noisy ones, and following the shift from one to the other: breath in a flute note, a noisy attack settling, an electroacoustic texture thickening. A first measurable approach to the distinction between tonal and complex sound.' },
+    rolloff: {
+      fr: "Estimer jusqu’où monte l’essentiel du spectre : la bande passante d’un enregistrement (vieux disque, MP3 très compressé, téléphone), la présence de souffle ou de bruit aigu. Un outil de diagnostic du signal plus qu’un descripteur musical.",
+      en: 'Estimating how high most of the spectrum reaches: the bandwidth of a recording (old disc, heavily compressed MP3, telephone), the presence of hiss or high noise. More a diagnostic tool for the signal than a musical descriptor.' },
+    zcr: {
+      fr: "Une mesure rapide pour séparer grossièrement les sons bruités ou aigus des sons graves et toniques : consonnes et voyelles dans la parole, percussions et notes tenues. Surtout utile comme indice parmi d’autres, ou sur des fichiers très longs, parce qu’il ne coûte presque rien.",
+      en: 'A quick way to roughly separate noisy or high sounds from low, tonal ones: consonants and vowels in speech, percussion and held notes. Mostly useful as one clue among others, or on very long files, because it costs almost nothing.' },
+    flux: {
+      fr: "Repérer les moments où le son change : attaques, entrées d’instruments, changements de section. C’est la base de la détection d’attaques et de la segmentation automatique, donc du découpage d’un enregistrement en unités à analyser.",
+      en: 'Finding the moments where the sound changes: attacks, instrument entries, section changes. It is the basis of onset detection and automatic segmentation, and so of cutting a recording into units to analyse.' },
+    mfcc: {
+      fr: "Comparer des sons par leur timbre : regrouper les sons proches d’un corpus, retrouver ceux qui ressemblent à un son donné, construire une carte de sons. Une représentation très utilisée en classification automatique (instruments, voix, genres).",
+      en: 'Comparing sounds by timbre: grouping similar sounds in a corpus, finding those that resemble a given sound, building a sound map. A representation widely used in automatic classification (instruments, voices, genres).' },
+    chroma: {
+      fr: "Analyser l’harmonie à partir d’un enregistrement : suivre les accords, estimer la tonalité, comparer deux interprétations d’une même pièce, aligner un enregistrement sur une partition. Utile dès qu’il faut relier un son enregistré à des notes sans passer par une transcription complète.",
+      en: 'Analysing harmony from a recording: following chords, estimating key, comparing two performances of the same piece, aligning a recording with a score. Useful whenever a recorded sound has to be related to notes without a full transcription.' }
+  };
+  DESC.forEach(function (d) {
+    if (!USE[d.id]) throw new Error('USE ' + d.id);
+    d.fr.use = USE[d.id].fr; d.en.use = USE[d.id].en;
+  });
 
   /* register strings */
   (function () {
@@ -3376,7 +3486,7 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
     Object.keys(UI.fr).forEach(function (k) { fr[k] = frTypo(UI.fr[k]); });
     Object.keys(UI.en).forEach(function (k) { en[k] = UI.en[k]; });
     DESC.forEach(function (d) {
-      ['name', 'short', 'what', 'how', 'tool'].forEach(function (f) {
+      ['tab', 'name', 'use', 'what', 'how', 'tool'].forEach(function (f) {
         fr['d.' + d.id + '.' + f] = frTypo(d.fr[f]);
         en['d.' + d.id + '.' + f] = d.en[f];
       });
@@ -3538,7 +3648,7 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
 
   var $ = function (id) { return document.getElementById(id); };
   var current = DESC[0];
-  var buffer = null, signal = null, srcName = '', segments = [], exampleRef = null;
+  var buffer = null, signal = null, srcName = '', segments = [], exampleRef = null, ownFile = null;
   var cache = {};          // feat + ':' + size → result
   var result = null, token = 0;
   var tp = Atelier.transport.create({ mount: $('transport') });
@@ -3548,6 +3658,23 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
   function frameSize() { return parseInt($('fftsize').value, 10); }
   function unit() { return current.unit ? Atelier.t(current.unit) : ''; }
   function pcNames() { return Atelier.t('pc').split(','); }
+  function status(msg, kind) { Atelier.status($('status'), plain(msg), kind); }
+
+  /* static text: data-gd="key" carries *italic* markup, so it is set as HTML */
+  function applyStatic() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-gd]'), function (el) {
+      setRich(el, el.getAttribute('data-gd'));
+    });
+  }
+
+  /* the two note boxes fold; each viewer's choice is remembered */
+  ['ex-box', 'traps-box'].forEach(function (id) {
+    var el = $(id);
+    try { if (localStorage.getItem('gd.' + id) === 'closed') el.open = false; } catch (e) { /* storage blocked */ }
+    el.addEventListener('toggle', function () {
+      try { localStorage.setItem('gd.' + id, el.open ? 'open' : 'closed'); } catch (e) { /* storage blocked */ }
+    });
+  });
 
   /* === tabs ================================================================ */
 
@@ -3556,7 +3683,6 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'gd-tab'; b.id = 'tab-' + d.id;
     b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', 'panel');
-    b.setAttribute('data-i18n', 'd.' + d.id + '.short');
     b.addEventListener('click', function () { select(d.id, true); });
     tabs.appendChild(b);
   });
@@ -3587,38 +3713,81 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
     }
     renderPanel();
     updateFrameHint();
-    if (signal) analyse(); else drawEmpty();
+    // Every tab opens on a sound, so there is always a curve to look at. A file
+    // the student dropped in stays loaded across tabs; examples belong to a tab.
+    if (ownFile) analyse();
+    else loadExample(d, 0);
+  }
+
+  function renderTabs() {
+    DESC.forEach(function (d) { setRich($('tab-' + d.id), 'd.' + d.id + '.tab'); });
   }
 
   function renderPanel() {
     var d = current;
-    $('d-name').textContent = Atelier.t('d.' + d.id + '.name');
+    setRich($('d-name'), 'd.' + d.id + '.name');
     $('d-code').textContent = d.feat;
-    $('d-what').textContent = Atelier.t('d.' + d.id + '.what');
-    $('d-how').textContent = Atelier.t('d.' + d.id + '.how');
-    $('d-tool').textContent = Atelier.t('d.' + d.id + '.tool');
-    var ul = $('d-traps'); ul.innerHTML = '';
-    d.fr.traps.forEach(function (_, i) {
-      var li = document.createElement('li'); li.textContent = Atelier.t('d.' + d.id + '.trap' + i); ul.appendChild(li);
-    });
-    var ex = $('d-ex'); ex.innerHTML = '';
-    d.ex.forEach(function (x, i) {
-      var li = document.createElement('li');
-      li.setAttribute('data-current', exampleRef && exampleRef.d === d && exampleRef.i === i ? 'true' : 'false');
-      var b = document.createElement('button'); b.type = 'button'; b.textContent = Atelier.t('ex.load');
-      b.setAttribute('aria-label', Atelier.t('ex.load') + ' — ' + Atelier.t('x.' + d.id + '.' + i + '.label'));
-      b.addEventListener('click', function () { loadExample(d, i); });
-      var txt = document.createElement('div');
-      var lab = document.createElement('span'); lab.className = 'gd-lab'; lab.textContent = Atelier.t('x.' + d.id + '.' + i + '.label');
-      var sh = document.createElement('span'); sh.className = 'gd-shows'; sh.textContent = ' — ' + Atelier.t('x.' + d.id + '.' + i + '.shows');
-      txt.appendChild(lab); txt.appendChild(sh);
-      var meas = document.createElement('div'); meas.className = 'gd-meas'; meas.id = 'meas-' + i;
-      li.appendChild(b); li.appendChild(txt); li.appendChild(meas);
-      ex.appendChild(li);
-    });
-    // .at-controls sets display, which beats the hidden attribute
+    setRich($('d-use'), 'd.' + d.id + '.use');
+    setRich($('d-what'), 'd.' + d.id + '.what');
+    setRich($('d-how'), 'd.' + d.id + '.how');
+    setRich($('d-tool'), 'd.' + d.id + '.tool');
+    renderSelect();
+    renderExampleBox();
     $('loupe-opts').style.display = ['centroid', 'spread', 'rolloff', 'flatness', 'flux'].indexOf(d.loupe) < 0 ? 'none' : '';
   }
+
+  function renderSelect() {
+    var sel = $('ex-select'), d = current;
+    sel.innerHTML = '';
+    var first = document.createElement('option');
+    first.value = '';
+    first.textContent = plain(ownFile ? Atelier.t('ex.own', { name: ownFile }) : Atelier.t('ex.pick'));
+    sel.appendChild(first);
+    d.ex.forEach(function (x, i) {
+      var o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = plain(Atelier.t('x.' + d.id + '.' + i + '.label'));
+      sel.appendChild(o);
+    });
+    sel.value = (!ownFile && exampleRef && exampleRef.d === d) ? String(exampleRef.i) : '';
+  }
+
+  function renderExampleBox() {
+    var d = current;
+    if (exampleRef && exampleRef.d === d) {
+      setRich($('ex-shows'), 'x.' + d.id + '.' + exampleRef.i + '.shows');
+    } else {
+      setRich($('ex-shows'), 'ex.ownNote');
+      $('ex-meas').textContent = '';
+    }
+    renderTraps();
+  }
+
+  /* The pitfalls this example brings out (EX_TRAPS); for the student's own
+     file, all of them, since nobody knows yet which ones it will trip. */
+  function renderTraps() {
+    var d = current, ul = $('d-traps'), own = !(exampleRef && exampleRef.d === d);
+    var idx = own ? d.fr.traps.map(function (_, i) { return i; }) : (EX_TRAPS[d.id][exampleRef.i] || []);
+    setRich($('traps-title'), own ? 'h.trapsAll' : 'h.traps');
+    ul.innerHTML = '';
+    idx.forEach(function (i) {
+      var li = document.createElement('li'); setRich(li, 'd.' + d.id + '.trap' + i); ul.appendChild(li);
+    });
+    $('traps-none').hidden = idx.length > 0;
+    // the rest of the descriptor's pitfalls, folded away rather than lost
+    var rest = d.fr.traps.map(function (_, i) { return i; }).filter(function (i) { return idx.indexOf(i) < 0; });
+    var ol = $('d-others'); ol.innerHTML = '';
+    rest.forEach(function (i) {
+      var li = document.createElement('li'); setRich(li, 'd.' + d.id + '.trap' + i); ol.appendChild(li);
+    });
+    $('traps-others').style.display = rest.length ? '' : 'none';
+    setRich($('others-title'), 'h.trapsOther', { n: rest.length });
+  }
+
+  $('ex-select').addEventListener('change', function () {
+    if (this.value === '') return;
+    loadExample(current, parseInt(this.value, 10));
+  });
 
   function updateFrameHint() {
     var size = frameSize(), sr = buffer ? buffer.sampleRate : SR, hop = size / 2;
@@ -3626,7 +3795,7 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
     if (current.id === 'pitch') s += Atelier.t('frame.pitch', { f: String(Math.round(Math.max(50, 2 * sr / size))) });
     // a semitone is f·(2^(1/12) − 1) ≈ 0.0595 f wide: below f = bin / 0.0595 two notes share a bin
     if (current.id === 'chroma') s += Atelier.t('frame.chroma', { f: String(Math.round(sr / size / 0.0595)) });
-    $('frame-hint').textContent = s;
+    $('frame-hint').innerHTML = rich(s);
   }
 
   /* === loading ============================================================= */
@@ -3634,40 +3803,41 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
   function adopt(buf, name, segs, ref) {
     buffer = buf; srcName = name; segments = segs || []; exampleRef = ref || null;
     signal = Atelier.dsp.mono(buf);
-    cache = {};
+    cache = {}; result = null; $('save-png').disabled = true;
     tp.setBuffer(buf);
     tp.detachAll();
     drawWave();
     tp.attach($('wave'));
     updateCaption(); updateFrameHint();
-    Atelier.log.ok(name + ' — ' + buf.duration.toFixed(2) + ' s, ' + buf.sampleRate + ' Hz');
-    Array.prototype.forEach.call($('d-ex').children, function (li, i) {
-      li.setAttribute('data-current', ref && ref.d === current && ref.i === i ? 'true' : 'false');
-    });
+    renderSelect(); renderExampleBox(); $('ex-meas').textContent = '';
+    Atelier.log.ok(plain(name) + ' — ' + buf.duration.toFixed(2) + ' s, ' + buf.sampleRate + ' Hz');
     analyse();
   }
 
   function updateCaption() {
-    $('wave-caption').textContent = buffer
-      ? Atelier.t('caption.loaded', { name: srcName, dur: fmt(buffer.duration), sr: buffer.sampleRate, ch: buffer.numberOfChannels })
-      : Atelier.t('caption.none');
+    $('wave-caption').innerHTML = buffer
+      ? rich(Atelier.t('caption.loaded', { name: srcName, dur: fmt(buffer.duration), sr: buffer.sampleRate, ch: buffer.numberOfChannels }))
+      : rich(Atelier.t('caption.none'));
   }
 
   function loadExample(d, i) {
     try {
       // every example states its frame size: what it shows depends on it
-      $('fftsize').value = String(d.ex[i].frame || 1024); updateFrameHint();
+      $('fftsize').value = String(d.ex[i].frame || 1024);
+      ownFile = null;
       var built = buildExample(d.ex[i]);
       adopt(built.buffer, Atelier.t('x.' + d.id + '.' + i + '.label'), built.segs, { d: d, i: i });
     } catch (err) {
-      Atelier.status($('status'), Atelier.t('st.failed', { msg: err.message }), 'bad');
+      status(Atelier.t('st.failed', { msg: err.message }), 'bad');
     }
   }
 
   Atelier.io.dropzone($('drop'), $('file'), function (file) {
-    Atelier.status($('status'), Atelier.t('st.decoding', { name: file.name }));
-    Atelier.audio.decodeFile(file).then(function (buf) { adopt(buf, file.name, [], null); })
-      .catch(function (err) { Atelier.status($('status'), err.message, 'bad'); });
+    status(Atelier.t('st.decoding', { name: file.name }));
+    Atelier.audio.decodeFile(file).then(function (buf) {
+      ownFile = file.name;
+      adopt(buf, file.name.replace(/\*/g, ''), [], null);
+    }).catch(function (err) { status(err.message, 'bad'); });
   });
 
   $('fftsize').addEventListener('change', function () { updateFrameHint(); if (signal) analyse(); });
@@ -3677,11 +3847,11 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
   function analyse() {
     if (!signal) return;
     var size = frameSize(), hop = size / 2, d = current, key = d.feat + ':' + size;
-    if (signal.length < size) { Atelier.status($('status'), Atelier.t('st.tooshort'), 'bad'); return; }
+    if (signal.length < size) { status(Atelier.t('st.tooshort'), 'bad'); return; }
     var my = ++token;
     if (cache[key]) { result = cache[key]; render(); return; }
     $('prog').hidden = false; $('prog').value = 0;
-    Atelier.status($('status'), Atelier.t('st.running', { name: Atelier.t('d.' + d.id + '.name') }));
+    status(Atelier.t('st.running', { name: Atelier.t('d.' + d.id + '.name') }));
     Atelier.dsp.describe(signal, buffer.sampleRate, [d.feat], {
       frameSize: size, hopSize: hop,
       onProgress: function (p) { if (my === token) $('prog').value = p; }
@@ -3694,12 +3864,12 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
       if (my !== token) return;
       result = res;
       $('prog').hidden = true;
-      Atelier.status($('status'), Atelier.t('st.done', { name: Atelier.t('d.' + d.id + '.name'), n: res.nFrames.toLocaleString(lang()) }), 'ok');
+      status(Atelier.t('st.done', { name: Atelier.t('d.' + d.id + '.name'), n: res.nFrames.toLocaleString(lang()) }), 'ok');
       render();
     }).catch(function (err) {
       if (my !== token) return;
       $('prog').hidden = true;
-      Atelier.status($('status'), Atelier.t('st.failed', { msg: err.message }), 'bad');
+      status(Atelier.t('st.failed', { msg: err.message }), 'bad');
     });
   }
 
@@ -3766,16 +3936,6 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
     return parts.join('   |   ');
   }
 
-  /* === drawing ============================================================= */
-
-  function cssv(n) { return getComputedStyle(document.body).getPropertyValue(n).trim(); }
-
-  function drawWave() {
-    if (!signal) return;
-    Atelier.draw.waveform($('wave'), signal, { label: srcName, height: 90 });
-    markSegments($('wave'));
-  }
-
   /* Dashed boundaries and A/B/C labels, on the transport's time mapping so
      they line up with the playhead. */
   function markSegments(cv) {
@@ -3794,32 +3954,97 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
     ctx.restore();
   }
 
+  /* === drawing ============================================================= */
+
+  function cssv(n) { return getComputedStyle(document.body).getPropertyValue(n).trim(); }
+
+  function drawWave() {
+    if (!signal) return;
+    Atelier.draw.waveform($('wave'), signal, { label: plain(srcName), height: 90 });
+    markSegments($('wave'));
+  }
+
+  /* A descriptor curve that is always drawn. Frames without a value (silence,
+     no periodicity) become grey bands, so "nothing" is visible as such; a sound
+     with no value at all still gets its axes and a sentence saying so. */
+  function drawCurve(cv, times, vals, label, u) {
+    var dur = buffer.duration, ext = Atelier.dsp.extent(vals), gotNaN = false, i;
+    // flux has no value on its first frame by definition: not worth a band
+    var from = current.feat === 'spectralFlux' ? 1 : 0;
+    for (i = from; i < vals.length; i++) if (!isFinite(vals[i])) { gotNaN = true; break; }
+    if (ext) {
+      Atelier.draw.curve(cv, times, vals, { label: label, unit: u, height: 160, tMax: dur });
+    } else {
+      var f = Atelier.draw.fit(cv, 160), ctx = f.ctx, w = f.w, h = f.h;
+      var padL = 3.6 * parseFloat(getComputedStyle(document.documentElement).fontSize), padT = 10, padB = 18;
+      var plotW = Math.max(10, w - padL - 8), plotH = Math.max(10, h - padT - padB);
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = cssv('--line-firm'); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT + plotH); ctx.lineTo(padL + plotW, padT + plotH); ctx.stroke();
+      ctx.fillStyle = cssv('--ink-soft'); ctx.font = '11px ' + cssv('--mono');
+      ctx.textAlign = 'left'; ctx.fillText('0 s', padL, h - 4);
+      ctx.textAlign = 'right'; ctx.fillText(dur.toFixed(1) + ' s', padL + plotW, h - 4);
+      ctx.textAlign = 'left'; ctx.fillStyle = cssv('--ink'); ctx.font = '12px ' + cssv('--sans');
+      ctx.fillText(label + (u ? ' (' + u + ')' : ''), padL + 6, padT + 11);
+      cv._atGeom = { padL: padL, padT: padT, plotW: plotW, plotH: plotH };
+      cv.setAttribute('aria-label', label + ' — ' + plain(Atelier.t('curve.none')));
+    }
+    var g = cv._atGeom;
+    if (gotNaN && g) {
+      var ctx2 = cv.getContext('2d'), half = result.hopSize / 2 / result.sampleRate;
+      ctx2.save();
+      ctx2.fillStyle = cssv('--line'); ctx2.globalAlpha = 0.55;
+      for (i = from; i < vals.length; i++) {
+        if (isFinite(vals[i])) continue;
+        var j = i; while (j + 1 < vals.length && !isFinite(vals[j + 1])) j++;
+        var t0 = Math.max(0, times[i] - half), t1 = Math.min(dur, times[j] + half);
+        if (i === 0) t0 = 0;
+        if (j === vals.length - 1) t1 = dur;
+        ctx2.fillRect(g.padL + t0 / dur * g.plotW, g.padT, Math.max(1, (t1 - t0) / dur * g.plotW), g.plotH);
+        i = j;
+      }
+      ctx2.restore();
+      if (!ext) {
+        ctx2.fillStyle = cssv('--ink'); ctx2.font = '600 13px ' + cssv('--sans'); ctx2.textAlign = 'center';
+        ctx2.fillText(plain(Atelier.t('curve.none')), g.padL + g.plotW / 2, g.padT + g.plotH / 2 + 4);
+      }
+    }
+    var lg = $('curve-legend'); lg.innerHTML = '';
+    if (gotNaN) {
+      var s = document.createElement('span'); s.className = 'gd-band';
+      s.style.setProperty('--sw', cssv('--line'));
+      s.innerHTML = rich(Atelier.t('curve.band'));
+      lg.appendChild(s);
+    }
+  }
+
   function drawEmpty() {
     var f = Atelier.draw.fit($('curve'), 60);
     f.ctx.clearRect(0, 0, f.w, f.h);
     $('stats').textContent = '';
+    $('curve-legend').innerHTML = '';
     updateCaption();
     drawLoupe();
   }
 
   function render() {
     if (!result) return;
-    var d = current, cv = $('curve'), tEnd = buffer.duration;
+    $('save-png').disabled = false;
+    var d = current, cv = $('curve'), tEnd = buffer.duration, label = plain(Atelier.t('d.' + d.id + '.name'));
     if (d.id === 'mfcc') {
       var m = result.matrices.mfcc, rows = m.rows - 1, yl = [];
       for (var k = 1; k <= rows; k += 2) yl.push({ row: k - 0.5, text: 'c' + k });
       Atelier.draw.heat(cv, { rows: rows, cols: m.cols, data: m.data.subarray(m.cols) },
-                        { height: 190, label: Atelier.t('d.mfcc.name'), x1: fmt(tEnd) + ' s', yLabels: yl });
+                        { height: 190, label: 'MFCC c1–c12', x1: fmt(tEnd) + ' s', yLabels: yl });
+      $('curve-legend').innerHTML = '';
     } else if (d.id === 'chroma') {
       var c = result.matrices.chroma, names = pcNames(), yl2 = [];
       for (var r = 0; r < 12; r++) yl2.push({ row: r + 0.5, text: names[r] });
-      Atelier.draw.heat(cv, c, { height: 220, min: 0, max: 1, label: Atelier.t('d.chroma.name'),
+      Atelier.draw.heat(cv, c, { height: 220, min: 0, max: 1, label: label,
                                  x1: fmt(tEnd) + ' s', yLabels: yl2 });
+      $('curve-legend').innerHTML = '';
     } else {
-      Atelier.draw.curve(cv, result.times, scalarSeries(), {
-        label: Atelier.t('d.' + d.id + '.name'), unit: unit(), height: 160,
-        tMax: tEnd       // span the whole sound, as the playhead and segment marks do
-      });
+      drawCurve(cv, result.times, scalarSeries(), label, unit());
     }
     markSegments(cv);
     tp.detachAll();
@@ -3831,17 +4056,17 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
     if (d.matrix) $('stats').textContent = '';
     else {
       var st = median(scalarSeries()), ext = Atelier.dsp.extent(scalarSeries());
-      if (!ext) $('stats').textContent = Atelier.t('stats.none');
+      if (!ext) setRich($('stats'), 'stats.none');
       else {
         var u = unit() ? ' ' + unit() : '';
-        $('stats').textContent = Atelier.t('stats', { med: fmt(st.med) + u, min: fmt(ext.min) + u, max: fmt(ext.max) + u }) +
-          (st.nan > 0.005 ? Atelier.t('stats.nan', { p: Math.round(st.nan * 100) }) : '');
+        $('stats').innerHTML = rich(Atelier.t('stats', { med: fmt(st.med) + u, min: fmt(ext.min) + u, max: fmt(ext.max) + u }) +
+          (st.nan > 0.005 ? Atelier.t('stats.nan', { p: Math.round(st.nan * 100) }) : ''));
       }
     }
     if (exampleRef && exampleRef.d === d) {
-      var el = $('meas-' + exampleRef.i);
-      if (el) { el.style.whiteSpace = 'pre-wrap'; el.textContent = segmentReport(); }
-    }
+      var rep = segmentReport().replace(/^\s+/, '');
+      $('ex-meas').textContent = rep ? plain(Atelier.t('meas.title')) + '\n' + rep : '';
+    } else $('ex-meas').textContent = '';
     drawLoupe();
   }
 
@@ -3875,28 +4100,28 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
     items.forEach(function (it) {
       var s = document.createElement('span');
       s.style.setProperty('--sw', cssv(it[0]));
-      s.textContent = Atelier.t(it[1]);
+      s.innerHTML = rich(Atelier.t(it[1]));
       box.appendChild(s);
     });
   }
 
   function valueText(i) {
     var d = current;
-    if (d.id === 'mfcc' || d.id === 'chroma') return Atelier.t('d.' + d.id + '.short');
+    if (d.id === 'mfcc' || d.id === 'chroma') return Atelier.t('d.' + d.id + '.tab');
     var v = scalarSeries()[i];
-    return Atelier.t('d.' + d.id + '.short') + ' = ' + (isFinite(v) ? fmt(v) + (unit() ? ' ' + unit() : '') : '—');
+    return Atelier.t('d.' + d.id + '.tab') + ' = ' + (isFinite(v) ? fmt(v) + (unit() ? ' ' + unit() : '') : '—');
   }
 
   function drawLoupe() {
     var cv = $('loupe');
     if (!result || !signal) {
       var f0 = Atelier.draw.fit(cv, 60); f0.ctx.clearRect(0, 0, f0.w, f0.h);
-      $('loupe-read').textContent = Atelier.t('loupe.empty');
+      setRich($('loupe-read'), 'loupe.empty');
       $('loupe-legend').innerHTML = '';
       return;
     }
     var i = frameIndexAt(tp.time()), frame = frameAt(i);
-    $('loupe-read').textContent = Atelier.t('loupe.read', { i: i, t: fmt(result.times[i]), v: valueText(i) });
+    setRich($('loupe-read'), 'loupe.read', { i: i, t: fmt(result.times[i]), v: valueText(i) });
     var L = current.loupe;
     if (L === 'rms' || L === 'zcr' || L === 'pitch') loupeWave(cv, frame, i, L);
     else if (L === 'bark') loupeBars(cv, meyda(['loudness'], frame).loudness.specific, { lg: 'lg.bark', zero: true });
@@ -4010,7 +4235,7 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
       ctx.fillText(hz >= 1000 ? (hz / 1000) + 'k' : String(hz), X(hz), h - 5);
     });
     if (silent) {
-      ctx.textAlign = 'center'; ctx.fillText(Atelier.t('lg.silent'), padL + plotW / 2, padT + plotH / 2);
+      ctx.textAlign = 'center'; ctx.fillText(plain(Atelier.t('lg.silent')), padL + plotW / 2, padT + plotH / 2);
       legend([['--accent', 'lg.spec']]);
       cv.setAttribute('aria-label', $('loupe-read').textContent);
       return;
@@ -4108,12 +4333,91 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
   tp.onSeek(function () { lastFrame = -1; drawLoupe(); });
   $('logf').addEventListener('change', drawLoupe);
 
+
+  /* === export: the analysis as one PNG ====================================
+     Title, sound, settings and measurements as text, then the waveform, the
+     curve and the magnifier, stacked at the screen's pixel density. The
+     playhead is a DOM overlay, so it is redrawn here as a line. */
+
+  function exportPng() {
+    if (!result) return;
+    var dpr = window.devicePixelRatio || 1;
+    var cvs = [$('wave'), $('curve'), $('loupe')];
+    var pad = Math.round(16 * dpr), W = Math.max(cvs[0].width, cvs[1].width, cvs[2].width) + 2 * pad;
+    var probe = document.createElement('canvas').getContext('2d');
+    var sans = cssv('--sans'), mono = cssv('--mono');
+    var maxW = W - 2 * pad;
+
+    function wrap(text, font) {
+      probe.font = font;
+      var words = String(text).split(/\s+/), lines = [], cur = '';
+      words.forEach(function (w) {
+        var t = cur ? cur + ' ' + w : w;
+        if (probe.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t;
+      });
+      if (cur) lines.push(cur);
+      return lines;
+    }
+    var F = function (px, weight) { return (weight || '') + ' ' + Math.round(px * dpr) + 'px '; };
+    var blocks = [];   // {lines, font, color, lh} or {canvas}
+    function text(t, font, color, lh) { if (t) blocks.push({ lines: wrap(t, font), font: font, color: color, lh: Math.round(lh * dpr) }); }
+    var d = current;
+    text(plain(Atelier.t('d.' + d.id + '.name')) + ' — ' + plain(srcName), F(17, '600') + sans, '--ink', 24);
+    text(Atelier.t('png.frame', { size: result.frameSize, hop: result.hopSize, sr: result.sampleRate }) +
+         ' · ' + $('wave-caption').textContent, F(12) + sans, '--ink-soft', 18);
+    text($('stats').textContent, F(12) + mono, '--ink', 18);
+    $('ex-meas').textContent.split('\n').forEach(function (l) { text(l, F(12) + mono, '--ink', 18); });
+    if (exampleRef && exampleRef.d === d) text($('ex-shows').textContent, F(12) + sans, '--ink-soft', 18);
+    blocks.push({ gap: Math.round(6 * dpr) });
+    blocks.push({ canvas: cvs[0], head: true });
+    blocks.push({ canvas: cvs[1], head: true });
+    blocks.push({ gap: Math.round(10 * dpr) });
+    text(Atelier.t('png.cursor', { t: tp.time().toFixed(2).replace('.', lang() === 'fr' ? ',' : '.') }) + ' · ' + $('loupe-read').textContent, F(12) + mono, '--ink', 18);
+    blocks.push({ canvas: cvs[2] });
+    var lg = Array.prototype.map.call($('loupe-legend').children, function (c) { return c.textContent; }).join(' · ');
+    text(lg, F(11) + sans, '--ink-soft', 16);
+
+    var H = pad;
+    blocks.forEach(function (b) {
+      if (b.gap) H += b.gap;
+      else if (b.canvas) H += b.canvas.height + Math.round(4 * dpr);
+      else H += b.lines.length * b.lh;
+    });
+    H += pad;
+    var out = document.createElement('canvas'); out.width = W; out.height = H;
+    var ctx = out.getContext('2d');
+    ctx.fillStyle = cssv('--panel'); ctx.fillRect(0, 0, W, H);
+    var y = pad, t = tp.time(), dur = buffer.duration;
+    blocks.forEach(function (b) {
+      if (b.gap) { y += b.gap; return; }
+      if (b.canvas) {
+        ctx.drawImage(b.canvas, pad, y);
+        var g = b.canvas._atGeom;
+        if (b.head && g) {           // the playhead, where the student left it
+          var x = pad + (g.padL + t / dur * g.plotW) * dpr;
+          ctx.strokeStyle = cssv('--bad'); ctx.lineWidth = Math.max(1, 1.5 * dpr);
+          ctx.beginPath(); ctx.moveTo(x, y + g.padT * dpr); ctx.lineTo(x, y + (g.padT + g.plotH) * dpr); ctx.stroke();
+        }
+        y += b.canvas.height + Math.round(4 * dpr);
+        return;
+      }
+      ctx.font = b.font; ctx.fillStyle = cssv(b.color); ctx.textBaseline = 'top';
+      b.lines.forEach(function (l) { ctx.fillText(l, pad, y); y += b.lh; });
+    });
+    var slug = (d.id + '-' + plain(srcName)).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                 .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || d.id;
+    Atelier.io.png(out, slug + '.png');
+    status(Atelier.t('png.saved', { name: slug + '.png' }), 'ok');
+    Atelier.log.ok('PNG ' + W + '×' + H + ' — ' + slug + '.png');
+  }
+  $('save-png').addEventListener('click', exportPng);
+
   /* === init ================================================================ */
 
   Atelier.init();
 
   function redraw() {
-    renderPanel(); updateFrameHint(); updateCaption();
+    applyStatic(); renderTabs(); renderPanel(); updateFrameHint(); updateCaption();
     drawWave();
     if (result) render(); else drawEmpty();
     tp.refresh();
@@ -4123,6 +4427,7 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
   var rt = null;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(redraw, 180); });
 
+  applyStatic(); renderTabs();
   var start = (location.hash || '').replace('#', '');
   if (!start) { try { start = localStorage.getItem('gd.tab') || ''; } catch (e) { start = ''; } }
   select(start || 'rms', false);
@@ -4130,8 +4435,7 @@ a.at-card p  { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
   // test hook for the headless probe; harmless in class
   window.__gd = { DESC: DESC, select: select, loadExample: loadExample,
                   report: function () { return result ? segmentReport() : ''; },
-                  result: function () { return result; },
-                  setFrame: function (s) { $('fftsize').value = String(s); updateFrameHint(); if (signal) analyse(); } };
+                  result: function () { return result; }, exportPng: exportPng };
 })();
 </script>
 </body>
