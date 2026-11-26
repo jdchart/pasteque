@@ -328,7 +328,7 @@ export default function Corpus({ tab }: PaneProps) {
     </>
   );
   const soundsAdder = (
-    <SoundAdder ids={Array.from(new Set(entries.map((e) => e.soundId)))} demos={DEMOS} onAdd={addSounds}
+    <SoundAdder ids={Array.from(new Set(entries.map((e) => e.soundId)))} demos={DEMOS} onAdd={addSounds} label={tr('corpus.addWhole')}
       accept="audio/*,.json,.csv,application/json,text/csv" main={tr('corpus.drop')} formats={tr('corpus.dropFormats')}
       onOther={async (fs) => { const id = await importIntoCorpus(fs, corpus?.id ?? null, setStatus); if (id) set({ cur: id }); }} />
   );

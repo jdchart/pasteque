@@ -114,6 +114,8 @@ export class Transport {
   }
 
   setBuffer(buf: AudioBuffer | null) {
+    // the same sound again (a re-render, a tool focusing the item it just started) must not cut it off
+    if (buf === this.buffer) return this;
     this.stop();
     this.buffer = buf;
     this.rangeStart = 0; this.rangeEnd = null; this.position = 0;

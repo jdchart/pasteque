@@ -7,10 +7,10 @@ import { addDemo, importFiles, useSoundVersion, getSound } from '../session/soun
 import { useT } from '../i18n/react';
 import { DropZone, Status, StatusMsg } from './kit';
 
-export function SoundAdder({ ids, onAdd, demos, demoDuration, onOther, accept, main, formats }: {
+export function SoundAdder({ ids, onAdd, demos, demoDuration, onOther, accept, main, formats, label }: {
   ids: string[]; onAdd: (ids: string[]) => void; demos: string[]; demoDuration?: number;
   /** files that are not audio (a CSV, a corpus.json) go here */
-  onOther?: (files: File[]) => void; accept?: string; main?: string; formats?: string;
+  onOther?: (files: File[]) => void; accept?: string; main?: string; formats?: string; label?: string;
 }) {
   const { t } = useT();
   const sounds = useApp((s) => s.sounds);
@@ -28,7 +28,7 @@ export function SoundAdder({ ids, onAdd, demos, demoDuration, onOther, accept, m
         if (added.length) { onAdd(added.map((a) => a.id)); setStatus({ msg: t('sounds.added', { n: added.length }), kind: 'ok' }); }
         else setStatus({ msg: t('err.decode'), kind: 'bad' });
       }} />
-      <label className="field"><span className="s-label">{t('files.add')}</span>
+      <label className="field"><span className="s-label">{label || t('files.add')}</span>
         <select value="" onChange={(e) => {
           const v = e.target.value; if (!v) return;
           if (v.startsWith('demo:')) { try { onAdd([addDemo(v.slice(5), demoDuration).id]); } catch (err) { setStatus({ msg: (err as Error).message, kind: 'bad' }); } }

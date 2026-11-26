@@ -204,8 +204,8 @@ export default function Waveform({ tab }: PaneProps) {
             <select value={st.bits} onChange={(e) => set({ bits: +e.target.value })}>{BITS.map((b) => <option key={b} value={b}>{b} bits</option>)}</select>
           </Field>
           {/* one transport, two buffers: A/B the same passage at will */}
-          <button type="button" onClick={() => { tpSamp.setBuffer(file ? file.buffer : toBuffer(synthSig, SR)); tpSamp.play(); }}>{t('btn.playOrig')}</button>
-          <button type="button" onClick={() => { tpSamp.setBuffer(toBuffer(sampled.sig, sampled.sr)); tpSamp.play(); }}>{t('btn.playSamp')}</button>
+          <button type="button" onClick={() => { tpSamp.setBuffer(file ? file.buffer : toBuffer(synthSig, SR)); tpSamp.stop().play(); }}>{t('btn.playOrig')}</button>
+          <button type="button" onClick={() => { tpSamp.setBuffer(toBuffer(sampled.sig, sampled.sr)); tpSamp.stop().play(); }}>{t('btn.playSamp')}</button>
         </Controls>
         <TransportBar tp={tpSamp} />
         <Readout html={rich('samp.readout', { sr: L(st.sr), ny: L(ny), levels: L(sampled.levels) }) + alias} />
@@ -259,8 +259,8 @@ export default function Waveform({ tab }: PaneProps) {
             <select value={st.bits} onChange={(e) => set({ bits: +e.target.value })}>{BITS.map((b) => <option key={b} value={b}>{b} bits</option>)}</select>
           </Field>
           {/* one transport, two buffers: A/B the same passage at will */}
-          <button type="button" onClick={() => { tpSamp.setBuffer(file ? file.buffer : toBuffer(synthSig, SR)); tpSamp.play(); }}>{t('btn.playOrig')}</button>
-          <button type="button" onClick={() => { tpSamp.setBuffer(toBuffer(sampled.sig, sampled.sr)); tpSamp.play(); }}>{t('btn.playSamp')}</button>
+          <button type="button" onClick={() => { tpSamp.setBuffer(file ? file.buffer : toBuffer(synthSig, SR)); tpSamp.stop().play(); }}>{t('btn.playOrig')}</button>
+          <button type="button" onClick={() => { tpSamp.setBuffer(toBuffer(sampled.sig, sampled.sr)); tpSamp.stop().play(); }}>{t('btn.playSamp')}</button>
         </Controls>
         <Readout html={rich('samp.readout', { sr: L(st.sr), ny: L(ny), levels: L(sampled.levels) }) + alias} />
       </Section>

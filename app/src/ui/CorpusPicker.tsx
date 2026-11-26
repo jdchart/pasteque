@@ -91,10 +91,15 @@ function uniqueName(n: string) {
 
 export type AddResult = { corpusId: string; added: number; next: 'stay' | 'open' };
 
-function AddBody({ count, files, close, nextLabel, exclude, canReplace }: { count: number; files: number; nextLabel?: string; exclude?: string; canReplace: boolean; close: (v?: { target: string; name: string; replace: boolean; next: 'stay' | 'open' } | null) => void }) {
+function AddBody({ count, files, close, nextLabel, exclude, canReplace, soundIds }: { count: number; files: number; nextLabel?: string; exclude?: string; canReplace: boolean; soundIds: string[]; close: (v?: { target: string; name: string; replace: boolean; next: 'stay' | 'open' } | null) => void }) {
   const { t } = useT();
   const corpora = useCorpora().filter((c) => c.id !== exclude);
-  const [target, setTarget] = useState<string>(corpora.length ? corpora[corpora.length - 1].id : NEW);
+  // a new corpus, unless one already holds these sounds (re-segmenting): never silently into an unrelated one
+  const [target, setTarget] = useState<string>(() => {
+    if (!canReplace) return NEW;
+    const prev = [...corpora].reverse().find((c) => c.entries.some((e) => soundIds.includes(e.soundId) && e.origin === 'segmentation'));
+    return prev ? prev.id : NEW;
+  });
   const [name, setName] = useState(freshName());
   const [replace, setReplace] = useState(true);
   const submit = (next: 'stay' | 'open') => close({ target, name, replace, next });
@@ -136,7 +141,7 @@ export async function addToCorpusDialog(entries: CorpusEntry[], opts: {
   const files = new Set(entries.map((e) => e.soundId || e.file)).size;
   const r = await openDialog<{ target: string; name: string; replace: boolean; next: 'stay' | 'open' } | null>({
     title: opts.title || tr('corpus.addTitle'), dismissValue: null,
-    render: (close) => <AddBody count={entries.length} files={files} nextLabel={opts.nextLabel} exclude={opts.exclude} canReplace={opts.canReplace !== false} close={close} />,
+    render: (close) => <AddBody count={entries.length} files={files} nextLabel={opts.nextLabel} exclude={opts.exclude} canReplace={opts.canReplace !== false} soundIds={Array.from(new Set(entries.map((e) => e.soundId).filter(Boolean)))} close={close} />,
   });
   if (!r) return null;
   let id = r.target;
@@ -172,7 +177,7 @@ export function CorpusInput({ value, onChange, lesson, demos, onImported }: {
   return (
     <div className="corpus-input">
       <CorpusPicker value={value} onChange={onChange} />
-      <SoundAdder ids={ids} demos={demos}
+      <SoundAdder ids={ids} demos={demos} label={t('corpus.addWhole')}
         accept="audio/*,.json,.csv,application/json,text/csv" main={t('corpus.drop')} formats={t('corpus.dropFormats')}
         onOther={async (fs) => { const id = await importIntoCorpus(fs, value && getCorpus(value) ? value : null, setStatus); if (id) { onChange(id); onImported?.(); } }}
         onAdd={(sids) => {

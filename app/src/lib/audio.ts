@@ -18,7 +18,7 @@ export function ctx(): AudioContext {
     if (!C) throw new Error(tr('err.noWebAudio'));
     audioCtx = new C();
   }
-  if (audioCtx.state === 'suspended') void audioCtx.resume();
+  if (audioCtx.state !== 'running' && audioCtx.state !== 'closed') void audioCtx.resume().catch(() => { /* needs a gesture */ });
   return audioCtx;
 }
 
@@ -126,6 +126,7 @@ export function release(src: AudioBufferSourceNode) {
 }
 
 export function stop() {
+  stopTriggers();
   const owner = currentOwner;
   currentOwner = null;
   if (currentSource) {
@@ -153,6 +154,13 @@ export function playRange(buffer: AudioBuffer, start?: number, end?: number, onE
   return src;
 }
 
+/** The voices of trigger(): overlapping is allowed, a pile-up is not. */
+const voices: { src: AudioBufferSourceNode; g: GainNode }[] = [];
+const MAX_VOICES = 6;
+export function stopTriggers() {
+  for (const v of voices.splice(0)) { try { v.src.stop(); } catch { /* already stopped */ } }
+}
+
 /** Fire-and-forget playback of a slice, overlapping allowed (for the map). */
 export function trigger(buffer: AudioBuffer, start?: number, end?: number, gain?: number) {
   const c = ctx();
@@ -167,6 +175,13 @@ export function trigger(buffer: AudioBuffer, start?: number, end?: number, gain?
   g.gain.setValueAtTime(level, now + d - fade);
   g.gain.linearRampToValueAtTime(0, now + d);
   src.connect(g); g.connect(master());
+  // too many at once: the oldest fades out quickly
+  while (voices.length >= MAX_VOICES) {
+    const old = voices.shift()!;
+    try { old.g.gain.cancelScheduledValues(now); old.g.gain.setTargetAtTime(0, now, 0.01); old.src.stop(now + 0.05); } catch { /* already stopped */ }
+  }
+  const v = { src, g }; voices.push(v);
+  src.onended = () => { const k = voices.indexOf(v); if (k >= 0) voices.splice(k, 1); };
   src.start(now, s, d);
   return src;
 }
