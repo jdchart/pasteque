@@ -8,6 +8,7 @@
 
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 import { Lang, setLangCore } from '../i18n/core';
+import type { Corpus } from './corpora';
 
 export type Theme = 'auto' | 'light' | 'dark';
 export type HomeView = 'home' | 'learn' | 'sandbox' | 'about' | `course:${string}`;
@@ -29,6 +30,8 @@ export type AppState = {
   name: string; dirty: boolean; savedAt: string | null;
   tabs: Tab[]; active: string; homeView: HomeView;
   sounds: SoundMeta[];
+  /** the corpora shared by the corpus tools (session/corpora.ts) */
+  corpora: Corpus[];
   tools: Record<string, unknown>;
   /** bumped when everything drawn must be redrawn (theme, OS scheme, text size) */
   epoch: number;
@@ -41,7 +44,7 @@ export function freshState(keep?: Pick<AppState, 'lang' | 'theme' | 'textScale' 
     lang: keep?.lang ?? initialLang(), theme: keep?.theme ?? 'auto', textScale: keep?.textScale ?? 1, hints: keep?.hints ?? true,
     name: '', dirty: false, savedAt: null,
     tabs: [], active: 'home', homeView: 'home',
-    sounds: [], tools: {}, epoch: 0,
+    sounds: [], corpora: [], tools: {}, epoch: 0,
   };
 }
 

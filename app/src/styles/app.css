@@ -603,3 +603,20 @@ button.wb-q.on { background: var(--s-ink); color: var(--s-paper); border-color: 
 .wb-side .seg { display: grid; grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)); border-radius: var(--s-radius); width: 100%; }
 .wb-side .seg button { border-radius: 5px; padding: 6px 6px; white-space: normal; line-height: 1.2; }
 .wb-pane-foot .seg { border-radius: var(--s-radius); }
+
+/* corpus tool and corpus inputs */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.table input[type="number"].num { padding: 2px 4px; font-size: .74rem; width: 8ch; text-align: right; }
+.table td input[type="checkbox"], .table th input[type="checkbox"] { margin: 0; }
+.corpus-wave canvas { cursor: crosshair; }
+.wb-pane-foot.corpus-top { border-top: 0; border-bottom: 1px solid var(--s-rule); }
+.corpus-bar { align-items: end; }
+.corpus-bar .field input[type="text"] { width: 16ch; }
+.corpus-input { display: flex; flex-direction: column; gap: 8px; }
+.corpus-input .readout { margin: 0; }
+/* sound map: several points picked */
+.cs-pickrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font: .74rem var(--s-ui); margin: 6px 0; }
+.wb-pane-foot.cs-pickrow { margin: 0; }
+.cs-picks { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cs-picks b { color: var(--s-accent); font-weight: 600; }
+.map canvas { cursor: crosshair; }

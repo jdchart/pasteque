@@ -1,8 +1,8 @@
 /* Segmentation — port of ats-segmentation.html.
    Several files, cut where the spectral flux peaks; sensitivity and minimum
    gap; labels that survive re-cutting; a table to listen, label and keep;
-   segments.csv and one WAV per segment. New here: the kept segments can be
-   sent straight to the batch description tab. */
+   segments.csv and one WAV per segment. New here: the kept segments join a
+   session corpus (session/corpora.ts), which batch description describes. */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { findLesson, findTool } from '../catalog';
@@ -24,8 +24,8 @@ import { Novelty, Odf, ODFS, OnsetCurves, onsetCurves, onsetNovelty, SSM_DESCRIP
 import * as audio from '../lib/audio';
 import { csvRows, saveWav } from '../lib/io';
 import { fmtTime } from '../lib/fmt';
-import { log } from '../lib/log';
-import { toast } from '../ui/dialogs';
+import { addToCorpusDialog } from '../ui/CorpusPicker';
+import { getCorpus, newEntry } from '../session/corpora';
 import { openItem } from '../shell/nav';
 import { S } from './Segmentation.strings';
 
@@ -269,14 +269,18 @@ export default function Segmentation({ tab }: PaneProps) {
     next();
     setExpStatus({ msg: t('st.wavAll', { n: rows.length }), kind: 'ok' });
   };
-  const sendToBatch = () => {
+  /** The kept segments join a session corpus; from there, batch description (or the corpus tool). */
+  const sendToCorpus = async () => {
     const rows = kept();
     if (!rows.length) { setExpStatus({ msg: t('st.none'), kind: 'bad' }); return; }
-    const ids = Array.from(new Set(rows.map((r) => r.soundId)));
-    setToolState(lesson ? 'lesson:batch' : 'batch', { soundIds: ids, segs: rows.map((r) => ({ soundId: r.soundId, start: r.start, end: r.end, label: r.label })), inbox: Date.now(), inboxFrom: 'segmentation' });
-    const msg = tr('pipe.sentBatch', { n: rows.length, files: ids.length });
-    log.ok(msg); toast(msg, 'ok');
-    openItem(lesson ? 'lesson' : 'tool', 'batch');
+    const r = await addToCorpusDialog(rows.map((x) => newEntry({ soundId: x.soundId, file: x.file, start: x.start, end: x.end, label: x.label, origin: 'segmentation' })),
+      { nextLabel: tr('pipe.toCorpusNext') });
+    if (!r) return;
+    setExpStatus({ msg: tr('corpus.added', { n: r.added, name: getCorpus(r.corpusId)?.name || '' }), kind: 'ok' });
+    if (r.next === 'open') {
+      setToolState(lesson ? 'lesson:batch' : 'batch', { corpusId: r.corpusId });
+      openItem(lesson ? 'lesson' : 'tool', 'batch');
+    }
   };
 
   const marks = segs && sound ? segs.slice(1).map((s) => s.start / sound.buffer.duration) : [];
@@ -529,7 +533,7 @@ export default function Segmentation({ tab }: PaneProps) {
           <Controls>
             {exportBtns}
             <span className="grow" />
-            <button type="button" className="primary" onClick={sendToBatch} title={t('pipe.hint')}>{t('pipe.toBatch')}</button>
+            <button type="button" className="primary" onClick={() => void sendToCorpus()} title={t('pipe.hint')}>{t('pipe.toCorpus')}</button>
           </Controls>
           {table}
           <Status s={expStatus} />
@@ -569,7 +573,7 @@ export default function Segmentation({ tab }: PaneProps) {
         <Pane id="segments" title={t('s4.title')} weight={1.6} flush
           actions={ready ? <>
             {exportBtns}
-            <button type="button" className="primary" onClick={sendToBatch} title={t('pipe.hint')}>{t('pipe.toBatch')}</button>
+            <button type="button" className="primary" onClick={() => void sendToCorpus()} title={t('pipe.hint')}>{t('pipe.toCorpus')}</button>
           </> : null}>
           {ready ? (
             <>

@@ -16,7 +16,8 @@ L’application (menu Session / Apprendre / Bac à sable, onglets) s’ouvre à 
 | Descripteurs audio | Prédire puis mesurer intensité, hauteur, centroïde, planéité, MFCC… |
 | Atelier spectral | Séparer harmonique / percussif, tonal / transitoires / résidu, NMF, réduction de bruit, sélection temporelle et masque dessiné sur le spectrogramme ; chaque couche s’écoute, s’exporte en WAV ou rejoint les sons de la session |
 | Segmentation | Couper par flux spectral, détection d’attaques (flux log, HFC, domaine complexe, énergie), transitoires, ou matrice d’auto-similarité (spectre, MFCC, chroma, descripteurs au choix) ; forme d’onde avec segments numérotés |
-| Description par lot | Décrire un corpus, trier, réécouter |
+| Corpus | Les corpus de la session : segments de la segmentation, sons entiers, passages choisis à la main sur la forme d’onde, corpus.json / segments.csv importés ; renommer, recouper, retirer, copier entre corpus, fusionner ; export JSON, CSV, WAV |
+| Description par lot | Décrire un corpus de la session (la description est gardée dans le corpus), trier, réécouter |
 | Carte sonore | Projeter le corpus par PCA, MDS, Isomap, t-SNE, UMAP ou deux descripteurs, puis le jouer |
 
 Chaque outil existe en version guidée (Apprendre) et en version application (Bac à sable), avec les mêmes méthodes.

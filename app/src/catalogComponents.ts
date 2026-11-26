@@ -14,6 +14,7 @@ export const COMPONENTS: Record<string, C> = {
   'tool:descriptors': lazy(() => import('./tools/Descriptors')),
   'tool:spectral': lazy(() => import('./tools/Spectral')),
   'tool:segmentation': lazy(() => import('./tools/Segmentation')),
+  'tool:corpus': lazy(() => import('./tools/Corpus')),
   'tool:batch': lazy(() => import('./tools/Batch')),
   'tool:soundmap': lazy(() => import('./tools/SoundMap')),
   // the guided versions: same components, paged layout (they read tab.kind)
@@ -23,6 +24,7 @@ export const COMPONENTS: Record<string, C> = {
   'lesson:descriptors': lazy(() => import('./tools/Descriptors')),
   'lesson:spectral': lazy(() => import('./tools/Spectral')),
   'lesson:segmentation': lazy(() => import('./tools/Segmentation')),
+  'lesson:corpus': lazy(() => import('./tools/Corpus')),
   'lesson:batch': lazy(() => import('./tools/Batch')),
   'lesson:soundmap': lazy(() => import('./tools/SoundMap')),
   'lesson:descriptor-guide': lazy(() => import('./learn/DescriptorGuide')),

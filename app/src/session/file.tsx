@@ -6,6 +6,7 @@
      "prefs":     { lang, theme, textScale, hints },
      "workspace": { tabs, active, homeView },
      "sounds":    [ SoundMeta … ],          // demos carry their recipe
+     "corpora":   [ Corpus … ],             // shared by the corpus tools (session/corpora.ts)
      "tools":     { <toolId>: { … } },      // each tool's own serialisable state
      "audio":     { <soundId>: "<base64 of the original file>" }   // optional
    }
@@ -22,6 +23,7 @@ import { alertDialog, confirmDialog, openDialog, promptDialog, toast } from '../
 import { AppState, freshState, getState, replaceState, setState, SoundMeta } from './store';
 import { clearSounds, getSoundBytes, importFiles, relink, removeSound, restoreSounds, useSoundVersion, getSound } from './sounds';
 import { useT } from '../i18n/react';
+import { Corpus, migrateTools } from './corpora';
 import { useApp } from './store';
 import { fmtTime } from '../lib/fmt';
 
@@ -32,7 +34,7 @@ type SessionFile = {
   format: string; version: number; saved?: string; name?: string;
   prefs?: Partial<Pick<AppState, 'lang' | 'theme' | 'textScale' | 'hints'>>;
   workspace?: Partial<Pick<AppState, 'tabs' | 'active' | 'homeView'>>;
-  sounds?: SoundMeta[]; tools?: Record<string, unknown>; audio?: Record<string, string>;
+  sounds?: SoundMeta[]; corpora?: Corpus[]; tools?: Record<string, unknown>; audio?: Record<string, string>;
 };
 
 function embeddableSize(): number {
@@ -46,6 +48,7 @@ export function buildSession(name: string, embed: boolean): string {
     prefs: { lang: s.lang, theme: s.theme, textScale: s.textScale, hints: s.hints },
     workspace: { tabs: s.tabs, active: s.active, homeView: s.homeView },
     sounds: s.sounds.map(({ missing, ...m }) => m), // eslint-disable-line @typescript-eslint/no-unused-vars
+    corpora: s.corpora,
     tools: s.tools,
   };
   if (embed) {
@@ -129,10 +132,11 @@ export async function openSession(file?: File) {
     active: data.workspace?.active || 'home',
     homeView: data.workspace?.homeView || 'home',
     sounds: [], tools: data.tools && typeof data.tools === 'object' ? data.tools : {},
+    corpora: Array.isArray(data.corpora) ? data.corpora : [],
     dirty: false, savedAt: data.saved || null,
   };
   if (!next.tabs.some((t) => t.id === next.active)) next.active = 'home';
-  replaceState(next);
+  replaceState(migrateTools(next));
   const embedded: Record<string, ArrayBuffer> = {};
   for (const [id, b64] of Object.entries(data.audio || {})) {
     try { embedded[id] = base64ToBytes(b64); } catch { /* left missing */ }
