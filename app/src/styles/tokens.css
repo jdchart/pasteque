@@ -1,0 +1,78 @@
+/* The suite's visual identity (scribe/scribe/suite/suite.css, canonical copy
+   there): white paper on a grey desk, a monospaced instrument around a serif
+   text, ink-edged cards with a small hard shadow, pills for choices, inverted
+   ink for "on", one ultramarine signal, highlighter yellow for marks.
+   Below the tokens, the names the original Atelier drawing code reads
+   (--accent, --line, --ink-soft…) are mapped onto them. */
+
+@font-face { font-family: "JetBrains Mono"; src: url("../assets/fonts/JetBrainsMono-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("../assets/fonts/JetBrainsMono-SemiBold.ttf") format("truetype"); font-weight: 500 700; font-display: swap; }
+
+:root {
+  --s-bg: #e9e9e6; --s-paper: #ffffff; --s-paper-2: #f5f5f2;
+  --s-rule: #e1e1dc; --s-rule-strong: #b8b8b2;
+  --s-ink: #0e0e0e; --s-muted: #5f5f5c; --s-faint: #a2a29d;
+  --s-edge: #0e0e0e;
+  --s-accent: #2232d0; --s-accent-soft: #e5e7fc; --s-on-accent: #ffffff;
+  --s-ochre: #9a7400; --s-ochre-soft: #fff1a6;
+  --s-ins: #11804a; --s-ins-soft: #dff3e6; --s-del: #d8331f; --s-del-soft: #fde5e1;
+  --s-hl-soft: #fff1a6; --s-warn: #b07400; --s-danger: #d8331f; --s-ok: #12a150;
+  --s-ui: "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --s-sans: var(--s-ui);
+  --s-serif: "Iowan Old Style", "Charter", "Palatino", "Book Antiqua", Georgia, serif;
+  --s-display: "Iowan Old Style", "Charter", "Palatino", Georgia, serif;
+  --s-mono: var(--s-ui);
+  --s-radius: 7px; --s-pill: 999px; --s-edge-w: 1.5px;
+  --s-card-shadow: 3px 3px 0 rgba(0, 0, 0, .13);
+  --s-card-shadow-hi: 5px 5px 0 rgba(0, 0, 0, .16);
+  --s-shadow: 4px 4px 0 rgba(0, 0, 0, .14);
+  --ui-scale: 1;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --s-bg: #000000; --s-paper: #0f0f0f; --s-paper-2: #161616;
+    --s-rule: #242424; --s-rule-strong: #3d3d3d;
+    --s-ink: #f0f0ee; --s-muted: #8d8d89; --s-faint: #565654; --s-edge: #8d8d89;
+    --s-accent: #8f9bff; --s-accent-soft: #191c3a; --s-on-accent: #000000;
+    --s-ochre: #e6c440; --s-ochre-soft: #2f2a10;
+    --s-ins: #4fd08a; --s-ins-soft: #0e2a1a; --s-del: #ff6b5a; --s-del-soft: #3a1511;
+    --s-hl-soft: #3a3312; --s-warn: #e6a640; --s-danger: #ff6b5a; --s-ok: #2fce6a;
+    --s-card-shadow: 3px 3px 0 rgba(255, 255, 255, .09);
+    --s-card-shadow-hi: 5px 5px 0 rgba(255, 255, 255, .12);
+    --s-shadow: 4px 4px 0 rgba(255, 255, 255, .1);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --s-bg: #000000; --s-paper: #0f0f0f; --s-paper-2: #161616;
+  --s-rule: #242424; --s-rule-strong: #3d3d3d;
+  --s-ink: #f0f0ee; --s-muted: #8d8d89; --s-faint: #565654; --s-edge: #8d8d89;
+  --s-accent: #8f9bff; --s-accent-soft: #191c3a; --s-on-accent: #000000;
+  --s-ochre: #e6c440; --s-ochre-soft: #2f2a10;
+  --s-ins: #4fd08a; --s-ins-soft: #0e2a1a; --s-del: #ff6b5a; --s-del-soft: #3a1511;
+  --s-hl-soft: #3a3312; --s-warn: #e6a640; --s-danger: #ff6b5a; --s-ok: #2fce6a;
+  --s-card-shadow: 3px 3px 0 rgba(255, 255, 255, .09);
+  --s-card-shadow-hi: 5px 5px 0 rgba(255, 255, 255, .12);
+  --s-shadow: 4px 4px 0 rgba(255, 255, 255, .1);
+  color-scheme: dark;
+}
+
+/* the Atelier names, read by the canvas code at draw time */
+body {
+  --bg: var(--s-bg); --panel: var(--s-paper); --sunken: var(--s-paper-2);
+  --ink: var(--s-ink); --ink-soft: var(--s-muted);
+  --line: var(--s-rule); --line-firm: var(--s-rule-strong);
+  --accent: var(--s-accent); --accent-bg: var(--s-accent-soft);
+  --ok: var(--s-ok); --warn: var(--s-warn); --bad: var(--s-danger);
+  --mono: var(--s-ui); --sans: var(--s-ui);
+}
+
+.s-label { font: 500 10px/1.3 var(--s-ui); text-transform: uppercase; letter-spacing: .14em; color: var(--s-muted); }
+.s-card { background: var(--s-paper); border: var(--s-edge-w) solid var(--s-edge); border-radius: var(--s-radius); box-shadow: var(--s-card-shadow); }
+.s-ruler {
+  height: 6px; flex: none; border-bottom: 1px solid var(--s-rule);
+  background: repeating-linear-gradient(90deg, var(--s-rule-strong) 0 1px, transparent 1px 8px) bottom / 100% 3px no-repeat,
+              repeating-linear-gradient(90deg, var(--s-rule-strong) 0 1px, transparent 1px 80px) bottom / 100% 6px no-repeat;
+}
+.s-brand { font: italic 400 19px/1 var(--s-display); letter-spacing: -.01em; color: var(--s-ink); }
