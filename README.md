@@ -6,6 +6,21 @@ Leçons et outils interactifs d’écoute et d’analyse sonore pour les étudia
 
 L’application (menu Session / Apprendre / Bac à sable, onglets) s’ouvre à la racine. **Apprendre** présente les cours, module par module, avec chaque outil en version guidée (la mise en page des pages d’origine) ; le **Bac à sable** propose les mêmes outils en version application, sans le récit. Tout est calculé dans le navigateur ; le seul moyen de garder son travail est d’**enregistrer la session** (un fichier `.pasteque.json` à télécharger, puis à rouvrir). Rien n’est conservé dans le navigateur.
 
+## Les outils
+
+| Outil | Ce qu’on y fait |
+|---|---|
+| Forme d’onde et échantillonnage | Amplitude, période, échantillons, repliement |
+| Synthèse additive | Empiler des sinusoïdes jusqu’au timbre |
+| Bac à sable FFT | La fenêtre d’analyse comme variable |
+| Descripteurs audio | Prédire puis mesurer intensité, hauteur, centroïde, planéité, MFCC… |
+| Atelier spectral | Séparer harmonique / percussif, tonal / transitoires / résidu, NMF, réduction de bruit, sélection temporelle et masque dessiné sur le spectrogramme ; chaque couche s’écoute, s’exporte en WAV ou rejoint les sons de la session |
+| Segmentation | Couper par flux spectral, détection d’attaques (flux log, HFC, domaine complexe, énergie), transitoires, ou matrice d’auto-similarité (spectre, MFCC, chroma, descripteurs au choix) ; forme d’onde avec segments numérotés |
+| Description par lot | Décrire un corpus, trier, réécouter |
+| Carte sonore | Projeter le corpus par PCA, MDS, Isomap, t-SNE, UMAP ou deux descripteurs, puis le jouer |
+
+Chaque outil existe en version guidée (Apprendre) et en version application (Bac à sable), avec les mêmes méthodes.
+
 ## Pages classiques (anciennes adresses, toujours en ligne)
 
 | Outil | Page |
